@@ -10,6 +10,9 @@ test("playwright renders the canonical.cloud landing page", async (t) => {
   const browser = await chromium.launch({
     executablePath: chromeExecutablePath(),
     headless: true,
+    // --no-sandbox: CI runners drive Chrome as root, where the sandbox refuses
+    // to start; harmless locally.
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   t.after(() => browser.close());
 
