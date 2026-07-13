@@ -1,5 +1,5 @@
 {
-  description = "canonical-frontend development environment";
+  description = "canonical-marketing-site.web development environment";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -40,7 +40,7 @@
               export PUPPETEER_SKIP_DOWNLOAD=1
               export PUPPETEER_EXECUTABLE_PATH="${pkgs.chromium}/bin/chromium"
               export PLAYWRIGHT_CHROMIUM="${pkgs.chromium}/bin/chromium"
-              echo "canonical-frontend dev shell (${system})"
+              echo "canonical-marketing-site.web dev shell (${system})"
             '';
           };
         });

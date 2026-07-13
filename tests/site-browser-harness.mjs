@@ -1,8 +1,8 @@
 // Self-contained boot recipe for the marketing-site browser e2e.
 //
-// canonical-frontend has no shared test-config package, so Chrome discovery and
-// the `astro preview` server lifecycle both live here, next to the specs that
-// use them.
+// canonical-marketing-site.web has no shared test-config package, so Chrome
+// discovery and the `astro preview` server lifecycle both live here, next to
+// the specs that use them.
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import net from "node:net";

@@ -1,9 +1,9 @@
-# canonical-frontend
+# canonical-marketing-site.web
 
 [Astro](https://astro.build) marketing site for
 **[canonical.cloud](https://canonical.cloud)** — SOC 2, FedRAMP & HIPAA
 compliance audits. Built to a static `dist/` and served in production by
-[`canonical-backend.rs`](https://github.com/canonical-cloud/canonical-backend.rs).
+[`canonical-web-server.rs`](https://github.com/canonical-cloud/canonical-web-server.rs).
 
 Part of the [`canonical-monorepo`](https://github.com/canonical-cloud/canonical-monorepo)
 superproject; also usable standalone.
@@ -35,11 +35,11 @@ npm run build         # -> dist/
 npm run preview       # serve the built dist/
 ```
 
-Wire the build into the backend for a full local stack:
+Wire the build into the web server for a full local stack:
 
 ```sh
 npm run build
-STATIC_DIR=$PWD/dist  (cd ../canonical-backend.rs && cargo run)
+STATIC_DIR=$PWD/dist  (cd ../canonical-web-server.rs && cargo run)
 ```
 
 ## Test

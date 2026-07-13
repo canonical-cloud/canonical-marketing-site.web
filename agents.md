@@ -1,8 +1,8 @@
-# Agent guidelines — canonical-frontend
+# Agent guidelines — canonical-marketing-site.web
 
 [Astro](https://astro.build) marketing site for **canonical.cloud** (SOC 2,
 FedRAMP & HIPAA compliance audits). Static build; served in production by
-`canonical-backend.rs` out of its `static/` dir.
+`canonical-web-server.rs` out of its `static/` dir.
 
 ## Layout
 
