@@ -30,11 +30,11 @@ jobs:
       # Astro production build — the gating step.
       - run: npm run build
 
-  # Browser e2e (Playwright + Puppeteer) needs a real Chrome, so it is
-  # best-effort only.
+  # Browser e2e (Playwright + Puppeteer). Blocking: the runner installs its
+  # own Chromium via `playwright install --with-deps`, so there is no
+  # missing-browser excuse; a red run means the site actually regressed.
   browser-e2e:
     runs-on: ubuntu-latest
-    continue-on-error: true
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
