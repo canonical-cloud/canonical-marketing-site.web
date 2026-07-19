@@ -12,6 +12,7 @@ test("Pages deploys only a successful, tested main-branch commit", () => {
   assert.match(pagesWorkflow, /types: \[completed\]/);
   assert.match(pagesWorkflow, /branches: \[main\]/);
   assert.doesNotMatch(pagesWorkflow, /\n\s+push:\s*\n/);
+  assert.doesNotMatch(pagesWorkflow, /workflow_dispatch:/);
   assert.match(
     pagesWorkflow,
     /workflow_run\.conclusion == 'success'/,
@@ -20,7 +21,7 @@ test("Pages deploys only a successful, tested main-branch commit", () => {
   assert.match(pagesWorkflow, /workflow_run\.head_branch == 'main'/);
   assert.match(
     pagesWorkflow,
-    /ref: \$\{\{ github\.event\.workflow_run\.head_sha \|\| github\.sha \}\}/,
+    /ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/,
   );
 });
 
