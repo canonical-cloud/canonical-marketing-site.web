@@ -63,6 +63,17 @@ test("static image supplies the same defensive headers as the server fallback", 
   assert.doesNotMatch(nginx, /script-src 'self' 'unsafe-inline'/);
 });
 
+test("production image inputs are pinned and test browsers never enter the artifact", async () => {
+  const dockerfile = await readFile(new URL("../Dockerfile", import.meta.url), "utf8");
+
+  assert.match(dockerfile, /^FROM node:22-slim@sha256:[0-9a-f]{64} AS build$/m);
+  assert.match(dockerfile, /^FROM nginx:1\.27-alpine@sha256:[0-9a-f]{64}$/m);
+  assert.match(dockerfile, /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1/);
+  assert.match(dockerfile, /PUPPETEER_SKIP_DOWNLOAD=true/);
+  assert.match(dockerfile, /^RUN npm ci$/m);
+  assert.doesNotMatch(dockerfile, /npm ci\s*\|\|\s*npm install/);
+});
+
 test("layout keeps base-aware links so the site works behind a gateway prefix", () => {
   assert.match(layout, /import\.meta\.env\.BASE_URL/);
   assert.match(layout, /const homeHref = /);
