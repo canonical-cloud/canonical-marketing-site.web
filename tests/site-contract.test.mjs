@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 const page = await readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8");
 const layout = await readFile(new URL("../src/layouts/BaseLayout.astro", import.meta.url), "utf8");
 const globalCss = await readFile(new URL("../src/styles/global.css", import.meta.url), "utf8");
+const siteScript = await readFile(new URL("../public/site.js", import.meta.url), "utf8");
 
 test("landing page keeps the compliance services visible", () => {
   for (const label of [
@@ -62,6 +63,17 @@ test("static image supplies the same defensive headers as the server fallback", 
   assert.doesNotMatch(nginx, /script-src 'self' 'unsafe-inline'/);
 });
 
+test("production image inputs are pinned and test browsers never enter the artifact", async () => {
+  const dockerfile = await readFile(new URL("../Dockerfile", import.meta.url), "utf8");
+
+  assert.match(dockerfile, /^FROM node:22-slim@sha256:[0-9a-f]{64} AS build$/m);
+  assert.match(dockerfile, /^FROM nginx:1\.27-alpine@sha256:[0-9a-f]{64}$/m);
+  assert.match(dockerfile, /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1/);
+  assert.match(dockerfile, /PUPPETEER_SKIP_DOWNLOAD=true/);
+  assert.match(dockerfile, /^RUN npm ci$/m);
+  assert.doesNotMatch(dockerfile, /npm ci\s*\|\|\s*npm install/);
+});
+
 test("layout keeps base-aware links so the site works behind a gateway prefix", () => {
   assert.match(layout, /import\.meta\.env\.BASE_URL/);
   assert.match(layout, /const homeHref = /);
@@ -79,4 +91,19 @@ test("nav exposes the section links", () => {
   for (const label of ["Services", "Process", "Frameworks", "About"]) {
     assert.ok(layout.includes(`>${label}<`), `missing nav link: ${label}`);
   }
+});
+
+test("mobile navigation has a real open state and synchronized accessibility state", () => {
+  assert.match(globalCss, /\.nav \.nav__links\.nav__links--open\s*\{/);
+  assert.match(globalCss, /min-height:\s*44px/);
+  assert.match(globalCss, /:focus-visible/);
+  assert.match(globalCss, /prefers-reduced-motion:\s*reduce/);
+
+  assert.match(siteScript, /setAttribute\('aria-controls', links\.id\)/);
+  assert.match(siteScript, /setAttribute\('aria-expanded', String\(nextOpen\)\)/);
+  assert.match(siteScript, /Open navigation/);
+  assert.match(siteScript, /Close navigation/);
+  assert.match(siteScript, /event\.key === 'Escape'/);
+  assert.match(siteScript, /restoreFocus:\s*true/);
+  assert.match(siteScript, /matchMedia\('\(max-width: 768px\)'\)/);
 });

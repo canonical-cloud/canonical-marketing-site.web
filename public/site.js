@@ -1,18 +1,53 @@
 const nav = document.getElementById('main-nav');
 
 if (nav) {
-  window.addEventListener('scroll', () => {
-    nav.style.borderBottomColor = window.scrollY > 10
-      ? 'rgba(255,255,255,0.1)'
-      : 'rgba(255,255,255,0.06)';
-  });
+  window.addEventListener(
+    'scroll',
+    () => {
+      nav.style.borderBottomColor = window.scrollY > 10
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(255,255,255,0.06)';
+    },
+    { passive: true },
+  );
 }
 
 const toggle = document.getElementById('nav-toggle');
 const links = document.getElementById('nav-links');
+const mobileNavigation = window.matchMedia('(max-width: 768px)');
 
 if (toggle && links) {
+  toggle.type = 'button';
+  toggle.setAttribute('aria-controls', links.id);
+
+  const setNavigationOpen = (open, { restoreFocus = false } = {}) => {
+    const nextOpen = Boolean(open && mobileNavigation.matches);
+    links.classList.toggle('nav__links--open', nextOpen);
+    toggle.setAttribute('aria-expanded', String(nextOpen));
+    toggle.setAttribute('aria-label', nextOpen ? 'Close navigation' : 'Open navigation');
+
+    if (restoreFocus) {
+      toggle.focus();
+    }
+  };
+
+  setNavigationOpen(false);
+
   toggle.addEventListener('click', () => {
-    links.classList.toggle('nav__links--open');
+    setNavigationOpen(toggle.getAttribute('aria-expanded') !== 'true');
   });
+
+  links.addEventListener('click', (event) => {
+    if (event.target instanceof HTMLAnchorElement) {
+      setNavigationOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      setNavigationOpen(false, { restoreFocus: true });
+    }
+  });
+
+  mobileNavigation.addEventListener('change', () => setNavigationOpen(false));
 }
