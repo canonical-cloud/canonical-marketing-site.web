@@ -46,6 +46,7 @@ test("live browser smoke is external-signal isolation, not a PR gate", () => {
   assert.doesNotMatch(liveBrowserWorkflow, /workflow_run:/);
   assert.match(liveBrowserWorkflow, /permissions:\s*\n\s+contents: read/);
   assert.match(liveBrowserWorkflow, /group: live-browser-smoke/);
+  assert.doesNotMatch(liveBrowserWorkflow, /\$\{\{\s*secrets(?:\.|\[)/);
 });
 
 test("live browser smoke is lockfile-strict and executes the deployed policy", () => {
@@ -60,4 +61,24 @@ test("live browser smoke is lockfile-strict and executes the deployed policy", (
     liveBrowserWorkflow,
     /tests\/container-security-playwright\.test\.mjs/,
   );
+});
+
+test("live browser diagnostics are immutable, failure-only, and short-lived", () => {
+  assert.match(
+    liveBrowserWorkflow,
+    /CANONICAL_BROWSER_ARTIFACT_DIR: artifacts\/live-browser-smoke/,
+  );
+  assert.match(
+    liveBrowserWorkflow,
+    /if: failure\(\)\s*\n\s*uses: actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/,
+  );
+  assert.doesNotMatch(liveBrowserWorkflow, /if: always\(\)/);
+  assert.equal(
+    liveBrowserWorkflow.match(/actions\/upload-artifact@/g)?.length,
+    1,
+  );
+  assert.match(liveBrowserWorkflow, /path: artifacts\/live-browser-smoke/);
+  assert.match(liveBrowserWorkflow, /if-no-files-found: error/);
+  assert.match(liveBrowserWorkflow, /retention-days: 14/);
+  assert.doesNotMatch(liveBrowserWorkflow, /include-hidden-files:\s*true/);
 });

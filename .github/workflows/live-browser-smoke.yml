@@ -24,6 +24,7 @@ jobs:
       PUPPETEER_SKIP_DOWNLOAD: "true"
       CANONICAL_REQUIRE_SECURITY_HEADERS: "1"
       CANONICAL_SITE_TEST_URL: https://canonical.cloud
+      CANONICAL_BROWSER_ARTIFACT_DIR: artifacts/live-browser-smoke
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -40,3 +41,11 @@ jobs:
         run: >-
           node --test --test-timeout=120000
           tests/container-security-playwright.test.mjs
+      - name: Upload bounded browser evidence
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: canonical-live-browser-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/live-browser-smoke
+          if-no-files-found: error
+          retention-days: 14
