@@ -12,6 +12,18 @@ if (nav) {
   );
 }
 
+const skipLink = document.querySelector('.skip-link');
+const mainContent = document.getElementById('main-content');
+
+if (skipLink instanceof HTMLAnchorElement && mainContent instanceof HTMLElement) {
+  skipLink.addEventListener('click', () => {
+    // The native fragment remains the navigation authority. Explicit focus
+    // makes the destination deterministic across Chromium and assistive-tech
+    // combinations while the static link still works without JavaScript.
+    mainContent.focus({ preventScroll: true });
+  });
+}
+
 const toggle = document.getElementById('nav-toggle');
 const links = document.getElementById('nav-links');
 const mobileNavigation = window.matchMedia('(max-width: 768px)');

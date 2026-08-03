@@ -93,11 +93,27 @@ test("nav exposes the section links", () => {
   }
 });
 
+test("skip navigation and named landmarks exist before JavaScript runs", () => {
+  assert.match(layout, /<a class="skip-link" href="#main-content">Skip to main content<\/a>/);
+  assert.match(layout, /<nav class="nav" id="main-nav" aria-label="Primary navigation">/);
+  assert.match(layout, /<main id="main-content" tabindex="-1">/);
+  assert.match(layout, /<nav class="footer__columns" aria-label="Footer navigation">/);
+  assert.match(layout, /\.skip-link:focus-visible\s*\{/);
+  assert.match(layout, /#main-content:focus-visible\s*\{/);
+  assert.match(layout, /aria-hidden="true" focusable="false"/);
+  assert.match(siteScript, /mainContent\.focus\(\{ preventScroll: true \}\)/);
+});
+
 test("mobile navigation has a real open state and synchronized accessibility state", () => {
   assert.match(globalCss, /\.nav \.nav__links\.nav__links--open\s*\{/);
   assert.match(globalCss, /min-height:\s*44px/);
   assert.match(globalCss, /:focus-visible/);
   assert.match(globalCss, /prefers-reduced-motion:\s*reduce/);
+
+  assert.match(layout, /id="nav-toggle"[\s\S]*type="button"/);
+  assert.match(layout, /id="nav-toggle"[\s\S]*aria-controls="nav-links"/);
+  assert.match(layout, /id="nav-toggle"[\s\S]*aria-expanded="false"/);
+  assert.match(layout, /id="nav-toggle"[\s\S]*aria-label="Open navigation"/);
 
   assert.match(siteScript, /setAttribute\('aria-controls', links\.id\)/);
   assert.match(siteScript, /setAttribute\('aria-expanded', String\(nextOpen\)\)/);
