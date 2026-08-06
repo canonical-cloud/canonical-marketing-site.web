@@ -1,4 +1,6 @@
-const APP_ORIGIN = 'https://app.canonical.plus';
+const APP_SCHEME = 'https';
+const APP_HOST = 'app.canonical.plus';
+const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
 const QUOTE_PATH = '/u/quote';
 const quoteUrl = new URL(QUOTE_PATH, APP_ORIGIN);
 const signInUrl = new URL('/auth/start', APP_ORIGIN);
