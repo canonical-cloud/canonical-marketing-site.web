@@ -3,8 +3,7 @@ const APP_HOST = 'app.canonical.plus';
 const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
 const QUOTE_PATH = '/u/quote';
 const quoteUrl = new URL(QUOTE_PATH, APP_ORIGIN);
-const signInUrl = new URL('/auth/start', APP_ORIGIN);
-signInUrl.searchParams.set('return_to', QUOTE_PATH);
+const signInUrl = new URL(QUOTE_PATH, APP_ORIGIN);
 
 const configureApplicationLinks = () => {
   const navContact = document.getElementById('nav-contact');
