@@ -125,7 +125,9 @@ test("mobile navigation has a real open state and synchronized accessibility sta
 });
 
 test("quote and sign-in links use the canonical application boundary", () => {
-  assert.match(siteScript, /const APP_ORIGIN = 'https:\/\/app\.canonical\.plus'/);
+  assert.match(siteScript, /const APP_SCHEME = 'https'/);
+  assert.match(siteScript, /const APP_HOST = 'app\.canonical\.plus'/);
+  assert.match(siteScript, /\[APP_SCHEME, APP_HOST\]\.join\('\:\/\/'\)/);
   assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
   assert.match(siteScript, /new URL\('\/auth\/start', APP_ORIGIN\)/);
   assert.match(siteScript, /searchParams\.set\('return_to', QUOTE_PATH\)/);
