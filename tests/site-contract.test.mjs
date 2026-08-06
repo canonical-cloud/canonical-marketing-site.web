@@ -129,8 +129,8 @@ test("quote and sign-in links use the canonical application boundary", () => {
   assert.match(siteScript, /const APP_HOST = 'app\.canonical\.plus'/);
   assert.match(siteScript, /\[APP_SCHEME, APP_HOST\]\.join\('\:\/\/'\)/);
   assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
-  assert.match(siteScript, /new URL\('\/auth\/start', APP_ORIGIN\)/);
-  assert.match(siteScript, /searchParams\.set\('return_to', QUOTE_PATH\)/);
+  assert.match(siteScript, /const signInUrl = new URL\(QUOTE_PATH, APP_ORIGIN\)/);
+  assert.doesNotMatch(siteScript, /\/auth\/start|return_to/);
   assert.match(siteScript, /Get a quote · under 5 min/);
   assert.match(siteScript, /Get a quote in under 5 min/);
   assert.match(siteScript, /signIn\.textContent = 'Sign in'/);
