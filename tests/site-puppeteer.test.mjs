@@ -38,14 +38,18 @@ test("puppeteer renders the canonical.cloud landing page", async (t) => {
   );
   assert.match(brand, /CANONICAL\.CLOUD/);
 
-  // Nav section and application links, in order.
+  // Nav section/account links, in order.
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((n) => n.textContent?.trim()),
   );
   assert.deepEqual(navLinks, ["Services", "Process", "Frameworks", "About", "Sign in"]);
   assert.equal(
-    await page.$eval("#nav-sign-in", (el) => el.getAttribute("href")),
-    "https://app.canonical.plus/auth/start?return_to=%2Fu%2Fquote",
+    await page.$eval("#nav-sign-in", (el) => el.href),
+    "https://app.canonical.plus/u/quote",
+  );
+  assert.equal(
+    await page.$eval("#nav-quote", (el) => el.href),
+    "https://app.canonical.plus/u/quote",
   );
 
   // The four compliance service cards under #services, in order.

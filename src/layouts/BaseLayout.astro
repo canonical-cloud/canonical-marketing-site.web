@@ -13,6 +13,7 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const homeHref = `${baseNoSlash}/`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
 const siteScriptHref = `${baseNoSlash}/site.js`;
+const quoteHref = 'https://app.canonical.plus/u/quote';
 ---
 
 <!doctype html>
@@ -52,7 +53,8 @@ const siteScriptHref = `${baseNoSlash}/site.js`;
           <a href="#process" class="nav__link" id="nav-process">Process</a>
           <a href="#frameworks" class="nav__link" id="nav-frameworks">Frameworks</a>
           <a href="#about" class="nav__link" id="nav-about">About</a>
-          <a href="#contact" class="btn btn--primary nav__cta" id="nav-contact">Get Compliant</a>
+          <a href={quoteHref} class="nav__link" id="nav-sign-in">Sign in</a>
+          <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote">Get a quote · under 5 min</a>
         </div>
 
         <button
@@ -105,6 +107,11 @@ const siteScriptHref = `${baseNoSlash}/site.js`;
               <a href="#process" class="footer__link">Our Process</a>
               <a href="#frameworks" class="footer__link">Frameworks</a>
               <a href="#contact" class="footer__link">Contact</a>
+            </div>
+            <div class="footer__col">
+              <h4 class="footer__col-title">Account</h4>
+              <a href={quoteHref} class="footer__link">Sign in</a>
+              <a href={quoteHref} class="footer__link">Get a quote in under 5 minutes</a>
             </div>
             <div class="footer__col">
               <h4 class="footer__col-title">Connect</h4>
@@ -232,6 +239,7 @@ const siteScriptHref = `${baseNoSlash}/site.js`;
       .nav__cta {
         padding: 0.5rem 1.25rem;
         font-size: 0.85rem;
+        white-space: nowrap;
       }
 
       .nav__mobile-toggle {
