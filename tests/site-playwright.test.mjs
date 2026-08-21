@@ -29,7 +29,7 @@ test("playwright renders the readiness-first canonical.cloud landing page", asyn
   await hero.waitFor({ state: "visible" });
   assert.match(
     (await hero.innerText()).replace(/\s+/g, " ").trim(),
-    /Know what stands between you and audit-ready/,
+    /Know what stands between you and\s*audit-ready/,
   );
 
   await page.locator(".nav__logo-text").filter({ hasText: "CANONICAL" }).first().waitFor({ state: "visible" });
