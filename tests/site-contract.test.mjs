@@ -3,35 +3,51 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 const page = await readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8");
+const readiness = await readFile(new URL("../src/pages/readiness.astro", import.meta.url), "utf8");
+const frameworks = await readFile(new URL("../src/pages/frameworks.astro", import.meta.url), "utf8");
+const compare = await readFile(new URL("../src/pages/compare.astro", import.meta.url), "utf8");
 const layout = await readFile(new URL("../src/layouts/BaseLayout.astro", import.meta.url), "utf8");
 const globalCss = await readFile(new URL("../src/styles/global.css", import.meta.url), "utf8");
+const marketingCss = await readFile(new URL("../src/styles/marketing-pages.css", import.meta.url), "utf8");
 const siteScript = await readFile(new URL("../public/site.js", import.meta.url), "utf8");
 
-test("landing page keeps the compliance services visible", () => {
+test("landing page keeps the readiness services visible", () => {
   for (const label of [
-    "SOC 2 Attestation",
-    "FedRAMP Authorization",
-    "HIPAA Compliance",
-    "vCISO & IT Advisory",
+    "Readiness assessment",
+    "Technical remediation roadmap",
+    "Evidence operations",
+    "Independent-review handoff",
   ]) {
-    assert.ok(
-      page.includes(label) || page.includes(label.replace("&", "&amp;")),
-      `missing service label: ${label}`,
-    );
+    assert.ok(page.includes(label), `missing readiness service: ${label}`);
   }
 });
 
-test("landing page advertises every audited framework", () => {
-  for (const framework of ["SOC 2", "FedRAMP", "HIPAA", "ISO 27001", "PCI DSS", "GDPR"]) {
-    assert.ok(page.includes(framework), `missing framework: ${framework}`);
+test("framework catalog covers the approved readiness portfolio", () => {
+  for (const framework of [
+    "SOC 2",
+    "ISO/IEC 27001",
+    "HIPAA",
+    "GDPR",
+    "NIST CSF 2.0",
+    "NIST SP 800-53",
+    "PCI DSS 4.0.1",
+    "FedRAMP",
+    "CMMC 2.0",
+    "CIS Controls v8.1",
+    "CSA Cloud Controls Matrix / STAR",
+    "ISO/IEC 27701",
+    "NIS2",
+    "DORA",
+  ]) {
+    assert.ok(frameworks.includes(framework), `missing framework: ${framework}`);
   }
 });
 
-test("primary calls to action stay internal / safe", () => {
-  assert.match(page, /href="#contact"/);
-  assert.match(page, /href="#services"/);
+test("primary calls to action stay on reviewed boundaries", () => {
+  assert.match(page, /href=\{quoteHref\}/);
+  assert.match(page, /href=\{readinessHref\}/);
   assert.match(page, /href="mailto:compliance@canonical\.cloud"/);
-  assert.doesNotMatch(page, /javascript:/i);
+  assert.doesNotMatch([page, readiness, frameworks, compare, layout].join("\n"), /javascript:/i);
 });
 
 test("layout keeps production metadata and viewport controls", () => {
@@ -40,8 +56,9 @@ test("layout keeps production metadata and viewport controls", () => {
   assert.match(layout, /name="description"/);
   assert.match(layout, /property="og:title"/);
   assert.match(layout, /property="og:description"/);
+  assert.match(layout, /name="twitter:card"/);
   assert.match(layout, /<title>\{title\} \| canonical\.cloud<\/title>/);
-  assert.match(layout, /target="_blank" rel="noopener noreferrer"/);
+  assert.match(compare, /target="_blank" rel="noopener noreferrer"/);
 });
 
 test("static image supplies the same defensive headers as the server fallback", async () => {
@@ -74,21 +91,24 @@ test("production image inputs are pinned and test browsers never enter the artif
   assert.doesNotMatch(dockerfile, /npm ci\s*\|\|\s*npm install/);
 });
 
-test("layout keeps base-aware links so the site works behind a gateway prefix", () => {
+test("layout keeps base-aware links so every page works behind a gateway prefix", () => {
   assert.match(layout, /import\.meta\.env\.BASE_URL/);
-  assert.match(layout, /const homeHref = /);
-  assert.match(layout, /const siteScriptHref = /);
+  for (const name of ["homeHref", "readinessHref", "frameworksHref", "compareHref", "siteScriptHref"]) {
+    assert.match(layout, new RegExp(`const ${name} = `));
+  }
 });
 
 test("source assets do not require third-party CSP exceptions", () => {
-  assert.doesNotMatch(globalCss, /@import\s+(?:url\()?['"]?https?:\/\//i);
-  assert.doesNotMatch(globalCss, /url\(\s*['"]?(?:https?:|\/\/|blob:)/i);
+  for (const css of [globalCss, marketingCss]) {
+    assert.doesNotMatch(css, /@import\s+(?:url\()?['"]?https?:\/\//i);
+    assert.doesNotMatch(css, /url\(\s*['"]?(?:https?:|\/\/|blob:)/i);
+  }
   assert.match(layout, /<script type="module" src=\{siteScriptHref\}><\/script>/);
   assert.doesNotMatch(layout, /\son[a-z]+\s*=/i);
 });
 
-test("nav exposes the section links", () => {
-  for (const label of ["Services", "Process", "Frameworks", "About"]) {
+test("nav exposes the readiness-first information architecture", () => {
+  for (const label of ["Readiness", "Process", "Frameworks", "Compare"]) {
     assert.ok(layout.includes(`>${label}<`), `missing nav link: ${label}`);
   }
 });
@@ -105,7 +125,7 @@ test("skip navigation and named landmarks exist before JavaScript runs", () => {
 });
 
 test("mobile navigation has a real open state and synchronized accessibility state", () => {
-  assert.match(globalCss, /\.nav \.nav__links\.nav__links--open\s*\{/);
+  assert.match(layout, /\.nav \.nav__links\.nav__links--open\s*\{/);
   assert.match(globalCss, /min-height:\s*44px/);
   assert.match(globalCss, /:focus-visible/);
   assert.match(globalCss, /prefers-reduced-motion:\s*reduce/);
@@ -128,11 +148,16 @@ test("quote and sign-in links use the canonical application boundary", () => {
   assert.match(siteScript, /const APP_SCHEME = 'https'/);
   assert.match(siteScript, /const APP_HOST = 'app\.canonical\.plus'/);
   assert.match(siteScript, /\[APP_SCHEME, APP_HOST\]\.join\('\:\/\/'\)/);
-  assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
-  assert.match(siteScript, /const signInUrl = new URL\(QUOTE_PATH, APP_ORIGIN\)/);
+  assert.match(siteScript, /const READINESS_PATH = '\/u\/quote'/);
+  assert.match(siteScript, /new URL\(READINESS_PATH, APP_ORIGIN\)/);
   assert.doesNotMatch(siteScript, /\/auth\/start|return_to/);
-  assert.match(siteScript, /Get a quote · under 5 min/);
-  assert.match(siteScript, /Get a quote in under 5 min/);
-  assert.match(siteScript, /signIn\.textContent = 'Sign in'/);
   assert.doesNotMatch(siteScript, /access_token|refresh_token|id_token/i);
+});
+
+test("comparison page states the competitive baseline without claiming parity", () => {
+  for (const vendor of ["Vanta", "Drata", "Secureframe", "Sprinto", "Thoropass"]) {
+    assert.ok(compare.includes(vendor), `missing comparison source: ${vendor}`);
+  }
+  assert.match(compare, /not positioned as a mature hundreds-of-integrations continuous-monitoring suite/);
+  assert.match(compare, /No independent audit opinion, certification, authorization, or legal conclusion/);
 });
