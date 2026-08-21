@@ -24,13 +24,13 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
   await page.goto(`${server.url}/`, { waitUntil: "networkidle0" });
   assert.equal(await page.title(), "Compliance readiness for software teams | canonical.cloud");
 
-  const heroTitle = await page.$eval(".hero__title", (el) =>
-    (el.textContent ?? "").replace(/\s+/g, " ").trim(),
+  const heroTitle = await page.$eval(".hero__title", (element) =>
+    (element.textContent ?? "").replace(/\s+/g, " ").trim(),
   );
-  assert.match(heroTitle, /Know what stands between you and audit-ready/);
+  assert.match(heroTitle, /Know what stands between you and\s*audit-ready/);
 
-  const brand = await page.$eval(".nav__logo-text", (el) =>
-    (el.textContent ?? "").replace(/\s+/g, "").trim(),
+  const brand = await page.$eval(".nav__logo-text", (element) =>
+    (element.textContent ?? "").replace(/\s+/g, "").trim(),
   );
   assert.match(brand, /CANONICAL\.CLOUD/);
 
@@ -39,11 +39,11 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
   );
   assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "Sign in"]);
   assert.equal(
-    await page.$eval("#nav-sign-in", (el) => el.href),
+    await page.$eval("#nav-sign-in", (element) => element.href),
     "https://app.canonical.plus/u/quote",
   );
   assert.equal(
-    await page.$eval("#nav-quote", (el) => el.href),
+    await page.$eval("#nav-quote", (element) => element.href),
     "https://app.canonical.plus/u/quote",
   );
 
@@ -58,7 +58,7 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
   ]);
 
   assert.equal(
-    await page.$eval('a[href="mailto:compliance@canonical.cloud"]', (el) => Boolean(el)),
+    await page.$eval('a[href="mailto:compliance@canonical.cloud"]', (element) => Boolean(element)),
     true,
   );
   assert.match(await pageText(page), /Readiness, not independent assurance/);
