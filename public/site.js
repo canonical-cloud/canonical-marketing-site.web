@@ -1,43 +1,19 @@
 const APP_SCHEME = 'https';
 const APP_HOST = 'app.canonical.plus';
 const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
-const QUOTE_PATH = '/u/quote';
-const quoteUrl = new URL(QUOTE_PATH, APP_ORIGIN);
-const signInUrl = new URL(QUOTE_PATH, APP_ORIGIN);
+const READINESS_PATH = '/u/quote';
+const readinessUrl = new URL(READINESS_PATH, APP_ORIGIN);
+const signInUrl = new URL(READINESS_PATH, APP_ORIGIN);
 
 const configureApplicationLinks = () => {
-  const navContact = document.getElementById('nav-contact');
-
-  if (navContact instanceof HTMLAnchorElement) {
-    navContact.href = quoteUrl.href;
-    navContact.textContent = 'Get a quote · under 5 min';
-    navContact.setAttribute('aria-label', 'Get a quote in less than 5 minutes');
-    navContact.dataset.applicationLink = 'quote';
-
-    let signIn = document.getElementById('nav-sign-in');
-    if (!(signIn instanceof HTMLAnchorElement)) {
-      signIn = document.createElement('a');
-      signIn.id = 'nav-sign-in';
-      signIn.className = 'nav__link';
-      navContact.before(signIn);
+  for (const link of document.querySelectorAll('[data-application-link]')) {
+    if (!(link instanceof HTMLAnchorElement)) {
+      continue;
     }
-    signIn.href = signInUrl.href;
-    signIn.textContent = 'Sign in';
-    signIn.dataset.applicationLink = 'sign-in';
-  }
 
-  const heroPrimary = document.getElementById('hero-cta-primary');
-  if (heroPrimary instanceof HTMLAnchorElement) {
-    heroPrimary.href = quoteUrl.href;
-    heroPrimary.setAttribute('aria-label', 'Get a quote in less than 5 minutes');
-    heroPrimary.dataset.applicationLink = 'quote';
-
-    const labelNode = Array.from(heroPrimary.childNodes).find(
-      (node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim(),
-    );
-    if (labelNode) {
-      labelNode.textContent = '\n            Get a quote in under 5 min\n            ';
-    }
+    const kind = link.dataset.applicationLink;
+    link.href = kind === 'sign-in' ? signInUrl.href : readinessUrl.href;
+    link.rel = 'noopener';
   }
 };
 
@@ -62,9 +38,6 @@ const mainContent = document.getElementById('main-content');
 
 if (skipLink instanceof HTMLAnchorElement && mainContent instanceof HTMLElement) {
   skipLink.addEventListener('click', () => {
-    // The native fragment remains the navigation authority. Explicit focus
-    // makes the destination deterministic across Chromium and assistive-tech
-    // combinations while the static link still works without JavaScript.
     mainContent.focus({ preventScroll: true });
   });
 }

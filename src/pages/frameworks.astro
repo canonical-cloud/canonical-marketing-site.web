@@ -1,0 +1,217 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const quoteHref = 'https://app.canonical.plus/u/quote';
+
+const assuranceTargets = [
+  {
+    name: 'SOC 2',
+    meta: 'Independent attestation target',
+    summary: 'Readiness for Trust Services Criteria scope, control design, operating evidence, exceptions, and auditor handoff.',
+    artifacts: ['System description inputs', 'Control and evidence map', 'Type I or Type II readiness plan'],
+  },
+  {
+    name: 'ISO/IEC 27001',
+    meta: 'Accredited certification target',
+    summary: 'Readiness for an information security management system, risk treatment, documented controls, and certification-body review.',
+    artifacts: ['ISMS scope and context', 'Risk treatment and Statement of Applicability', 'Internal-audit and management-review preparation'],
+  },
+  {
+    name: 'PCI DSS 4.0.1',
+    meta: 'Payment security standard',
+    summary: 'Readiness for cardholder-data scope, technical requirements, evidence, compensating controls, and the applicable validation path.',
+    artifacts: ['Cardholder-data environment boundary', 'Requirement ownership map', 'SAQ, ROC, or QSA handoff preparation'],
+  },
+  {
+    name: 'FedRAMP',
+    meta: 'US federal authorization program',
+    summary: 'Readiness for the selected impact level, NIST control baseline, documentation package, continuous monitoring, and approved assessor path.',
+    artifacts: ['Authorization boundary and impact assumptions', 'SSP and POA&M preparation', '3PAO and agency handoff plan'],
+  },
+];
+
+const securityPrograms = [
+  {
+    name: 'NIST CSF 2.0',
+    meta: 'Cybersecurity program framework',
+    summary: 'Govern, Identify, Protect, Detect, Respond, and Recover maturity assessment aligned to business risks.',
+    artifacts: ['Current and target profiles', 'Gap and priority register', 'Implementation roadmap'],
+  },
+  {
+    name: 'NIST SP 800-53',
+    meta: 'Control catalog',
+    summary: 'Readiness mapping for security and privacy controls used by federal and other high-assurance programs.',
+    artifacts: ['Baseline and tailoring decisions', 'Control implementation statements', 'Evidence and assessment plan'],
+  },
+  {
+    name: 'NIST SP 800-171 / CMMC 2.0',
+    meta: 'Defense supply-chain readiness',
+    summary: 'Readiness for protecting controlled unclassified information, documenting implementation, and preparing for the required CMMC path.',
+    artifacts: ['CUI boundary and data flow', 'SSP and POA&M preparation', 'Assessment responsibility map'],
+  },
+  {
+    name: 'CIS Controls v8.1',
+    meta: 'Prioritized security safeguards',
+    summary: 'Implementation-group-based readiness for foundational, enterprise, and higher-risk security safeguards.',
+    artifacts: ['Implementation Group selection', 'Safeguard gap map', 'Technical remediation backlog'],
+  },
+  {
+    name: 'CSA Cloud Controls Matrix / STAR',
+    meta: 'Cloud assurance framework',
+    summary: 'Readiness for cloud control mapping, shared-responsibility evidence, and the selected STAR assurance level.',
+    artifacts: ['Cloud service and responsibility map', 'CCM control mapping', 'STAR submission or assessment preparation'],
+  },
+];
+
+const privacyAndRegulation = [
+  {
+    name: 'HIPAA',
+    meta: 'US healthcare regulation',
+    summary: 'Security and privacy readiness for electronic protected health information and the organization’s covered-entity or business-associate role.',
+    artifacts: ['ePHI systems and data-flow boundary', 'Security risk analysis inputs', 'Administrative, physical, and technical safeguard plan'],
+  },
+  {
+    name: 'GDPR',
+    meta: 'EU data-protection regulation',
+    summary: 'Operational privacy readiness across roles, lawful bases, rights handling, retention, vendors, transfers, and security measures.',
+    artifacts: ['Processing and role inventory', 'DPIA and records-of-processing plan', 'Rights, retention, and transfer controls'],
+  },
+  {
+    name: 'ISO/IEC 27701',
+    meta: 'Privacy information management',
+    summary: 'Readiness to extend an information security management system with privacy-specific controller and processor controls.',
+    artifacts: ['PIMS scope and role map', 'Privacy risk treatment', 'ISO 27001 dependency plan'],
+  },
+  {
+    name: 'NIS2',
+    meta: 'EU cybersecurity directive',
+    summary: 'Readiness for governance, risk management, incident handling, supply-chain controls, reporting, and accountability obligations.',
+    artifacts: ['Entity and applicability assumptions', 'Management accountability map', 'Incident and supply-chain readiness plan'],
+  },
+  {
+    name: 'DORA',
+    meta: 'EU financial-sector resilience',
+    summary: 'Readiness for ICT risk, incident reporting, resilience testing, third-party risk, and oversight requirements.',
+    artifacts: ['ICT service and dependency inventory', 'Resilience and incident-testing plan', 'Third-party register preparation'],
+  },
+];
+
+const sections = [
+  { title: 'Assurance and certification targets', frameworks: assuranceTargets },
+  { title: 'Security and cloud programs', frameworks: securityPrograms },
+  { title: 'Privacy and digital regulation', frameworks: privacyAndRegulation },
+];
+---
+
+<BaseLayout
+  title="Compliance framework readiness"
+  description="Explore Canonical Plus readiness coverage for SOC 2, ISO 27001, HIPAA, GDPR, NIST, PCI DSS, FedRAMP, CMMC, CIS Controls, CSA CCM, NIS2, DORA, and ISO 27701."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge animate-fade-in-up">Framework catalog</span>
+        <p class="page-hero__eyebrow animate-fade-in-up stagger-1">Map once, prepare deliberately</p>
+        <h1 class="page-hero__title animate-fade-in-up stagger-2">
+          Readiness across the security, privacy, and cloud standards
+          <span class="gradient-text">your market expects</span>
+        </h1>
+        <p class="page-hero__subtitle animate-fade-in-up stagger-2">
+          Frameworks overlap, but their formal outcomes do not. Canonical Plus maps reusable controls
+          and evidence while preserving the distinct assessor, certification, authorization,
+          legal, and regulatory paths required for each program.
+        </p>
+        <div class="page-hero__actions animate-fade-in-up stagger-3">
+          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+            Scope your framework mix
+          </a>
+          <a href="mailto:compliance@canonical.cloud" class="btn btn--secondary btn--large">
+            Discuss applicability
+          </a>
+        </div>
+      </div>
+
+      <aside class="page-hero__panel animate-fade-in-up stagger-3">
+        <h2>Framework selection should consider</h2>
+        <ul class="check-list">
+          <li>Customer and contractual demands</li>
+          <li>Data types, jurisdictions, and regulated roles</li>
+          <li>Cloud, product, and supply-chain boundaries</li>
+          <li>The independent reviewer or authority required</li>
+        </ul>
+        <p class="boundary-note">
+          This catalog describes readiness support. It does not imply that Canonical Plus
+          is the auditor, certification body, 3PAO, C3PAO, QSA, regulator, or legal adviser.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {sections.map((section) => (
+        <section class="framework-category">
+          <header class="section-header framework-category__title">
+            <span class="badge">{section.title}</span>
+          </header>
+          <div class="card-grid card-grid--two">
+            {section.frameworks.map((framework) => (
+              <article class="card framework-card">
+                <span class="framework-card__meta">{framework.meta}</span>
+                <h3>{framework.name}</h3>
+                <p>{framework.summary}</p>
+                <ul>
+                  {framework.artifacts.map((artifact) => <li>{artifact}</li>)}
+                </ul>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="definition-grid">
+        <article class="definition-card definition-card--positive">
+          <h2>What can be reused</h2>
+          <p>
+            Identity, access, change management, incident response, vendor management,
+            risk assessment, asset inventory, logging, vulnerability management, and evidence operations
+            often support multiple frameworks.
+          </p>
+        </article>
+        <article class="definition-card definition-card--independent">
+          <h2>What must stay distinct</h2>
+          <p>
+            Scope rules, sampling periods, report formats, accreditation requirements,
+            assessor qualifications, filing obligations, regulatory conclusions, and formal outcomes
+            cannot be collapsed into one generic “compliance” result.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">Custom and contractual requirements</span>
+        <h2>Not every obligation has a public framework name</h2>
+        <p>
+          Customer security addenda, procurement requirements, internal standards, and sector-specific
+          control sets can be mapped into the same readiness model, with the source and interpretation
+          kept explicit.
+        </p>
+        <div class="action-row">
+          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+            Start readiness assessment
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
