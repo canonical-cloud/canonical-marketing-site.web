@@ -34,6 +34,7 @@ test("framework catalog covers the approved readiness portfolio", () => {
     "FedRAMP",
     "CMMC 2.0",
     "CIS Controls v8.1",
+    "ISO 22301",
     "CSA Cloud Controls Matrix / STAR",
     "ISO/IEC 27701",
     "NIS2",
