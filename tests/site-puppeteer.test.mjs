@@ -5,15 +5,13 @@ import { chromeExecutablePath, startSite } from "./site-browser-harness.mjs";
 
 const pageText = (page) => page.evaluate(() => document.body.innerText);
 
-test("puppeteer renders the canonical.cloud landing page", async (t) => {
+test("puppeteer renders the readiness-first canonical.cloud landing page", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
   const browser = await puppeteer.launch({
     executablePath: chromeExecutablePath(),
     headless: "new",
-    // --no-sandbox: CI runners drive Chrome as root, where launch otherwise
-    // fails ("Running as root without --no-sandbox"); harmless locally.
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   t.after(() => browser.close());
@@ -24,52 +22,46 @@ test("puppeteer renders the canonical.cloud landing page", async (t) => {
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle0" });
-  assert.equal(await page.title(), "SOC 2, FedRAMP & HIPAA Compliance Audits | canonical.cloud");
+  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.cloud");
 
-  // Hero <h1> — headline split across a <br>, so normalize whitespace.
-  const heroTitle = await page.$eval(".hero__title", (el) =>
-    (el.textContent ?? "").replace(/\s+/g, " ").trim(),
+  const heroTitle = await page.$eval(".hero__title", (element) =>
+    (element.textContent ?? "").replace(/\s+/g, " ").trim(),
   );
-  assert.match(heroTitle, /Compliance Audits\s*Without the Overhead/);
+  assert.match(heroTitle, /Know what stands between you and\s*audit-ready/);
 
-  // Nav brand.
-  const brand = await page.$eval(".nav__logo-text", (el) =>
-    (el.textContent ?? "").replace(/\s+/g, "").trim(),
+  const brand = await page.$eval(".nav__logo-text", (element) =>
+    (element.textContent ?? "").replace(/\s+/g, "").trim(),
   );
   assert.match(brand, /CANONICAL\.CLOUD/);
 
-  // Nav section/account links, in order.
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
-    nodes.map((n) => n.textContent?.trim()),
+    nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(navLinks, ["Services", "Process", "Frameworks", "About", "Sign in"]);
+  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "Sign in"]);
   assert.equal(
-    await page.$eval("#nav-sign-in", (el) => el.href),
+    await page.$eval("#nav-sign-in", (element) => element.href),
     "https://app.canonical.plus/u/quote",
   );
   assert.equal(
-    await page.$eval("#nav-quote", (el) => el.href),
+    await page.$eval("#nav-quote", (element) => element.href),
     "https://app.canonical.plus/u/quote",
   );
 
-  // The four compliance service cards under #services, in order.
   const serviceCards = await page.$$eval("#services .services__card h3", (nodes) =>
-    nodes.map((n) => n.textContent?.trim()),
+    nodes.map((node) => node.textContent?.trim()),
   );
   assert.deepEqual(serviceCards, [
-    "SOC 2 Attestation",
-    "FedRAMP Authorization",
-    "HIPAA Compliance",
-    "vCISO & IT Advisory",
+    "Readiness assessment",
+    "Technical remediation roadmap",
+    "Evidence operations",
+    "Independent-review handoff",
   ]);
 
-  // Primary contact CTA (mailto).
   assert.equal(
-    await page.$eval('a[href="mailto:compliance@canonical.cloud"]', (el) => Boolean(el)),
+    await page.$eval('a[href="mailto:compliance@canonical.cloud"]', (element) => Boolean(element)),
     true,
   );
-
-  // Footer copyright.
+  assert.match(await pageText(page), /Readiness, not independent assurance/);
   assert.match(await pageText(page), /canonical\.cloud\. All rights reserved/);
 
   assert.deepEqual(pageErrors, []);

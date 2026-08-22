@@ -7,10 +7,10 @@ const layout = await readFile(
   "utf8",
 );
 
-test("marketing navigation exposes the authenticated canonical.plus quote entry point", () => {
+test("marketing navigation exposes the authenticated canonical.plus readiness entry point", () => {
   assert.match(layout, /const quoteHref = 'https:\/\/app\.canonical\.plus\/u\/quote';/);
-  assert.match(layout, /id="nav-sign-in">Sign in<\/a>/);
-  assert.match(layout, /id="nav-quote">Get a quote · under 5 min<\/a>/);
+  assert.match(layout, /id="nav-sign-in"[^>]*>Sign in<\/a>/);
+  assert.match(layout, /id="nav-quote"[^>]*>Start readiness assessment<\/a>/);
 });
 
 test("quote links use one exact HTTPS destination and never carry tokens", () => {

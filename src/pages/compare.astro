@@ -1,0 +1,217 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const quoteHref = 'https://app.canonical.plus/u/quote';
+
+const approaches = [
+  {
+    approach: 'Canonical Plus readiness support',
+    bestFor: 'Teams that need scope, technical gap analysis, remediation sequencing, and an evidence plan.',
+    output: 'Customer-specific readiness artifacts and implementation roadmap.',
+    automation: 'Targeted and evolving; not positioned as a mature hundreds-of-integrations continuous-monitoring suite.',
+    support: 'Technical remediation and independent-review preparation.',
+    assurance: 'No independent audit opinion, certification, authorization, or legal conclusion.',
+  },
+  {
+    approach: 'Compliance automation platform',
+    bestFor: 'Teams that want broad integrations, continuous tests, evidence collection, control workflows, and multi-framework dashboards.',
+    output: 'Live control/evidence posture, tasks, alerts, policies, and auditor collaboration workflows.',
+    automation: 'Usually the strongest option for large integration catalogs and continuous monitoring.',
+    support: 'Varies by vendor and plan; may include experts, partners, or implementation services.',
+    assurance: 'Generally prepares for assurance; formal outcomes still depend on the required independent party.',
+  },
+  {
+    approach: 'Audit or assessment firm',
+    bestFor: 'Teams whose controls and evidence are sufficiently ready for independent testing and a formal engagement.',
+    output: 'The applicable independent report, opinion, assessment, findings, or validation.',
+    automation: 'Usually not the primary value proposition, though firms may use or provide tooling.',
+    support: 'Independent testing and professional judgment under the engagement rules.',
+    assurance: 'Yes, when the firm and engagement are qualified for the specific outcome.',
+  },
+  {
+    approach: 'Internal / DIY program',
+    bestFor: 'Teams with experienced security, privacy, compliance, legal, and engineering owners plus sufficient time.',
+    output: 'Internally created scope, controls, evidence, and remediation records.',
+    automation: 'Depends on the team’s existing tools and integrations.',
+    support: 'Internal expertise; external specialists added as needed.',
+    assurance: 'No independent outcome until a qualified reviewer is appointed.',
+  },
+];
+
+const sources = [
+  ['Vanta', 'https://www.vanta.com/'],
+  ['Drata', 'https://drata.com/products/compliance'],
+  ['Secureframe', 'https://secureframe.com/comply'],
+  ['Sprinto', 'https://sprinto.com/'],
+  ['Thoropass', 'https://www.thoropass.com/platform/compliance-automation'],
+];
+---
+
+<BaseLayout
+  title="Compare compliance readiness approaches"
+  description="Compare Canonical Plus readiness support with compliance automation platforms, independent audit firms, and internal compliance programs."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge animate-fade-in-up">Compare approaches</span>
+        <p class="page-hero__eyebrow animate-fade-in-up stagger-1">Choose for the job you actually have</p>
+        <h1 class="page-hero__title animate-fade-in-up stagger-2">
+          Readiness support is not a substitute for
+          <span class="gradient-text">automation or independent assurance</span>
+        </h1>
+        <p class="page-hero__subtitle animate-fade-in-up stagger-2">
+          The best operating model may combine all three: readiness and remediation support,
+          a continuous compliance platform, and a qualified independent reviewer.
+          Canonical Plus should be selected for its current strengths—not for capabilities it has not yet proven.
+        </p>
+        <div class="page-hero__actions animate-fade-in-up stagger-3">
+          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+            Assess your readiness
+          </a>
+          <a href="mailto:compliance@canonical.cloud" class="btn btn--secondary btn--large">
+            Discuss platform fit
+          </a>
+        </div>
+      </div>
+
+      <aside class="page-hero__panel animate-fade-in-up stagger-3">
+        <h2>Canonical Plus is a strong fit when</h2>
+        <ul class="check-list">
+          <li>Your main blocker is technical or organizational remediation</li>
+          <li>You need a defensible scope before buying more tooling</li>
+          <li>You want cross-framework reuse without hiding differences</li>
+          <li>You value an explicit handoff to an independent reviewer</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Category comparison</span>
+        <h2>Different tools solve different parts of the journey</h2>
+        <p>
+          This comparison is intentionally conservative. Vendor capabilities and commercial terms change;
+          verify current product documentation and contract terms before purchasing.
+        </p>
+      </header>
+
+      <div class="table-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th scope="col">Approach</th>
+              <th scope="col">Best fit</th>
+              <th scope="col">Primary output</th>
+              <th scope="col">Automation posture</th>
+              <th scope="col">Formal assurance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {approaches.map((item) => (
+              <tr>
+                <td><strong>{item.approach}</strong></td>
+                <td>{item.bestFor}</td>
+                <td>{item.output}</td>
+                <td>{item.automation}</td>
+                <td>{item.assurance}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container" style="position: relative; z-index: 1;">
+      <header class="section-header section-header--center">
+        <span class="badge">What leading platforms emphasize</span>
+        <h2>The competitive baseline is continuous readiness</h2>
+        <p>
+          Public product pages from Vanta, Drata, Secureframe, Sprinto, and Thoropass consistently emphasize
+          integrations, evidence automation, gap visibility, control reuse, continuous monitoring,
+          audit preparation, and expert or auditor collaboration.
+        </p>
+      </header>
+
+      <div class="card-grid card-grid--three">
+        <article class="card fit-card">
+          <h3>Automation platforms</h3>
+          <p>Choose one when ongoing evidence collection, integrations, tests, alerts, policy workflows, and dashboards are central requirements.</p>
+          <ul>
+            <li>Broad SaaS and cloud integrations</li>
+            <li>Continuous control and evidence status</li>
+            <li>Recurring compliance operations</li>
+          </ul>
+        </article>
+        <article class="card fit-card">
+          <h3>Canonical Plus</h3>
+          <p>Choose readiness support when you first need scope clarity, engineering remediation, evidence design, and a clean independent-review boundary.</p>
+          <ul>
+            <li>Technical and organizational gap analysis</li>
+            <li>Prioritized remediation sequence</li>
+            <li>Framework and assessor handoff plan</li>
+          </ul>
+        </article>
+        <article class="card fit-card">
+          <h3>Independent reviewers</h3>
+          <p>Appoint the qualified reviewer when you are ready for the formal testing, opinion, certification, authorization, or validation your target requires.</p>
+          <ul>
+            <li>Independent testing and judgment</li>
+            <li>Program-specific qualifications</li>
+            <li>Formal report or determination</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Named vendor examples</span>
+        <h2>Public sources reviewed for this comparison</h2>
+        <p>
+          These vendors are examples of the automation-platform category. Listing them does not imply
+          partnership, endorsement, feature parity, or a claim that one vendor is universally better.
+        </p>
+      </header>
+
+      <ul class="source-list">
+        {sources.map(([name, href]) => (
+          <li>
+            <a href={href} target="_blank" rel="noopener noreferrer">{name} official product site ↗</a>
+          </li>
+        ))}
+      </ul>
+      <p class="source-note">
+        Source review date: August 21, 2026. Product pages and claims are controlled by their respective vendors
+        and should be rechecked before publishing time-sensitive comparisons.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">A combined model is valid</span>
+        <h2>You do not have to choose only one category</h2>
+        <p>
+          Canonical Plus can help establish scope and remediation priorities, a platform can run continuous
+          evidence operations, and an independent reviewer can perform the formal engagement.
+          The responsibilities should be written down before work begins.
+        </p>
+        <div class="action-row">
+          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+            Start readiness assessment
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

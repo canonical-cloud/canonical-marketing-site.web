@@ -4,13 +4,17 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "canonical.cloud — SOC 2, FedRAMP & HIPAA compliance audits via CPA and technology services." } = Astro.props;
+const {
+  title,
+  description = "Canonical Plus helps software teams assess compliance readiness, prioritize remediation, and prepare evidence for independent audits and certifications.",
+} = Astro.props;
 
-// Base-aware URLs so links/assets resolve whether served at / (local) or
-// behind the gateway prefix (/canonical/ in the cluster). BASE_URL includes a
-// trailing slash.
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const homeHref = `${baseNoSlash}/`;
+const readinessHref = `${baseNoSlash}/readiness/`;
+const frameworksHref = `${baseNoSlash}/frameworks/`;
+const compareHref = `${baseNoSlash}/compare/`;
+const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
 const siteScriptHref = `${baseNoSlash}/site.js`;
 const quoteHref = 'https://app.canonical.plus/u/quote';
@@ -26,17 +30,18 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
     <link rel="icon" type="image/svg+xml" href={faviconHref} />
     <title>{title} | canonical.cloud</title>
 
-    <!-- Open Graph -->
     <meta property="og:title" content={`${title} | canonical.cloud`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Canonical Plus" />
+    <meta name="twitter:card" content="summary" />
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <nav class="nav" id="main-nav" aria-label="Primary navigation">
       <div class="nav__inner container">
-        <a href={homeHref} class="nav__logo" id="nav-logo">
+        <a href={homeHref} class="nav__logo" id="nav-logo" aria-label="Canonical Plus home">
           <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
             <g class="brand-mark__primary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
               <path d="M8.55 25.36A21.5 21.5 0 0 1 22.36 11.55"/>
@@ -57,12 +62,12 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         </a>
 
         <div class="nav__links" id="nav-links">
-          <a href="#services" class="nav__link" id="nav-services">Services</a>
-          <a href="#process" class="nav__link" id="nav-process">Process</a>
-          <a href="#frameworks" class="nav__link" id="nav-frameworks">Frameworks</a>
-          <a href="#about" class="nav__link" id="nav-about">About</a>
-          <a href={quoteHref} class="nav__link" id="nav-sign-in">Sign in</a>
-          <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote">Get a quote · under 5 min</a>
+          <a href={readinessHref} class="nav__link" id="nav-services">Readiness</a>
+          <a href={processHref} class="nav__link" id="nav-process">Process</a>
+          <a href={frameworksHref} class="nav__link" id="nav-frameworks">Frameworks</a>
+          <a href={compareHref} class="nav__link" id="nav-about">Compare</a>
+          <a href={quoteHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
+          <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote" data-application-link="quote">Start readiness assessment</a>
         </div>
 
         <button
@@ -86,9 +91,17 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
 
     <footer class="footer" id="site-footer">
       <div class="container">
+        <div class="footer__boundary">
+          <strong>Readiness, not independent assurance.</strong>
+          <span>
+            Canonical Plus helps scope frameworks, identify gaps, plan remediation, and prepare evidence.
+            Independent auditors, assessors, certification bodies, regulators, and legal counsel make formal determinations.
+          </span>
+        </div>
+
         <div class="footer__top">
           <div class="footer__brand">
-            <a href={homeHref} class="nav__logo">
+            <a href={homeHref} class="nav__logo" aria-label="Canonical Plus home">
               <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                 <g class="brand-mark__primary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
                   <path d="M8.55 25.36A21.5 21.5 0 0 1 22.36 11.55"/>
@@ -107,41 +120,40 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
                 <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.CLOUD</span>
               </span>
             </a>
-            <p class="footer__tagline">SOC 2, FedRAMP & HIPAA compliance<br/>audits powered by CPA + technology.</p>
+            <p class="footer__tagline">
+              Compliance readiness and technical remediation planning for software and cloud teams.
+            </p>
           </div>
 
           <nav class="footer__columns" aria-label="Footer navigation">
             <div class="footer__col">
-              <h4 class="footer__col-title">Services</h4>
-              <a href="#services" class="footer__link">SOC 2 Attestation</a>
-              <a href="#services" class="footer__link">FedRAMP Authorization</a>
-              <a href="#services" class="footer__link">HIPAA Compliance</a>
-              <a href="#services" class="footer__link">vCISO Services</a>
+              <h4 class="footer__col-title">Readiness</h4>
+              <a href={readinessHref} class="footer__link">Readiness assessment</a>
+              <a href={processHref} class="footer__link">How it works</a>
+              <a href={quoteHref} class="footer__link" data-application-link="quote">Start an assessment</a>
             </div>
             <div class="footer__col">
-              <h4 class="footer__col-title">Company</h4>
-              <a href="#about" class="footer__link">About Us</a>
-              <a href="#process" class="footer__link">Our Process</a>
-              <a href="#frameworks" class="footer__link">Frameworks</a>
-              <a href="#contact" class="footer__link">Contact</a>
+              <h4 class="footer__col-title">Coverage</h4>
+              <a href={frameworksHref} class="footer__link">Framework catalog</a>
+              <a href={compareHref} class="footer__link">Compare approaches</a>
+              <a href={`${homeHref}#services`} class="footer__link">What we deliver</a>
             </div>
             <div class="footer__col">
               <h4 class="footer__col-title">Account</h4>
-              <a href={quoteHref} class="footer__link">Sign in</a>
-              <a href={quoteHref} class="footer__link">Get a quote in under 5 minutes</a>
+              <a href={quoteHref} class="footer__link" data-application-link="sign-in">Sign in</a>
+              <a href={quoteHref} class="footer__link" data-application-link="quote">Readiness quote</a>
             </div>
             <div class="footer__col">
-              <h4 class="footer__col-title">Connect</h4>
-              <a href="https://dancingdragons.cc" target="_blank" rel="noopener noreferrer" class="footer__link">Dancing Dragons ↗</a>
-              <a href="https://dragonteam.co" target="_blank" rel="noopener noreferrer" class="footer__link">Dragon Team ↗</a>
+              <h4 class="footer__col-title">Contact</h4>
               <a href="mailto:compliance@canonical.cloud" class="footer__link">compliance@canonical.cloud</a>
+              <a href={homeHref} class="footer__link">Canonical Plus</a>
             </div>
           </nav>
         </div>
 
         <div class="footer__bottom">
           <p class="footer__copy">&copy; {new Date().getFullYear()} canonical.cloud. All rights reserved.</p>
-          <p class="footer__copy">A <a href="https://dancingdragons.cc" target="_blank" rel="noopener noreferrer" class="footer__link--inline">Dancing Dragons</a> company.</p>
+          <p class="footer__copy">No audit opinion, certification, authorization, or legal conclusion is promised by this site.</p>
         </div>
       </div>
     </footer>
@@ -173,7 +185,6 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         scroll-margin-top: calc(var(--nav-height) + var(--space-md));
       }
 
-      /* ── Navigation ── */
       .nav {
         position: fixed;
         top: 0;
@@ -181,7 +192,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         right: 0;
         z-index: 1000;
         height: var(--nav-height);
-        background: rgba(10, 15, 24, 0.85);
+        background: rgba(10, 15, 24, 0.9);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border-bottom: 1px solid var(--av-border);
@@ -231,7 +242,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
       .nav__links {
         display: flex;
         align-items: center;
-        gap: var(--space-xl);
+        gap: var(--space-lg);
       }
 
       .nav__link {
@@ -262,8 +273,8 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
       }
 
       .nav__cta {
-        padding: 0.5rem 1.25rem;
-        font-size: 0.85rem;
+        padding: 0.5rem 1.15rem;
+        font-size: 0.82rem;
         white-space: nowrap;
       }
 
@@ -271,7 +282,9 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         display: none;
         flex-direction: column;
         gap: 5px;
-        padding: 4px;
+        padding: 11px;
+        min-height: 44px;
+        min-width: 44px;
       }
 
       .nav__mobile-toggle span {
@@ -280,14 +293,28 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         height: 2px;
         background: var(--av-text-secondary);
         border-radius: 2px;
-        transition: all var(--duration-fast) var(--ease-out);
       }
 
-      /* ── Footer ── */
       .footer {
         border-top: 1px solid var(--av-border);
-        padding: var(--space-4xl) 0 var(--space-xl);
+        padding: var(--space-3xl) 0 var(--space-xl);
         background: var(--av-black);
+      }
+
+      .footer__boundary {
+        display: grid;
+        grid-template-columns: minmax(12rem, 0.45fr) 1.55fr;
+        gap: var(--space-lg);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-3xl);
+        border: 1px solid var(--av-border-active);
+        border-radius: var(--radius-md);
+        background: var(--av-emerald-glow);
+        color: var(--av-text-secondary);
+      }
+
+      .footer__boundary strong {
+        color: var(--av-text-primary);
       }
 
       .footer__top {
@@ -298,7 +325,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
       }
 
       .footer__brand {
-        max-width: 300px;
+        max-width: 320px;
       }
 
       .footer__tagline {
@@ -341,32 +368,25 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
       .footer__bottom {
         display: flex;
         justify-content: space-between;
+        gap: var(--space-lg);
         align-items: center;
         padding-top: var(--space-xl);
         border-top: 1px solid var(--av-border);
       }
 
       .footer__copy {
+        max-width: 42rem;
         font-size: 0.8rem;
         color: var(--av-text-muted);
       }
 
-      .footer__link--inline {
-        color: var(--av-teal);
-        transition: opacity var(--duration-fast);
-      }
-
-      .footer__link--inline:hover {
-        opacity: 0.8;
-      }
-
-      @media (max-width: 768px) {
+      @media (max-width: 900px) {
         .nav__links {
-          display: none;
+          gap: var(--space-md);
         }
 
-        .nav__mobile-toggle {
-          display: flex;
+        .nav__cta {
+          display: none;
         }
 
         .footer__top {
@@ -378,10 +398,45 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
           flex-wrap: wrap;
           gap: var(--space-2xl);
         }
+      }
+
+      @media (max-width: 768px) {
+        .nav__links {
+          display: none;
+        }
+
+        .nav .nav__links.nav__links--open {
+          position: absolute;
+          top: var(--nav-height);
+          left: 0;
+          right: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          padding: var(--space-md);
+          background: rgba(10, 15, 24, 0.98);
+          border-bottom: 1px solid var(--av-border);
+        }
+
+        .nav .nav__links.nav__links--open .nav__link,
+        .nav .nav__links.nav__links--open .nav__cta {
+          display: flex;
+          min-height: 44px;
+          align-items: center;
+          padding: 0.75rem;
+        }
+
+        .nav__mobile-toggle {
+          display: flex;
+        }
+
+        .footer__boundary {
+          grid-template-columns: 1fr;
+        }
 
         .footer__bottom {
           flex-direction: column;
-          gap: var(--space-sm);
           text-align: center;
         }
       }

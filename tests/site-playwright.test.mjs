@@ -7,15 +7,13 @@ async function launchBrowser(t) {
   const browser = await chromium.launch({
     executablePath: chromeExecutablePath(),
     headless: true,
-    // --no-sandbox: CI runners drive Chrome as root, where the sandbox refuses
-    // to start; harmless locally.
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
   t.after(() => browser.close());
   return browser;
 }
 
-test("playwright renders the canonical.cloud landing page", async (t) => {
+test("playwright renders the readiness-first canonical.cloud landing page", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
@@ -25,37 +23,35 @@ test("playwright renders the canonical.cloud landing page", async (t) => {
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
-  assert.equal(await page.title(), "SOC 2, FedRAMP & HIPAA Compliance Audits | canonical.cloud");
+  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.cloud");
 
-  // Hero <h1> — headline split across a <br>, so normalize whitespace.
   const hero = page.getByRole("heading", { level: 1 });
   await hero.waitFor({ state: "visible" });
   assert.match(
     (await hero.innerText()).replace(/\s+/g, " ").trim(),
-    /Compliance Audits\s*Without the Overhead/,
+    /Know what stands between you and\s*audit-ready/,
   );
 
-  // Nav: brand and the four section links.
   await page.locator(".nav__logo-text").filter({ hasText: "CANONICAL" }).first().waitFor({ state: "visible" });
-  for (const label of ["Services", "Process", "Frameworks", "About"]) {
+  for (const label of ["Readiness", "Process", "Frameworks", "Compare"]) {
     await page.locator(".nav__link", { hasText: label }).first().waitFor({ state: "visible" });
   }
 
-  // The four compliance service cards.
-  for (const svc of [
-    "SOC 2 Attestation",
-    "FedRAMP Authorization",
-    "HIPAA Compliance",
-    "vCISO & IT Advisory",
+  for (const service of [
+    "Readiness assessment",
+    "Technical remediation roadmap",
+    "Evidence operations",
+    "Independent-review handoff",
   ]) {
-    await page.getByRole("heading", { name: svc, exact: true }).waitFor({ state: "visible" });
+    await page.getByRole("heading", { name: service, exact: true }).waitFor({ state: "visible" });
   }
 
-  // Primary contact CTA (mailto).
-  const contact = page.locator('a[href="mailto:compliance@canonical.cloud"]');
-  await contact.first().waitFor({ state: "visible" });
-
-  // Footer copyright.
+  assert.equal(
+    await page.locator("#hero-cta-primary").getAttribute("href"),
+    "https://app.canonical.plus/u/quote",
+  );
+  await page.locator('a[href="mailto:compliance@canonical.cloud"]').first().waitFor({ state: "visible" });
+  await page.locator("footer").getByText(/Readiness, not independent assurance/).waitFor({ state: "visible" });
   await page.locator("footer").getByText(/canonical\.cloud\. All rights reserved/).waitFor({ state: "visible" });
 
   assert.deepEqual(pageErrors, []);
@@ -91,7 +87,7 @@ test("playwright keeps mobile navigation operable by keyboard and touch", async 
   assert.equal(await toggle.getAttribute("aria-label"), "Close navigation");
   await links.waitFor({ state: "visible" });
 
-  const firstLink = links.getByRole("link", { name: "Services", exact: true });
+  const firstLink = links.getByRole("link", { name: "Readiness", exact: true });
   const box = await firstLink.boundingBox();
   assert.ok(box && box.height >= 44, `mobile link target was ${box?.height ?? 0}px high`);
 
@@ -102,19 +98,18 @@ test("playwright keeps mobile navigation operable by keyboard and touch", async 
 
   await toggle.click();
   await firstLink.click();
-  await page.waitForURL(/#services$/);
-  assert.equal(await toggle.getAttribute("aria-expanded"), "false");
-  assert.equal(await links.isVisible(), false);
-  await page.locator("#services").waitFor({ state: "visible" });
+  await page.waitForURL(/\/readiness\/$/);
+  await page.getByRole("heading", { level: 1 }).waitFor({ state: "visible" });
 
-  // Crossing the desktop breakpoint cannot leave a stale expanded state.
+  await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
+  await toggle.waitFor({ state: "visible" });
   await toggle.click();
   assert.equal(await toggle.getAttribute("aria-expanded"), "true");
   await page.setViewportSize({ height: 900, width: 1024 });
   await page.waitForFunction(
     () => document.getElementById("nav-toggle")?.getAttribute("aria-expanded") === "false",
   );
-  for (const label of ["Services", "Process", "Frameworks", "About"]) {
+  for (const label of ["Readiness", "Process", "Frameworks", "Compare"]) {
     await page.locator(".nav__link", { hasText: label }).first().waitFor({ state: "visible" });
   }
 

@@ -1,0 +1,179 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const frameworksHref = `${baseNoSlash}/frameworks/`;
+const compareHref = `${baseNoSlash}/compare/`;
+const quoteHref = 'https://app.canonical.plus/u/quote';
+
+const deliverables = [
+  ['Scope memo', 'Systems, products, data, people, vendors, locations, and exclusions that define the readiness boundary.'],
+  ['Control map', 'Target requirements mapped to current controls, owners, evidence sources, and known exceptions.'],
+  ['Gap register', 'Missing, partial, stale, or unverified controls and evidence, with assumptions kept visible.'],
+  ['Remediation roadmap', 'Prioritized work with dependencies, owners, acceptance criteria, and evidence expectations.'],
+  ['Evidence index', 'A durable inventory of artifacts, systems of record, freshness windows, and access constraints.'],
+  ['Independent-review handoff', 'A package for the qualified auditor, assessor, certification body, or other reviewer you select.'],
+];
+---
+
+<BaseLayout
+  title="Compliance readiness assessment"
+  description="Understand the difference between compliance readiness and an independent audit, and see the artifacts Canonical Plus prepares for software and cloud teams."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge animate-fade-in-up">Readiness assessment</span>
+        <p class="page-hero__eyebrow animate-fade-in-up stagger-1">Preparation with explicit boundaries</p>
+        <h1 class="page-hero__title animate-fade-in-up stagger-2">
+          Get ready for independent review
+          <span class="gradient-text">without pretending readiness is the audit</span>
+        </h1>
+        <p class="page-hero__subtitle animate-fade-in-up stagger-2">
+          Readiness asks whether your scope, controls, evidence, ownership, and remediation plan
+          are prepared for scrutiny. An independent audit or certification is a separate engagement
+          performed by a qualified party under its own rules.
+        </p>
+        <div class="page-hero__actions animate-fade-in-up stagger-3">
+          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+            Start readiness assessment
+          </a>
+          <a href={frameworksHref} class="btn btn--secondary btn--large">Choose a framework</a>
+        </div>
+      </div>
+
+      <aside class="page-hero__panel animate-fade-in-up stagger-3">
+        <h2>Readiness is useful when you need to</h2>
+        <ul class="check-list">
+          <li>Choose the right first framework or combination</li>
+          <li>Understand what engineering work is actually required</li>
+          <li>Separate missing controls from missing evidence</li>
+          <li>Prepare for an auditor, assessor, customer, or regulator</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Know what you are buying</span>
+        <h2>Readiness and assurance are related, but not interchangeable</h2>
+      </header>
+
+      <div class="definition-grid">
+        <article class="definition-card definition-card--positive">
+          <h3>Canonical Plus readiness</h3>
+          <p>
+            Scopes the program, maps requirements, identifies gaps, prioritizes remediation,
+            and prepares an evidence package.
+          </p>
+          <p>
+            The output is management and implementation guidance. It can support an independent
+            review, but it is not the reviewer’s conclusion.
+          </p>
+        </article>
+        <article class="definition-card definition-card--independent">
+          <h3>Independent audit, assessment, or certification</h3>
+          <p>
+            Tests evidence and controls under the reviewer’s professional, regulatory,
+            contractual, or accreditation requirements.
+          </p>
+          <p>
+            The reviewer decides the opinion, report, certification, authorization, score,
+            or finding. Canonical Plus does not pre-approve that result.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container" style="position: relative; z-index: 1;">
+      <header class="section-header">
+        <span class="badge">Assessment flow</span>
+        <h2>Five reviewable phases</h2>
+        <p>
+          Each phase records assumptions and dependencies so a future reviewer can understand
+          how the readiness position was reached.
+        </p>
+      </header>
+
+      <div class="process-list">
+        <article class="process-step">
+          <div>
+            <h3>Business and framework fit</h3>
+            <p>Clarify customer demands, contractual obligations, regulated data, public-sector goals, and timing.</p>
+          </div>
+        </article>
+        <article class="process-step">
+          <div>
+            <h3>System and data boundary</h3>
+            <p>Define products, cloud services, identities, code paths, vendors, data flows, and explicit exclusions.</p>
+          </div>
+        </article>
+        <article class="process-step">
+          <div>
+            <h3>Control and evidence review</h3>
+            <p>Map current practices to requirements and assess design, operation, evidence quality, and ownership.</p>
+          </div>
+        </article>
+        <article class="process-step">
+          <div>
+            <h3>Risk-based remediation</h3>
+            <p>Sequence foundational and dependent work, define acceptance criteria, and track exceptions without hiding them.</p>
+          </div>
+        </article>
+        <article class="process-step">
+          <div>
+            <h3>Independent-review preparation</h3>
+            <p>Prepare a scope memo, control map, evidence index, open-issues log, and responsibility matrix for handoff.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Typical deliverables</span>
+        <h2>Artifacts that survive beyond a slide deck</h2>
+        <p>
+          Exact deliverables depend on scope. The following are planning targets,
+          not promises of audit outcome or certification.
+        </p>
+      </header>
+
+      <div class="card-grid card-grid--three">
+        {deliverables.map(([name, description]) => (
+          <article class="deliverable">
+            <strong>{name}</strong>
+            <p>{description}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">Choose the right approach</span>
+        <h2>Readiness support, automation platform, or audit firm?</h2>
+        <p>
+          Some teams need technical remediation help; others need continuous evidence automation;
+          others are ready to appoint an independent reviewer. The right answer can be a combination.
+        </p>
+        <div class="action-row">
+          <a href={compareHref} class="btn btn--secondary btn--large">Compare approaches</a>
+          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+            Start readiness assessment
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
