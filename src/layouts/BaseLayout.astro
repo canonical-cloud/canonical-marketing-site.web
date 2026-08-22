@@ -16,25 +16,28 @@ const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
 const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
+const themeInitScriptHref = `${baseNoSlash}/theme-init.js`;
 const siteScriptHref = `${baseNoSlash}/site.js`;
-const quoteHref = 'https://app.canonical.plus/u/quote';
+const quoteHref = 'https://app.canonical.plus/u/readiness';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" data-theme-preference="auto">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#0a0f18" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0a0f1a" id="theme-color" />
     <link rel="icon" type="image/svg+xml" href={faviconHref} />
-    <title>{title} | canonical.cloud</title>
+    <title>{title} | canonical.plus</title>
 
-    <meta property="og:title" content={`${title} | canonical.cloud`} />
+    <meta property="og:title" content={`${title} | canonical.plus`} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Canonical Plus" />
     <meta name="twitter:card" content="summary" />
+    <script src={themeInitScriptHref}></script>
   </head>
   <body>
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -57,7 +60,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
             </g>
           </svg>
           <span class="nav__logo-text">
-            <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.CLOUD</span>
+            <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.PLUS</span>
           </span>
         </a>
 
@@ -70,18 +73,30 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
           <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote" data-application-link="quote">Start readiness assessment</a>
         </div>
 
-        <button
-          class="nav__mobile-toggle"
-          id="nav-toggle"
-          type="button"
-          aria-controls="nav-links"
-          aria-expanded="false"
-          aria-label="Open navigation"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+        <div class="nav__actions">
+          <div class="theme-switcher theme-switcher--header" data-theme-switcher>
+            <span class="sr-only">Appearance</span>
+            <div class="theme-switcher__options" role="group" aria-label="Choose color theme">
+              <button type="button" class="theme-switcher__option" data-theme-choice="auto" aria-label="Use local time theme" title="Auto · follows your local time">A</button>
+              <button type="button" class="theme-switcher__option" data-theme-choice="light" aria-label="Use light theme" title="Light theme">L</button>
+              <button type="button" class="theme-switcher__option" data-theme-choice="medium" aria-label="Use medium theme" title="Medium theme">M</button>
+              <button type="button" class="theme-switcher__option" data-theme-choice="dark" aria-label="Use dark theme" title="Dark theme">D</button>
+            </div>
+          </div>
+
+          <button
+            class="nav__mobile-toggle"
+            id="nav-toggle"
+            type="button"
+            aria-controls="nav-links"
+            aria-expanded="false"
+            aria-label="Open navigation"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
       </div>
     </nav>
 
@@ -117,7 +132,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
                 </g>
               </svg>
               <span class="nav__logo-text">
-                <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.CLOUD</span>
+                <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.PLUS</span>
               </span>
             </a>
             <p class="footer__tagline">
@@ -151,8 +166,24 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
           </nav>
         </div>
 
+        <div class="footer__theme theme-switcher" data-theme-switcher>
+          <div>
+            <p class="footer__theme-title">Choose your viewing mode</p>
+            <p class="footer__theme-copy">
+              Auto follows your browser's local time: light by day, medium around dawn and dusk, and dark at night.
+              <span data-theme-status aria-live="polite">Auto · local time</span>
+            </p>
+          </div>
+          <div class="theme-switcher__options theme-switcher__options--labeled" role="group" aria-label="Choose footer color theme">
+            <button type="button" class="theme-switcher__option" data-theme-choice="auto">Auto</button>
+            <button type="button" class="theme-switcher__option" data-theme-choice="light">Light</button>
+            <button type="button" class="theme-switcher__option" data-theme-choice="medium">Medium</button>
+            <button type="button" class="theme-switcher__option" data-theme-choice="dark">Dark</button>
+          </div>
+        </div>
+
         <div class="footer__bottom">
-          <p class="footer__copy">&copy; {new Date().getFullYear()} canonical.cloud. All rights reserved.</p>
+          <p class="footer__copy">&copy; {new Date().getFullYear()} canonical.plus. All rights reserved.</p>
           <p class="footer__copy">No audit opinion, certification, authorization, or legal conclusion is promised by this site.</p>
         </div>
       </div>
@@ -177,6 +208,18 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         transform: translateY(0);
       }
 
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       #main-content:focus-visible {
         outline-offset: -3px;
       }
@@ -192,10 +235,19 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         right: 0;
         z-index: 1000;
         height: var(--nav-height);
-        background: rgba(10, 15, 24, 0.9);
+        background: var(--av-nav-bg);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
         border-bottom: 1px solid var(--av-border);
+        transition:
+          background-color var(--duration-normal) var(--ease-out),
+          border-color var(--duration-normal) var(--ease-out),
+          box-shadow var(--duration-normal) var(--ease-out);
+      }
+
+      .nav.nav--scrolled {
+        border-bottom-color: var(--av-nav-border-scrolled);
+        box-shadow: var(--shadow-sm);
       }
 
       .nav__inner {
@@ -278,6 +330,56 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         white-space: nowrap;
       }
 
+      .nav__actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        margin-left: var(--space-md);
+      }
+
+      .theme-switcher__options {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 3px;
+        border: 1px solid var(--av-border-hover);
+        border-radius: var(--radius-full);
+        background: var(--av-switcher-bg);
+        box-shadow: inset 0 1px 0 var(--av-highlight);
+      }
+
+      .theme-switcher__option {
+        min-width: 2rem;
+        min-height: 2rem;
+        padding: 0.35rem 0.55rem;
+        border-radius: var(--radius-full);
+        color: var(--av-text-muted);
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        transition:
+          color var(--duration-fast) var(--ease-out),
+          background-color var(--duration-fast) var(--ease-out),
+          box-shadow var(--duration-fast) var(--ease-out),
+          transform var(--duration-fast) var(--ease-out);
+      }
+
+      .theme-switcher__option:hover {
+        color: var(--av-text-primary);
+        background: var(--av-surface-hover);
+      }
+
+      .theme-switcher__option[aria-pressed='true'] {
+        color: var(--av-theme-active-text);
+        background: var(--av-theme-active-bg);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .theme-switcher__option:active {
+        transform: scale(0.96);
+      }
+
       .nav__mobile-toggle {
         display: none;
         flex-direction: column;
@@ -298,7 +400,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
       .footer {
         border-top: 1px solid var(--av-border);
         padding: var(--space-3xl) 0 var(--space-xl);
-        background: var(--av-black);
+        background: var(--av-footer-bg);
       }
 
       .footer__boundary {
@@ -374,6 +476,37 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         border-top: 1px solid var(--av-border);
       }
 
+      .footer__theme {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-xl);
+        padding: var(--space-lg) 0;
+        border-top: 1px solid var(--av-border);
+      }
+
+      .footer__theme-title {
+        color: var(--av-text-primary);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .footer__theme-copy {
+        margin-top: 0.2rem;
+        color: var(--av-text-muted);
+        font-size: 0.8rem;
+      }
+
+      .footer__theme-copy [data-theme-status] {
+        color: var(--av-teal);
+        white-space: nowrap;
+      }
+
+      .theme-switcher__options--labeled .theme-switcher__option {
+        min-width: auto;
+        padding-inline: 0.8rem;
+      }
+
       .footer__copy {
         max-width: 42rem;
         font-size: 0.8rem;
@@ -398,6 +531,11 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
           flex-wrap: wrap;
           gap: var(--space-2xl);
         }
+
+        .footer__theme {
+          align-items: flex-start;
+          flex-direction: column;
+        }
       }
 
       @media (max-width: 768px) {
@@ -415,7 +553,7 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
           align-items: stretch;
           gap: 0;
           padding: var(--space-md);
-          background: rgba(10, 15, 24, 0.98);
+          background: var(--av-nav-bg-strong);
           border-bottom: 1px solid var(--av-border);
         }
 
@@ -438,6 +576,24 @@ const quoteHref = 'https://app.canonical.plus/u/quote';
         .footer__bottom {
           flex-direction: column;
           text-align: center;
+        }
+
+        .theme-switcher__options--labeled {
+          width: 100%;
+        }
+
+        .theme-switcher__options--labeled .theme-switcher__option {
+          flex: 1;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .nav > .nav__inner > .nav__logo .nav__logo-text {
+          display: none;
+        }
+
+        .nav__actions {
+          margin-left: 0;
         }
       }
     </style>

@@ -5,7 +5,7 @@ import { chromeExecutablePath, startSite } from "./site-browser-harness.mjs";
 
 const pageText = (page) => page.evaluate(() => document.body.innerText);
 
-test("puppeteer renders the readiness-first canonical.cloud landing page", async (t) => {
+test("puppeteer renders the readiness-first canonical.plus landing page", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
@@ -22,7 +22,7 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle0" });
-  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.cloud");
+  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.plus");
 
   const heroTitle = await page.$eval(".hero__title", (element) =>
     (element.textContent ?? "").replace(/\s+/g, " ").trim(),
@@ -32,7 +32,7 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
   const brand = await page.$eval(".nav__logo-text", (element) =>
     (element.textContent ?? "").replace(/\s+/g, "").trim(),
   );
-  assert.match(brand, /CANONICAL\.CLOUD/);
+  assert.match(brand, /CANONICAL\.PLUS/);
 
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
@@ -40,11 +40,11 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
   assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "Sign in"]);
   assert.equal(
     await page.$eval("#nav-sign-in", (element) => element.href),
-    "https://app.canonical.plus/u/quote",
+    "https://app.canonical.plus/u/readiness",
   );
   assert.equal(
     await page.$eval("#nav-quote", (element) => element.href),
-    "https://app.canonical.plus/u/quote",
+    "https://app.canonical.plus/u/readiness",
   );
 
   const serviceCards = await page.$$eval("#services .services__card h3", (nodes) =>
@@ -62,7 +62,7 @@ test("puppeteer renders the readiness-first canonical.cloud landing page", async
     true,
   );
   assert.match(await pageText(page), /Readiness, not independent assurance/);
-  assert.match(await pageText(page), /canonical\.cloud\. All rights reserved/);
+  assert.match(await pageText(page), /canonical\.plus\. All rights reserved/);
 
   assert.deepEqual(pageErrors, []);
 });

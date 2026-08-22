@@ -60,7 +60,7 @@ test("puppeteer: hero CTAs target the readiness app and explanatory page", async
 
   assert.equal(
     await page.$eval("#hero-cta-primary", (element) => element.getAttribute("href")),
-    "https://app.canonical.plus/u/quote",
+    "https://app.canonical.plus/u/readiness",
   );
   assert.equal(
     await page.$eval("#hero-cta-primary", (element) => element.getAttribute("data-application-link")),

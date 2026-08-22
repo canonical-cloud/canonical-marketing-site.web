@@ -1,7 +1,7 @@
 const APP_SCHEME = 'https';
 const APP_HOST = 'app.canonical.plus';
 const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
-const READINESS_PATH = '/u/quote';
+const READINESS_PATH = '/u/readiness';
 const readinessUrl = new URL(READINESS_PATH, APP_ORIGIN);
 const signInUrl = new URL(READINESS_PATH, APP_ORIGIN);
 
@@ -22,15 +22,74 @@ configureApplicationLinks();
 const nav = document.getElementById('main-nav');
 
 if (nav) {
+  const updateNavigationElevation = () => {
+    nav.classList.toggle('nav--scrolled', window.scrollY > 10);
+  };
+
+  updateNavigationElevation();
   window.addEventListener(
     'scroll',
-    () => {
-      nav.style.borderBottomColor = window.scrollY > 10
-        ? 'rgba(255,255,255,0.1)'
-        : 'rgba(255,255,255,0.06)';
-    },
+    updateNavigationElevation,
     { passive: true },
   );
+}
+
+const themeController = window.canonicalTheme;
+
+if (themeController) {
+  const themeButtons = document.querySelectorAll('[data-theme-choice]');
+  const themeStatuses = document.querySelectorAll('[data-theme-status]');
+
+  const synchronizeThemeControls = () => {
+    const { theme, themePreference } = document.documentElement.dataset;
+
+    for (const button of themeButtons) {
+      if (!(button instanceof HTMLButtonElement)) {
+        continue;
+      }
+
+      const selected = button.dataset.themeChoice === themePreference;
+      button.setAttribute('aria-pressed', String(selected));
+    }
+
+    const status = themePreference === 'auto'
+      ? `Auto · ${theme} from local time`
+      : `${theme[0].toUpperCase()}${theme.slice(1)} · manual`;
+
+    for (const node of themeStatuses) {
+      node.textContent = status;
+    }
+  };
+
+  for (const button of themeButtons) {
+    button.addEventListener('click', () => {
+      themeController.apply(button.dataset.themeChoice, { persist: true });
+      synchronizeThemeControls();
+    });
+  }
+
+  window.addEventListener('storage', (event) => {
+    if (event.key === themeController.storageKey) {
+      themeController.apply(themeController.readPreference());
+      synchronizeThemeControls();
+    }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && document.documentElement.dataset.themePreference === 'auto') {
+      themeController.apply('auto');
+      synchronizeThemeControls();
+    }
+  });
+
+  window.setInterval(() => {
+    if (document.documentElement.dataset.themePreference === 'auto') {
+      themeController.apply('auto');
+      synchronizeThemeControls();
+    }
+  }, 60_000);
+
+  synchronizeThemeControls();
 }
 
 const skipLink = document.querySelector('.skip-link');

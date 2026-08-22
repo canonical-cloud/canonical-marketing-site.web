@@ -51,13 +51,13 @@ test("primary calls to action stay on reviewed boundaries", () => {
 });
 
 test("layout keeps production metadata and viewport controls", () => {
-  assert.match(layout, /<html lang="en">/);
+  assert.match(layout, /<html lang="en"[^>]*>/);
   assert.match(layout, /name="viewport"/);
   assert.match(layout, /name="description"/);
   assert.match(layout, /property="og:title"/);
   assert.match(layout, /property="og:description"/);
   assert.match(layout, /name="twitter:card"/);
-  assert.match(layout, /<title>\{title\} \| canonical\.cloud<\/title>/);
+  assert.match(layout, /<title>\{title\} \| canonical\.plus<\/title>/);
   assert.match(compare, /target="_blank" rel="noopener noreferrer"/);
 });
 
@@ -148,7 +148,7 @@ test("quote and sign-in links use the canonical application boundary", () => {
   assert.match(siteScript, /const APP_SCHEME = 'https'/);
   assert.match(siteScript, /const APP_HOST = 'app\.canonical\.plus'/);
   assert.match(siteScript, /\[APP_SCHEME, APP_HOST\]\.join\('\:\/\/'\)/);
-  assert.match(siteScript, /const READINESS_PATH = '\/u\/quote'/);
+  assert.match(siteScript, /const READINESS_PATH = '\/u\/readiness'/);
   assert.match(siteScript, /new URL\(READINESS_PATH, APP_ORIGIN\)/);
   assert.doesNotMatch(siteScript, /\/auth\/start|return_to/);
   assert.doesNotMatch(siteScript, /access_token|refresh_token|id_token/i);

@@ -39,7 +39,7 @@ tests/
 ```
 
 The authenticated assessment entry point is exactly
-`https://app.canonical.plus/u/quote`. Marketing pages must not place tokens,
+`https://app.canonical.plus/u/readiness`. Marketing pages must not place tokens,
 identity assertions, return destinations, or other credentials in that URL.
 
 ## Claims policy

@@ -1,6 +1,6 @@
 name: live browser smoke
 
-# This job exercises the deployed canonical.cloud origin rather than a PR
+# This job exercises the deployed canonical.plus origin rather than a PR
 # checkout or local preview. It is deliberately scheduled/manual only so an
 # external deployment incident cannot make an unrelated source PR unmergeable.
 on:
@@ -23,7 +23,7 @@ jobs:
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
       PUPPETEER_SKIP_DOWNLOAD: "true"
       CANONICAL_REQUIRE_SECURITY_HEADERS: "1"
-      CANONICAL_SITE_TEST_URL: https://canonical.cloud
+      CANONICAL_SITE_TEST_URL: https://canonical.plus
       CANONICAL_BROWSER_ARTIFACT_DIR: artifacts/live-browser-smoke
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

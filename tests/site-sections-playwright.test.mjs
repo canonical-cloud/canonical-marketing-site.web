@@ -67,7 +67,7 @@ test("playwright: contact CTA preserves the application and email boundaries", a
   await contact.getByRole("link", { name: /Start readiness assessment/ }).waitFor({ state: "visible" });
   assert.equal(
     await page.locator("#cta-readiness-btn").getAttribute("href"),
-    "https://app.canonical.plus/u/quote",
+    "https://app.canonical.plus/u/readiness",
   );
   assert.equal(
     await page.locator("#cta-contact-btn").getAttribute("href"),
