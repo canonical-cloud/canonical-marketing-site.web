@@ -8,7 +8,7 @@ const layout = await readFile(
 );
 
 test("marketing navigation exposes the authenticated canonical.plus readiness entry point", () => {
-  assert.match(layout, /const quoteHref = 'https:\/\/app\.canonical\.plus\/u\/quote';/);
+  assert.match(layout, /const quoteHref = 'https:\/\/app\.canonical\.plus\/u\/readiness';/);
   assert.match(layout, /id="nav-sign-in"[^>]*>Sign in<\/a>/);
   assert.match(layout, /id="nav-quote"[^>]*>Start readiness assessment<\/a>/);
 });

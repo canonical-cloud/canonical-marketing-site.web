@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
-const quoteHref = 'https://app.canonical.plus/u/quote';
+const quoteHref = 'https://app.canonical.plus/u/readiness';
 
 const assuranceTargets = [
   {
@@ -58,6 +58,12 @@ const securityPrograms = [
     artifacts: ['Implementation Group selection', 'Safeguard gap map', 'Technical remediation backlog'],
   },
   {
+    name: 'ISO 22301',
+    meta: 'Business continuity certification target',
+    summary: 'Readiness for a business continuity management system, impact analysis, recovery objectives, exercises, and certification-body review.',
+    artifacts: ['BCMS scope and continuity policy', 'Business impact and recovery assumptions', 'Exercise, corrective-action, and handoff plan'],
+  },
+  {
     name: 'CSA Cloud Controls Matrix / STAR',
     meta: 'Cloud assurance framework',
     summary: 'Readiness for cloud control mapping, shared-responsibility evidence, and the selected STAR assurance level.',
@@ -107,7 +113,7 @@ const sections = [
 
 <BaseLayout
   title="Compliance framework readiness"
-  description="Explore Canonical Plus readiness coverage for SOC 2, ISO 27001, HIPAA, GDPR, NIST, PCI DSS, FedRAMP, CMMC, CIS Controls, CSA CCM, NIS2, DORA, and ISO 27701."
+  description="Explore Canonical Plus readiness coverage for SOC 2, ISO 27001, ISO 22301, HIPAA, GDPR, NIST, PCI DSS, FedRAMP, CMMC, CIS Controls, CSA CCM, NIS2, DORA, and ISO 27701."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">

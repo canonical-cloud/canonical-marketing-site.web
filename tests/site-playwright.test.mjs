@@ -13,7 +13,7 @@ async function launchBrowser(t) {
   return browser;
 }
 
-test("playwright renders the readiness-first canonical.cloud landing page", async (t) => {
+test("playwright renders the readiness-first canonical.plus landing page", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
@@ -23,7 +23,7 @@ test("playwright renders the readiness-first canonical.cloud landing page", asyn
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
-  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.cloud");
+  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.plus");
 
   const hero = page.getByRole("heading", { level: 1 });
   await hero.waitFor({ state: "visible" });
@@ -48,11 +48,11 @@ test("playwright renders the readiness-first canonical.cloud landing page", asyn
 
   assert.equal(
     await page.locator("#hero-cta-primary").getAttribute("href"),
-    "https://app.canonical.plus/u/quote",
+    "https://app.canonical.plus/u/readiness",
   );
   await page.locator('a[href="mailto:compliance@canonical.cloud"]').first().waitFor({ state: "visible" });
   await page.locator("footer").getByText(/Readiness, not independent assurance/).waitFor({ state: "visible" });
-  await page.locator("footer").getByText(/canonical\.cloud\. All rights reserved/).waitFor({ state: "visible" });
+  await page.locator("footer").getByText(/canonical\.plus\. All rights reserved/).waitFor({ state: "visible" });
 
   assert.deepEqual(pageErrors, []);
 });

@@ -5,7 +5,7 @@ version = "0.1.0"
 description = "Canonical Cloud public Astro marketing site"
 license = "MIT"
 keywords = ["marketing", "astro", "compliance", "web"]
-language = "typescript"
+language = "nodejs"
 
 [package.repository]
 vcs = "git"
@@ -25,6 +25,4 @@ adapter = "none"
 dir = ".vendor/.zed"
 
 [scripts]
-test = "npm test"
-browser-test = "npm run test:browser"
-build = "npm run build"
+test = "npm test && npm run build"
