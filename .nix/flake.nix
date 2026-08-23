@@ -23,6 +23,10 @@
         {
           default = pkgs.mkShell {
             packages = with pkgs; [
+              # encrypted env files — env/enc/*.env.enc (sops + age), see env/README.md
+              sops
+              age
+              just
               nodejs
               pnpm
 
