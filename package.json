@@ -7,10 +7,12 @@
     "dev": "astro dev",
     "start": "astro dev",
     "build": "astro build",
+    "postbuild": "node scripts/release-manifest.mjs stamp",
     "preview": "astro preview",
     "astro": "astro",
-    "test": "npm run build && node --test tests/site-contract.test.mjs tests/theme-contract.test.mjs tests/marketing-claims-contract.test.mjs tests/quote-cta-contract.test.mjs tests/csp-contract.test.mjs tests/actions-contract.test.mjs",
-    "test:browser": "npm run build && node --test --test-concurrency=1 --test-timeout=120000 tests/*-playwright.test.mjs tests/*-puppeteer.test.mjs"
+    "test": "npm run build && node --test tests/site-contract.test.mjs tests/theme-contract.test.mjs tests/marketing-claims-contract.test.mjs tests/quote-cta-contract.test.mjs tests/csp-contract.test.mjs tests/actions-contract.test.mjs tests/release-manifest.test.mjs",
+    "test:browser": "npm run build && node --test --test-concurrency=1 --test-timeout=120000 tests/*-playwright.test.mjs tests/*-puppeteer.test.mjs",
+    "verify:release": "node scripts/release-manifest.mjs verify"
   },
   "dependencies": {
     "astro": "^7.2.4"
