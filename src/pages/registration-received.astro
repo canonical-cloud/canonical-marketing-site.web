@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import '../styles/public-intake.css';
+
+const quoteHref = 'https://user.canonical.plus/u/quote';
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const homeHref = `${baseNoSlash}/`;
+---
+
+<BaseLayout
+  title="Registration received"
+  description="Uniform Canonical Plus confirmation for accepted public-intake submissions."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container intake-receipt" data-public-intake-receipt="accepted">
+      <span class="badge">Accepted</span>
+      <h1>Your submission was received</h1>
+      <p>
+        Canonical Plus returns this same confirmation for new, repeated, and previously known
+        contact addresses. This page does not reveal whether an address already existed.
+      </p>
+      <p>
+        No account, role, entitlement, quote, audit, certification, or authorization was created.
+      </p>
+      <div class="action-row">
+        <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">
+          Continue to the existing quote flow
+        </a>
+        <a class="btn btn--secondary btn--large" href={homeHref}>Return to Canonical Plus</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
