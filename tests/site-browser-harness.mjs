@@ -1,11 +1,23 @@
 // Self-contained boot recipe for the marketing-site browser e2e.
 //
 // canonical-marketing-site.web has no shared test-config package, so Chrome
-// discovery and the `astro preview` server lifecycle both live here, next to
-// the specs that use them.
-import { spawn } from "node:child_process";
+// discovery and the static-server lifecycle both live here, next to the specs
+// that use them.
+import { once } from "node:events";
 import { existsSync } from "node:fs";
-import net from "node:net";
+import { readFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import { extname, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const DIST_ROOT = fileURLToPath(new URL("../dist/", import.meta.url));
+const CONTENT_TYPES = Object.freeze({
+  ".css": "text/css; charset=utf-8",
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml; charset=utf-8",
+});
 
 // Resolve a Chrome/Chromium executable for Playwright/Puppeteer.
 //
@@ -33,30 +45,57 @@ export function chromeExecutablePath() {
   return undefined;
 }
 
-function freePort() {
-  return new Promise((resolve, reject) => {
-    const srv = net.createServer();
-    srv.on("error", reject);
-    srv.listen(0, "127.0.0.1", () => {
-      const { port } = srv.address();
-      srv.close(() => resolve(port));
-    });
-  });
-}
+const fileForPath = (pathname) => {
+  const relativePath = pathname.endsWith("/")
+    ? `${pathname.slice(1)}index.html`
+    : pathname.slice(1);
+  const candidate = resolve(DIST_ROOT, relativePath);
+  const relationship = relative(DIST_ROOT, candidate);
+  return relationship === ".." || relationship.startsWith(`..${sep}`)
+    ? null
+    : candidate;
+};
 
-async function waitForReady(url, timeoutMs) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      const res = await fetch(url);
-      if (res.ok || res.status === 404) return;
-    } catch {
-      // server not up yet
-    }
-    await new Promise((r) => setTimeout(r, 250));
+const status = (response, code) => {
+  response.writeHead(code, {
+    "cache-control": "no-store",
+    "content-type": "text/plain; charset=utf-8",
+  });
+  response.end();
+};
+
+const serveStaticRequest = async (request, response) => {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    status(response, 405);
+    return;
   }
-  throw new Error(`site did not become ready at ${url} within ${timeoutMs}ms`);
-}
+
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(request.url ?? "/", "http://127.0.0.1").pathname);
+  } catch {
+    status(response, 400);
+    return;
+  }
+
+  const file = fileForPath(pathname);
+  if (file === null) {
+    status(response, 404);
+    return;
+  }
+
+  try {
+    const body = await readFile(file);
+    response.writeHead(200, {
+      "cache-control": "no-store",
+      "content-length": String(body.length),
+      "content-type": CONTENT_TYPES[extname(file)] ?? "application/octet-stream",
+    });
+    response.end(request.method === "HEAD" ? undefined : body);
+  } catch (error) {
+    status(response, error?.code === "ENOENT" ? 404 : 500);
+  }
+};
 
 // Boots `astro preview` on an ephemeral port and waits until it answers.
 //
@@ -68,45 +107,26 @@ export async function startSite() {
     return { url: reuse.replace(/\/+$/, ""), stop: () => {} };
   }
 
-  const port = await freePort();
-  const url = `http://127.0.0.1:${port}`;
-  // `npm run preview` forks an `astro preview` grandchild. Spawn detached so the
-  // child is a process-group leader, and use `stdio: "ignore"` so the grandchild
-  // never inherits this process's stdout/stderr — otherwise it holds those pipes
-  // open and node --test's per-file subprocess never exits (it hangs to the test
-  // timeout even after the assertions pass).
-  const child = spawn(
-    "npm",
-    ["run", "preview", "--", "--port", String(port), "--host", "127.0.0.1"],
-    {
-      cwd: new URL("..", import.meta.url).pathname,
-      stdio: "ignore",
-      detached: true,
-    },
-  );
-  child.unref();
+  const server = createServer((request, response) => {
+    serveStaticRequest(request, response).catch(() => status(response, 500));
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
 
-  const stop = () => {
-    if (child.pid === undefined) return;
-    // Kill the whole process group (npm + the astro grandchild). Negative pid
-    // targets the group whose leader is `child` (created by detached: true).
-    try {
-      process.kill(-child.pid, "SIGTERM");
-    } catch {
-      try {
-        child.kill("SIGTERM");
-      } catch {
-        // already gone
-      }
-    }
-  };
-
-  try {
-    await waitForReady(`${url}/`, 45000);
-  } catch (err) {
-    stop();
-    throw err;
+  const address = server.address();
+  if (address === null || typeof address === "string") {
+    await new Promise((resolve) => server.close(resolve));
+    throw new Error("static test server did not expose a TCP address");
   }
 
-  return { url, stop };
+  let stopped = false;
+  const stop = () => {
+    if (stopped) return Promise.resolve();
+    stopped = true;
+    return new Promise((resolveStop, rejectStop) => {
+      server.close((error) => (error ? rejectStop(error) : resolveStop()));
+    });
+  };
+
+  return { url: `http://127.0.0.1:${address.port}`, stop };
 }

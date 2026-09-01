@@ -57,6 +57,48 @@ test("playwright renders the readiness-first canonical.plus landing page", async
   assert.deepEqual(pageErrors, []);
 });
 
+test("playwright exercises every header and footer theme control", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+
+  const page = await browser.newPage({ viewport: { height: 900, width: 1440 } });
+  await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
+
+  assert.equal(await page.evaluate(() => typeof window.canonicalTheme?.apply), "function");
+
+  for (const theme of ["light", "medium", "dark"]) {
+    const header = page.locator(`[data-theme-switcher].theme-switcher--header [data-theme-choice="${theme}"]`);
+    await header.click();
+    assert.deepEqual(
+      await page.evaluate(() => ({
+        preference: document.documentElement.dataset.themePreference,
+        theme: document.documentElement.dataset.theme,
+      })),
+      { preference: theme, theme },
+    );
+    assert.equal(await header.getAttribute("aria-pressed"), "true");
+    assert.equal(
+      await page.locator(`footer [data-theme-choice="${theme}"]`).getAttribute("aria-pressed"),
+      "true",
+    );
+    await page.locator("[data-theme-status]").getByText(new RegExp(`^${theme} · manual$`, "i")).waitFor();
+  }
+
+  await page.locator('footer [data-theme-choice="auto"]').click();
+  const automatic = await page.evaluate(() => ({
+    preference: document.documentElement.dataset.themePreference,
+    theme: document.documentElement.dataset.theme,
+  }));
+  assert.equal(automatic.preference, "auto");
+  assert.ok(["light", "medium", "dark"].includes(automatic.theme));
+  assert.equal(
+    await page.locator('[data-theme-switcher].theme-switcher--header [data-theme-choice="auto"]').getAttribute("aria-pressed"),
+    "true",
+  );
+  await page.locator("[data-theme-status]").getByText(new RegExp(`^Auto · ${automatic.theme} from local time$`)).waitFor();
+});
+
 test("playwright keeps mobile navigation operable by keyboard and touch", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
