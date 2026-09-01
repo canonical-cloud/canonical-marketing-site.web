@@ -1,0 +1,174 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import '../styles/public-intake.css';
+
+const quoteHref = 'https://user.canonical.plus/u/quote';
+const applicationHref = 'https://org.canonical.plus/submit-application';
+const formAction = '/forms/pre-interest';
+const interestAreas = [
+  ['readiness_assessment', 'Readiness assessment'],
+  ['soc2', 'SOC 2'],
+  ['iso_27001', 'ISO 27001'],
+  ['hipaa', 'HIPAA'],
+  ['pci_dss_4', 'PCI DSS 4'],
+  ['fedramp', 'FedRAMP'],
+  ['nist', 'NIST'],
+  ['gdpr', 'GDPR'],
+  ['cmmc', 'CMMC'],
+];
+---
+
+<BaseLayout
+  title="Register your interest"
+  description="Register interest in Canonical Plus readiness support without creating an account or submitting a quote."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container intake-shell">
+      <header class="intake-header">
+        <span class="badge">Pre-interest registration</span>
+        <h1>Tell us what you are preparing for</h1>
+        <p>
+          This short form records interest only. It does not create an account, submit a quote,
+          grant access, or promise an audit, certification, authorization, or outcome.
+        </p>
+      </header>
+
+      <div class="intake-grid">
+        <form
+          class="intake-form"
+          action={formAction}
+          method="post"
+          accept-charset="UTF-8"
+          data-public-intake-form="individual"
+          data-required-host="user.canonical.plus"
+          aria-describedby="registration-boundary"
+        >
+          <input type="hidden" name="consentRevision" value="pre-interest-v1" />
+          <input type="hidden" name="marketingConsentCopyRevision" value="marketing-v1" />
+
+          <div class="intake-field">
+            <label for="pre-interest-email">Email address <span aria-hidden="true">*</span></label>
+            <input
+              id="pre-interest-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              maxlength="320"
+              required
+            />
+          </div>
+
+          <div class="intake-field">
+            <label for="pre-interest-name">Name <span class="intake-optional">(optional)</span></label>
+            <input
+              id="pre-interest-name"
+              name="displayName"
+              type="text"
+              autocomplete="name"
+              maxlength="120"
+            />
+          </div>
+
+          <div class="intake-field">
+            <label for="pre-interest-website">Website <span class="intake-optional">(optional)</span></label>
+            <input
+              id="pre-interest-website"
+              name="websiteUrl"
+              type="url"
+              inputmode="url"
+              autocomplete="url"
+              maxlength="2048"
+              placeholder="https://example.com"
+              pattern="https://.*"
+            />
+          </div>
+
+          <fieldset class="intake-fieldset">
+            <legend>What are you interested in? <span aria-hidden="true">*</span></legend>
+            <p class="intake-help" id="individual-interest-help">Choose one or more bounded categories. The server rejects an empty selection.</p>
+            <div class="intake-options" aria-describedby="individual-interest-help">
+              {interestAreas.map(([value, label]) => (
+                <label class="intake-option">
+                  <input
+                    type="checkbox"
+                    name="interestAreas"
+                    value={value}
+                  />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <div class="intake-consent">
+            <label class="intake-choice">
+              <input
+                type="checkbox"
+                name="registrationConsent"
+                value="true"
+                required
+              />
+              <span>
+                I consent to Canonical Plus storing this registration and contacting me about
+                the selected interests. This consent is separate from any future quote.
+              </span>
+            </label>
+          </div>
+
+          <fieldset class="intake-fieldset">
+            <legend>Marketing permission <span aria-hidden="true">*</span></legend>
+            <p class="intake-help">
+              Choose explicitly. Declining does not prevent this registration from being accepted.
+            </p>
+            <div class="intake-radio-row">
+              <label class="intake-choice">
+                <input type="radio" name="marketingPermission" value="yes" required />
+                <span>Yes, send occasional product updates.</span>
+              </label>
+              <label class="intake-choice">
+                <input type="radio" name="marketingPermission" value="no" required />
+                <span>No marketing messages.</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <p id="registration-boundary" class="intake-boundary">
+            The same-origin BFF derives the verified host, party type, acceptance time, and opaque
+            idempotency identifier. Contact data is not placed in URLs, logs, or idempotency keys.
+          </p>
+
+          <button class="btn btn--primary btn--large" type="submit">
+            Submit pre-interest registration
+          </button>
+        </form>
+
+        <aside class="intake-aside">
+          <h2>Prefer an organization application?</h2>
+          <p>
+            Use the organization route when you are applying on behalf of a company, agency,
+            nonprofit, or other organization.
+          </p>
+          <a class="btn btn--secondary" href={applicationHref}>Submit an organization application</a>
+
+          <hr />
+
+          <h2>Ready for the full quote?</h2>
+          <p>Registration never starts the quote automatically.</p>
+          <a class="btn btn--secondary" href={quoteHref} data-application-link="quote">
+            Open the existing quote flow
+          </a>
+        </aside>
+      </div>
+
+      <noscript>
+        <p class="intake-noscript">
+          JavaScript is not required. This form uses a normal HTTPS POST to the same-origin
+          Canonical BFF.
+        </p>
+      </noscript>
+    </div>
+  </section>
+</BaseLayout>
