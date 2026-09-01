@@ -97,7 +97,7 @@ const serveStaticRequest = async (request, response) => {
   }
 };
 
-// Boots `astro preview` on an ephemeral port and waits until it answers.
+// Boots the bounded in-process static server on an ephemeral port.
 //
 // The site is built with base `/` (astro.config.mjs), so pages are served at
 // `${url}/`. Set CANONICAL_SITE_TEST_URL to run against an already-running site.
