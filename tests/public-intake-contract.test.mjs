@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
+const chooser = await readFile(
+  new URL("../src/pages/interest/index.astro", import.meta.url),
+  "utf8",
+);
 const individual = await readFile(
   new URL("../src/pages/pre-interest.astro", import.meta.url),
   "utf8",
@@ -16,12 +20,22 @@ const receipt = await readFile(
 );
 const pages = [individual, organization];
 
+test("marketing chooser routes to the two standard hosts without accepting a form", () => {
+  assert.match(chooser, /data-public-intake-chooser="standard-hosts"/);
+  assert.match(chooser, /https:\/\/user\.canonical\.plus\/pre-interest/);
+  assert.match(chooser, /https:\/\/org\.canonical\.plus\/submit-application/);
+  assert.match(chooser, /https:\/\/user\.canonical\.plus\/u\/quote/);
+  assert.doesNotMatch(chooser, /<form/);
+  assert.doesNotMatch(chooser, /\/forms\/pre-interest/);
+  assert.doesNotMatch(chooser, /https:\/\/(?:auth|admin|api-admin)\.canonical\.plus/);
+});
+
 test("public intake pages use the standard user and organization host contract", () => {
   assert.match(individual, /data-required-host="user\.canonical\.plus"/);
   assert.match(organization, /data-required-host="org\.canonical\.plus"/);
   assert.match(individual, /https:\/\/org\.canonical\.plus\/submit-application/);
   assert.match(organization, /https:\/\/user\.canonical\.plus\/pre-interest/);
-  for (const page of [...pages, receipt]) {
+  for (const page of [...pages, receipt, chooser]) {
     assert.match(page, /https:\/\/user\.canonical\.plus\/u\/quote/);
     assert.doesNotMatch(page, /https:\/\/app\.canonical\.plus\/u\/readiness/);
   }
@@ -83,7 +97,7 @@ test("accepted receipt is enumeration resistant and never implies quote creation
 });
 
 test("pages never embed credentials, tokens, or database connection material", () => {
-  const combined = [...pages, receipt].join("\n").toLowerCase();
+  const combined = [...pages, receipt, chooser].join("\n").toLowerCase();
   assert.doesNotMatch(combined, /database_url|postgres(?:ql)?:\/\/|supabase_service|authorization:\s*bearer/i);
   assert.doesNotMatch(combined, /access_token|refresh_token|client_secret|api[_-]?key/i);
 });
