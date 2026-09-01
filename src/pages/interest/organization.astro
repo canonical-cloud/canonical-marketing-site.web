@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PreInterestForm from '../../components/PreInterestForm.astro';
+import '../../styles/global.css';
+import '../../styles/marketing-pages.css';
+---
+
+<BaseLayout
+  title="Register organization interest"
+  description="Register organization interest in Canonical Plus readiness services without creating an account or submitting a quote."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container">
+      <span class="badge">Organization registration</span>
+      <h1 class="page-hero__title">
+        Register interest on
+        <span class="gradient-text">org.canonical.plus</span>
+      </h1>
+      <p class="page-hero__subtitle">
+        This path is for an organization representative. The organization
+        name is required, bounded, and kept separate from any later quote.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <PreInterestForm partyType="organization" />
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/global.css';
+import '../../styles/marketing-pages.css';
+
+const individualHref = 'https://user.canonical.plus/interest/individual/';
+const organizationHref = 'https://org.canonical.plus/interest/organization/';
+const quoteHref = 'https://app.canonical.plus/u/readiness';
+---
+
+<BaseLayout
+  title="Register interest"
+  description="Register interest in Canonical Plus compliance-readiness services without creating an account or submitting a quote."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container">
+      <div class="page-hero__copy">
+        <span class="badge">Pre-interest registration</span>
+        <h1 class="page-hero__title">
+          Tell us which readiness work matters
+          <span class="gradient-text">before creating an account</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Choose the registration path that matches who you represent. Each
+          path stays on its own standard Canonical host and records contact
+          consent separately from account, marketing, and quote consent.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container card-grid">
+      <article class="card">
+        <span class="badge">Individual</span>
+        <h2>I am registering for myself</h2>
+        <p>
+          Use the individual path on <code>user.canonical.plus</code>. An
+          organization name is not collected on this path.
+        </p>
+        <a
+          class="btn btn--primary"
+          href={individualHref}
+          id="interest-individual"
+        >
+          Register individual interest
+        </a>
+      </article>
+
+      <article class="card">
+        <span class="badge">Organization</span>
+        <h2>I represent an organization</h2>
+        <p>
+          Use the organization path on <code>org.canonical.plus</code>. The
+          organization name is required and bounded.
+        </p>
+        <a
+          class="btn btn--primary"
+          href={organizationHref}
+          id="interest-organization"
+        >
+          Register organization interest
+        </a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container cta-panel">
+      <h2>Ready to provide the full readiness scope?</h2>
+      <p>
+        The authenticated quote workflow is separate. Nothing on the
+        pre-interest path automatically creates or submits a quote.
+      </p>
+      <a class="btn btn--secondary" href={quoteHref}>
+        Start a readiness assessment instead
+      </a>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PreInterestForm from '../../components/PreInterestForm.astro';
+import '../../styles/global.css';
+import '../../styles/marketing-pages.css';
+---
+
+<BaseLayout
+  title="Register individual interest"
+  description="Register individual interest in Canonical Plus readiness services without creating an account or submitting a quote."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container">
+      <span class="badge">Individual registration</span>
+      <h1 class="page-hero__title">
+        Register interest on
+        <span class="gradient-text">user.canonical.plus</span>
+      </h1>
+      <p class="page-hero__subtitle">
+        This path is for one person. It does not accept an organization name
+        and does not create an account or quote.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <PreInterestForm partyType="individual" />
+    </div>
+  </section>
+</BaseLayout>
