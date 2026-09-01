@@ -125,6 +125,10 @@ export async function startSite() {
     stopped = true;
     return new Promise((resolveStop, rejectStop) => {
       server.close((error) => (error ? rejectStop(error) : resolveStop()));
+      // Playwright route.fetch() may retain a keep-alive socket after the test
+      // has completed. Closing owned sockets makes teardown deterministic on
+      // both local macOS and hosted Linux runners.
+      server.closeAllConnections();
     });
   };
 
