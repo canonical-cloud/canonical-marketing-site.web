@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/global.css';
+import '../../styles/marketing-pages.css';
+import '../../styles/public-intake.css';
+
+const individualHref = 'https://user.canonical.plus/pre-interest';
+const organizationHref = 'https://org.canonical.plus/submit-application';
+const quoteHref = 'https://user.canonical.plus/u/quote';
+---
+
+<BaseLayout
+  title="Register interest"
+  description="Choose the Canonical Plus individual or organization pre-interest path without creating an account or submitting a quote."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container intake-shell" data-public-intake-chooser="standard-hosts">
+      <header class="intake-header">
+        <span class="badge">Pre-interest registration</span>
+        <h1>Choose the registration path that matches who you represent</h1>
+        <p>
+          The marketing site does not receive database credentials or accept the
+          registration itself. Continue to the standard user or organization host.
+        </p>
+      </header>
+
+      <div class="intake-grid">
+        <article class="intake-aside">
+          <h2>Register as an individual</h2>
+          <p>
+            Use <code>user.canonical.plus</code> when you are registering for yourself.
+            An organization name is not collected on that path.
+          </p>
+          <a
+            class="btn btn--primary btn--large"
+            href={individualHref}
+            data-public-intake-link="individual"
+          >
+            Open individual registration
+          </a>
+        </article>
+
+        <article class="intake-aside">
+          <h2>Register for an organization</h2>
+          <p>
+            Use <code>org.canonical.plus</code> when you represent a company,
+            agency, nonprofit, or other organization.
+          </p>
+          <a
+            class="btn btn--primary btn--large"
+            href={organizationHref}
+            data-public-intake-link="organization"
+          >
+            Open organization application
+          </a>
+        </article>
+      </div>
+
+      <aside class="intake-aside">
+        <h2>Ready for the full readiness scope?</h2>
+        <p>
+          The authenticated quote is a separate explicit action. Pre-interest
+          registration never creates or submits one automatically.
+        </p>
+        <a class="btn btn--secondary" href={quoteHref} data-application-link="quote">
+          Open the existing quote flow
+        </a>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
