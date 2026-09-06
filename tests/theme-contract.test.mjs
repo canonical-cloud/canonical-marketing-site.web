@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 
 const layout = await readFile(new URL('../src/layouts/BaseLayout.astro', import.meta.url), 'utf8');
+const builtIndex = await readFile(new URL('../dist/index.html', import.meta.url), 'utf8');
 const globalCss = await readFile(new URL('../src/styles/global.css', import.meta.url), 'utf8');
 const themeInit = await readFile(new URL('../public/theme-init.js', import.meta.url), 'utf8');
 const siteScript = await readFile(new URL('../public/site.js', import.meta.url), 'utf8');
@@ -68,7 +69,12 @@ test('header and footer expose synchronized auto, light, medium, and dark contro
   }
 
   assert.match(layout, /theme-init\.js/);
-  assert.match(layout, /<script src=\{themeInitScriptHref\}><\/script>/);
+  assert.match(layout, /<script is:inline src=\{themeInitScriptHref\}><\/script>/);
+  assert.match(builtIndex, /<script src="\/theme-init\.js"><\/script>/);
+  assert.ok(
+    builtIndex.indexOf('/theme-init.js') < builtIndex.indexOf('/site.js'),
+    'the synchronous initializer must load before the module that wires controls',
+  );
   assert.match(siteScript, /setAttribute\('aria-pressed', String\(selected\)\)/);
   assert.match(siteScript, /themeController\.apply\(button\.dataset\.themeChoice, \{ persist: true \}\)/);
 });
