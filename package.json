@@ -19,7 +19,7 @@
     "astro": "^7.2.9"
   },
   "devDependencies": {
-    "playwright": "^1.62.1",
+    "playwright": "^1.63.0",
     "puppeteer": "^25.9.0"
   },
   "oresLint": {
