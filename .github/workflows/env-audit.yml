@@ -1,0 +1,29 @@
+# Keyless secrets audit — proves no plaintext dotenv is tracked, the .gitignore
+# contract is intact, and every env/enc/*.env.enc is sops ciphertext with >= 2
+# recipients. Runs without any decryption key on purpose: handing CI a key just
+# to lint would defeat the point. See env/README.md.
+name: env-audit
+
+on:
+  push:
+    paths:
+      - ".gitignore"
+      - ".sops.yaml"
+      - "env/**"
+      - ".just/env.just"
+      - "justfile"
+      - ".github/workflows/env-audit.yml"
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  env-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4.0.0
+      - run: just env-audit

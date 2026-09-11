@@ -50,7 +50,7 @@ test("live browser smoke is external-signal isolation, not a PR gate", () => {
 });
 
 test("live browser smoke is lockfile-strict and executes the deployed policy", () => {
-  assert.match(liveBrowserWorkflow, /CANONICAL_SITE_TEST_URL: https:\/\/canonical\.cloud/);
+  assert.match(liveBrowserWorkflow, /CANONICAL_SITE_TEST_URL: https:\/\/canonical\.plus/);
   assert.match(liveBrowserWorkflow, /CANONICAL_REQUIRE_SECURITY_HEADERS: "1"/);
   assert.match(liveBrowserWorkflow, /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"/);
   assert.match(liveBrowserWorkflow, /PUPPETEER_SKIP_DOWNLOAD: "true"/);

@@ -57,7 +57,7 @@ test("playwright: production assets execute under the Rust marketing CSP", async
 
   await page.evaluate(() => window.scrollTo(0, 200));
   await page.waitForFunction(
-    () => document.getElementById("main-nav")?.style.borderBottomColor !== "",
+    () => document.getElementById("main-nav")?.classList.contains("nav--scrolled"),
   );
 
   await page.locator("#nav-toggle").click();

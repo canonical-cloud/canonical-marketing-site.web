@@ -1,10 +1,11 @@
 /* ========================================
-   canonical.cloud — Global Design System
-   Trust-Forward Dark Theme · CPA & IT Compliance
+   canonical.plus — Global Design System
+   Readiness-first adaptive themes
    ======================================== */
 
 /* ── Design Tokens ── */
-:root {
+:root,
+:root[data-theme='dark'] {
   /* Brand — Emerald Security */
   --av-emerald: #34d399;
   --av-emerald-light: #6ee7b7;
@@ -14,11 +15,29 @@
   --av-blue: #38bdf8;
 
   /* Neutrals — Deep Navy */
-  --av-black: #060a10;
+  --av-black: #04100b;
   --av-bg: #0a0f1a;
   --av-surface: #111827;
   --av-surface-hover: #1e293b;
   --av-surface-elevated: #1e2a3a;
+  --av-surface-translucent: rgba(17, 24, 39, 0.78);
+  --av-panel-start: rgba(30, 41, 59, 0.95);
+  --av-panel-end: rgba(17, 24, 39, 0.95);
+  --av-table-header: rgba(30, 41, 59, 0.75);
+  --av-nav-bg: rgba(10, 15, 26, 0.9);
+  --av-nav-bg-strong: rgba(10, 15, 26, 0.98);
+  --av-footer-bg: #060a10;
+  --av-switcher-bg: rgba(17, 24, 39, 0.74);
+  --av-theme-active-bg: #f1f5f9;
+  --av-theme-active-text: #0a0f1a;
+  --av-highlight: rgba(255, 255, 255, 0.08);
+  --av-nav-border-scrolled: rgba(255, 255, 255, 0.12);
+  --av-grid-line: rgba(148, 163, 184, 0.03);
+  --av-radial-glow: rgba(52, 211, 153, 0.06);
+  --av-cta-glow: rgba(45, 212, 191, 0.12);
+  --av-warning-glow: rgba(251, 191, 36, 0.06);
+  --av-blue-glow: rgba(56, 189, 248, 0.08);
+  --av-blue-border: rgba(56, 189, 248, 0.25);
   --av-border: rgba(148, 163, 184, 0.08);
   --av-border-hover: rgba(148, 163, 184, 0.15);
   --av-border-active: rgba(52, 211, 153, 0.35);
@@ -74,6 +93,100 @@
   --nav-height: 72px;
 }
 
+:root[data-theme='medium'] {
+  --av-emerald: #4adea6;
+  --av-emerald-light: #86efc4;
+  --av-emerald-dark: #0d9b70;
+  --av-emerald-glow: rgba(74, 222, 166, 0.13);
+  --av-teal: #5eead4;
+  --av-blue: #67c8f5;
+
+  --av-bg: #172033;
+  --av-surface: #202c43;
+  --av-surface-hover: #2a3953;
+  --av-surface-elevated: #31415c;
+  --av-surface-translucent: rgba(32, 44, 67, 0.8);
+  --av-panel-start: rgba(49, 65, 92, 0.95);
+  --av-panel-end: rgba(32, 44, 67, 0.95);
+  --av-table-header: rgba(42, 57, 83, 0.86);
+  --av-nav-bg: rgba(23, 32, 51, 0.9);
+  --av-nav-bg-strong: rgba(23, 32, 51, 0.98);
+  --av-footer-bg: #111a2b;
+  --av-switcher-bg: rgba(32, 44, 67, 0.8);
+  --av-theme-active-bg: #ecfdf5;
+  --av-theme-active-text: #132033;
+  --av-highlight: rgba(255, 255, 255, 0.1);
+  --av-nav-border-scrolled: rgba(255, 255, 255, 0.15);
+  --av-grid-line: rgba(203, 213, 225, 0.045);
+  --av-radial-glow: rgba(74, 222, 166, 0.09);
+  --av-cta-glow: rgba(94, 234, 212, 0.14);
+  --av-warning-glow: rgba(251, 191, 36, 0.08);
+  --av-blue-glow: rgba(103, 200, 245, 0.1);
+  --av-blue-border: rgba(103, 200, 245, 0.3);
+  --av-border: rgba(203, 213, 225, 0.1);
+  --av-border-hover: rgba(203, 213, 225, 0.2);
+  --av-border-active: rgba(74, 222, 166, 0.4);
+
+  --av-text-primary: #f8fafc;
+  --av-text-secondary: #b7c4d6;
+  --av-text-muted: #8493a9;
+  --av-text-accent: var(--av-emerald);
+
+  --shadow-sm: 0 1px 3px rgba(3, 7, 18, 0.34);
+  --shadow-md: 0 6px 18px rgba(3, 7, 18, 0.38);
+  --shadow-lg: 0 16px 44px rgba(3, 7, 18, 0.42);
+  --shadow-glow: 0 0 42px rgba(74, 222, 166, 0.08);
+}
+
+:root[data-theme='light'] {
+  --av-emerald: #087f5b;
+  --av-emerald-light: #0b9369;
+  --av-emerald-dark: #056347;
+  --av-emerald-glow: rgba(5, 150, 105, 0.1);
+  --av-teal: #0f766e;
+  --av-blue: #0369a1;
+
+  --av-bg: #f3f7f5;
+  --av-surface: #ffffff;
+  --av-surface-hover: #e6f0ec;
+  --av-surface-elevated: #f8fbfa;
+  --av-surface-translucent: rgba(255, 255, 255, 0.82);
+  --av-panel-start: rgba(255, 255, 255, 0.98);
+  --av-panel-end: rgba(234, 244, 240, 0.98);
+  --av-table-header: rgba(226, 239, 234, 0.9);
+  --av-nav-bg: rgba(243, 247, 245, 0.88);
+  --av-nav-bg-strong: rgba(243, 247, 245, 0.98);
+  --av-footer-bg: #e7efec;
+  --av-switcher-bg: rgba(255, 255, 255, 0.78);
+  --av-theme-active-bg: #0b5f47;
+  --av-theme-active-text: #ffffff;
+  --av-highlight: rgba(255, 255, 255, 0.85);
+  --av-nav-border-scrolled: rgba(15, 23, 42, 0.16);
+  --av-grid-line: rgba(15, 118, 110, 0.055);
+  --av-radial-glow: rgba(5, 150, 105, 0.1);
+  --av-cta-glow: rgba(13, 148, 136, 0.11);
+  --av-warning-glow: rgba(180, 83, 9, 0.07);
+  --av-blue-glow: rgba(3, 105, 161, 0.08);
+  --av-blue-border: rgba(3, 105, 161, 0.22);
+  --av-border: rgba(15, 23, 42, 0.09);
+  --av-border-hover: rgba(15, 23, 42, 0.17);
+  --av-border-active: rgba(5, 126, 89, 0.34);
+
+  --av-text-primary: #0f1f1a;
+  --av-text-secondary: #40564e;
+  --av-text-muted: #61766e;
+  --av-text-accent: var(--av-emerald);
+
+  --av-success: #15803d;
+  --av-error: #b91c1c;
+  --av-warning: #b45309;
+
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 8px 22px rgba(15, 23, 42, 0.09);
+  --shadow-lg: 0 18px 48px rgba(15, 23, 42, 0.12);
+  --shadow-glow: 0 0 44px rgba(5, 126, 89, 0.09);
+}
+
 /* ── Reset ── */
 *,
 *::before,
@@ -93,6 +206,9 @@ body {
   color: var(--av-text-primary);
   line-height: 1.6;
   overflow-x: hidden;
+  transition:
+    background-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
 }
 img,
 video {
@@ -327,12 +443,12 @@ p {
 /* ── Background Effects ── */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    linear-gradient(var(--av-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--av-grid-line) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 .bg-radial {
-  background: radial-gradient(ellipse at 50% 0%, rgba(52, 211, 153, 0.06) 0%, transparent 60%);
+  background: radial-gradient(ellipse at 50% 0%, var(--av-radial-glow) 0%, transparent 60%);
 }
 .bg-noise {
   position: relative;
@@ -375,7 +491,7 @@ p {
     align-items: stretch;
     gap: var(--space-sm);
     padding: var(--space-lg) var(--space-md);
-    background: rgba(10, 15, 24, 0.98);
+    background: var(--av-nav-bg-strong);
     border-bottom: 1px solid var(--av-border-hover);
     box-shadow: var(--shadow-lg);
   }
