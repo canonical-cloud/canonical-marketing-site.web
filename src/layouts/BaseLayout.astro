@@ -14,6 +14,11 @@ const homeHref = `${baseNoSlash}/`;
 const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
+const peopleHref = `${baseNoSlash}/people/`;
+const pricingHref = `${baseNoSlash}/pricing/`;
+const trainingHref = `${baseNoSlash}/training/`;
+const securityHref = `${baseNoSlash}/security/`;
+const contactHref = `${baseNoSlash}/contact/`;
 const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
 const themeInitScriptHref = `${baseNoSlash}/theme-init.js`;
@@ -154,14 +159,17 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
               <a href={`${homeHref}#services`} class="footer__link">What we deliver</a>
             </div>
             <div class="footer__col">
-              <h4 class="footer__col-title">Account</h4>
-              <a href={quoteHref} class="footer__link" data-application-link="sign-in">Sign in</a>
-              <a href={quoteHref} class="footer__link" data-application-link="quote">Readiness quote</a>
+              <h4 class="footer__col-title">Explore</h4>
+              <a href={peopleHref} class="footer__link">People</a>
+              <a href={pricingHref} class="footer__link">Pricing</a>
+              <a href={trainingHref} class="footer__link">Training</a>
+              <a href={securityHref} class="footer__link">Security</a>
             </div>
             <div class="footer__col">
               <h4 class="footer__col-title">Contact</h4>
-              <a href="mailto:compliance@canonical.cloud" class="footer__link">compliance@canonical.cloud</a>
-              <a href={homeHref} class="footer__link">Canonical Plus</a>
+              <a href="mailto:hello@canonical.plus" class="footer__link">hello@canonical.plus</a>
+              <a href={contactHref} class="footer__link">Contact Canonical Plus</a>
+              <a href={quoteHref} class="footer__link" data-application-link="sign-in">Sign in</a>
             </div>
           </nav>
         </div>
