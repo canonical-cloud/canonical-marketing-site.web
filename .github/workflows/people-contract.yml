@@ -1,0 +1,61 @@
+name: People directory contract
+
+on:
+  pull_request:
+    paths:
+      - "contracts/people/**"
+      - "src/pages/people.astro"
+      - "tests/people-page.test.mjs"
+      - ".github/workflows/people-contract.yml"
+  push:
+    branches: [main]
+    paths:
+      - "contracts/people/**"
+      - "src/pages/people.astro"
+      - "tests/people-page.test.mjs"
+      - ".github/workflows/people-contract.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: people-contract-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parity-and-roster:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: "22"
+      - name: Check out exact TJSV authority
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          repository: ORESoftware/typespec-json-schema-validator
+          ref: 93dd73cb246a09b0a1c62d7192cc62ca6ecbe405
+          persist-credentials: false
+          fetch-depth: 1
+          path: .tooling/tjsv
+      - name: Install exact TJSV dependencies and native flags-2-env binding
+        working-directory: .tooling/tjsv
+        run: npm ci --no-audit --no-fund
+      - name: Enforce People TypeSpec and JSON Schema peer-authority parity
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          node .tooling/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/people/v1/main.tsp \
+            --schema=contracts/people/v1/authored.schema.json \
+            --instances=contracts/people/v1/instances \
+            --report=artifacts/people.parity.json \
+            --quiet
+          test -s artifacts/people.parity.json
+      - name: Run People regression tests
+        run: node --test tests/people-page.test.mjs
+      - name: Reject whitespace and patch errors
+        run: git diff-tree --check --root HEAD --

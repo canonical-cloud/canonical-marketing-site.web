@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:canonical-cloud:people:v1",
+  "$defs": {
+    "PersonProfile": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "role": { "type": "string" },
+        "initials": { "type": "string" },
+        "photoUrl": { "type": "string" }
+      },
+      "required": ["id", "name", "role", "initials"],
+      "unevaluatedProperties": false
+    },
+    "PeopleDirectory": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "type": "string", "const": "canonical-cloud.people/v1" },
+        "people": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:people:v1#/$defs/PersonProfile" }
+        }
+      },
+      "required": ["schemaVersion", "people"],
+      "unevaluatedProperties": false
+    }
+  }
+}

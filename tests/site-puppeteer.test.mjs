@@ -37,7 +37,11 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "Sign in"]);
+  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "People", "Sign in"]);
+  assert.equal(
+    await page.$eval("#nav-people", (element) => new URL(element.href).pathname),
+    "/people/",
+  );
   assert.equal(
     await page.$eval("#nav-sign-in", (element) => element.href),
     "https://app.canonical.plus/u/readiness",

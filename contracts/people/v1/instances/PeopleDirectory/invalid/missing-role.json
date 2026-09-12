@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "canonical-cloud.people/v1",
+  "people": [
+    {
+      "id": "missing-role",
+      "name": "Invalid fixture",
+      "initials": "IF"
+    }
+  ]
+}
