@@ -60,8 +60,12 @@ test('puppeteer: people page renders six cards in a responsive 3-by-2 desktop gr
 
   const remotePhotos = await page.$$('[data-people-photo]');
   assert.equal(remotePhotos.length, 4);
-  await page.waitForFunction(() =>
-    [...document.querySelectorAll('[data-people-photo]')].every((image) => image.hidden),
+  await page.$$eval('[data-people-photo]', (images) => {
+    for (const image of images) image.dispatchEvent(new Event('error'));
+  });
+  assert.equal(
+    await page.$$eval('[data-people-photo]', (images) => images.every((image) => image.hidden)),
+    true,
   );
 
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
