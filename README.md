@@ -42,6 +42,24 @@ The authenticated assessment entry point is exactly
 `https://app.canonical.plus/u/readiness`. Marketing pages must not place tokens,
 identity assertions, return destinations, or other credentials in that URL.
 
+## People directory
+
+The homepage and `/people/` share `src/components/PeopleGrid.astro`, backed by
+`contracts/people/v1/instances/PeopleDirectory/valid/canonical.json`. Eight
+profiles display as two rows of four on desktop, two columns on tablets, and
+one column on phones. The four existing portraits are copied from Benefactor's
+public team directory and served locally from `public/team/`, so page visitors
+do not depend on another site's image hosting. The source URLs are
+`https://benefactor.cc/team/alex-mills.jpg`,
+`https://benefactor.cc/team/vinayak-pandey.png`,
+`https://benefactor.cc/team/elijah-gizzarelli.jpeg`, and
+`https://benefactor.cc/team/marcus-gerlach.jpg` (retrieved 2026-09-12).
+John, Jack, Eugene, and Tom use neutral silhouette/initials
+placeholders until their portraits are supplied. Failed photo loads also reveal
+the placeholder. Names and roles added on 2026-09-12 were supplied by the site
+owner; the existing `john-siciliano` ID is retained with the requested display
+spelling `John Siliciano`.
+
 ## Claims policy
 
 Public copy must follow `canonical-cloud/canonical-docs/docs/claims-register.md`.

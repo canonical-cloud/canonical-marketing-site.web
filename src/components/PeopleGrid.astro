@@ -1,0 +1,164 @@
+---
+import directory from '../../contracts/people/v1/instances/PeopleDirectory/valid/canonical.json';
+
+const people = directory.people;
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+---
+
+<div class="people-grid" data-people-grid>
+  {people.map((person) => (
+    <article class="person-card" data-person-card data-person-id={person.id}>
+      <div class="person-card__portrait-shell">
+        <div class="person-card__fallback" aria-hidden="true">
+          <svg viewBox="0 0 80 80" role="presentation" focusable="false">
+            <circle cx="40" cy="28" r="15" fill="currentColor" opacity="0.72" />
+            <path d="M14 70c2-18 12-27 26-27s24 9 26 27" fill="currentColor" opacity="0.46" />
+          </svg>
+          <span>{person.initials}</span>
+        </div>
+        {person.photoUrl && (
+          <img
+            src={`${baseNoSlash}${person.photoUrl}`}
+            alt={`${person.name} headshot`}
+            class="person-card__photo"
+            width="190"
+            height="190"
+            loading="lazy"
+            decoding="async"
+            referrerpolicy="no-referrer"
+            data-people-photo
+          />
+        )}
+      </div>
+      <div class="person-card__body">
+        <h3>{person.name}</h3>
+        <p>{person.role}</p>
+      </div>
+    </article>
+  ))}
+</div>
+
+<style>
+  .people-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-xl);
+    margin-top: var(--space-2xl);
+  }
+
+  .person-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(1rem, 2vw, 1.75rem);
+    border: 1px solid var(--av-border);
+    border-radius: var(--radius-lg);
+    background: var(--av-surface);
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+    transition:
+      transform var(--duration-normal) var(--ease-out),
+      border-color var(--duration-normal) var(--ease-out),
+      box-shadow var(--duration-normal) var(--ease-out);
+  }
+
+  .person-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--av-border-active);
+    box-shadow: var(--shadow-md);
+  }
+
+  .person-card__portrait-shell {
+    position: relative;
+    width: min(170px, 100%);
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 3px solid var(--av-border-hover);
+    border-radius: 50%;
+    background: var(--av-surface-hover);
+    box-shadow: inset 0 0 0 1px var(--av-highlight);
+  }
+
+  .person-card__photo,
+  .person-card__fallback {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .person-card__photo {
+    z-index: 2;
+    object-fit: cover;
+    object-position: center top;
+    filter: saturate(0.86) contrast(1.02);
+    transition: filter var(--duration-normal) var(--ease-out);
+  }
+
+  .person-card:hover .person-card__photo {
+    filter: saturate(1) contrast(1.03);
+  }
+
+  .person-card__fallback {
+    display: grid;
+    place-items: center;
+    color: var(--av-teal);
+    background:
+      radial-gradient(circle at 50% 30%, var(--av-emerald-glow), transparent 58%),
+      var(--av-surface-hover);
+  }
+
+  .person-card__fallback svg {
+    position: absolute;
+    width: 72%;
+    height: 72%;
+    color: var(--av-text-muted);
+  }
+
+  .person-card__fallback span {
+    position: absolute;
+    right: 50%;
+    bottom: 0.7rem;
+    transform: translateX(50%);
+    z-index: 1;
+    min-width: 2.15rem;
+    padding: 0.35rem 0.45rem;
+    border: 1px solid var(--av-border-active);
+    border-radius: var(--radius-full);
+    background: var(--av-nav-bg-strong);
+    color: var(--av-text-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+  }
+
+  .person-card__body {
+    margin-top: var(--space-lg);
+  }
+
+  .person-card__body h3 {
+    color: var(--av-text-primary);
+    font-size: 1.2rem;
+  }
+
+  .person-card__body p {
+    margin-top: 0.35rem;
+    color: var(--av-teal);
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 1000px) {
+    .people-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .people-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

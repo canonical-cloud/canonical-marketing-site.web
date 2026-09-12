@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PeopleGrid from '../components/PeopleGrid.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
@@ -270,6 +271,17 @@ const featuredFrameworks = [
       <div class="action-row">
         <a href={compareHref} class="btn btn--secondary">Compare approaches</a>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="people" aria-labelledby="team-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Our people</span>
+        <h2 id="team-title">The people behind <span class="gradient-text">your readiness</span></h2>
+        <p>Engineering, security, infrastructure, business, and legal perspectives on the same team.</p>
+      </header>
+      <PeopleGrid />
     </div>
   </section>
 

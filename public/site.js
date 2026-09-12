@@ -168,7 +168,9 @@ for (const image of document.querySelectorAll('[data-people-photo]')) {
     continue;
   }
 
-  image.addEventListener('error', () => {
+  const showPlaceholder = () => {
     image.hidden = true;
-  });
+  };
+  image.addEventListener('error', showPlaceholder);
+  if (image.complete && image.naturalWidth === 0) showPlaceholder();
 }
