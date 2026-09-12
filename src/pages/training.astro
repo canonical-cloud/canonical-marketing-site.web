@@ -1,0 +1,438 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const pricesHref = `${baseNoSlash}/prices/`;
+const readinessHref = `${baseNoSlash}/readiness/`;
+const appTrainingHref = 'https://app.canonical.plus/training';
+
+const tracks = [
+  {
+    title: 'SOC 2 Foundations',
+    meta: '4 modules · about 2 hours · Beginner',
+    copy: 'Build a shared understanding of scope, Trust Services Criteria, control ownership, evidence quality, and the readiness journey.',
+  },
+  {
+    title: 'Control Owner Workshop',
+    meta: '6 modules · about 4 hours · Intermediate',
+    copy: 'Role-based training for engineering, IT, security, and operations teams that need to operate controls continuously.',
+  },
+  {
+    title: 'Audit Readiness Bootcamp',
+    meta: 'Hands-on cohort · scope-dependent · Advanced',
+    copy: 'Work from gap assessment through evidence review and readiness rehearsal before an independent SOC 2 examination.',
+  },
+];
+---
+
+<BaseLayout
+  title="Interactive compliance readiness training"
+  description="Choose-your-own-adventure compliance readiness training for software and cloud teams, plus structured SOC 2 foundations, control-owner workshops, and audit-readiness training."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Public training · no account required</span>
+        <p class="page-hero__eyebrow">Choose your own compliance adventure</p>
+        <h1 class="page-hero__title hero__title">
+          Learn compliance by making the decisions your team
+          <span class="gradient-text">actually faces</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Pick a scenario, complete the learning checkpoints, and follow the graph wherever your
+          answers take you. You can loop back, take another path, or revisit a concept at any time.
+        </p>
+        <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href={appTrainingHref} data-application-link="training">Open full product curriculum</a>
+          <a class="btn btn--secondary btn--large" href={pricesHref}>See readiness packages</a>
+          <a class="btn btn--secondary btn--large" href={readinessHref}>Readiness overview</a>
+        </div>
+      </div>
+      <aside class="page-hero__panel" aria-label="Training boundaries">
+        <h2>Training is for readiness</h2>
+        <ul class="check-list">
+          <li>Teaches scope, controls, evidence, remediation, and handoff concepts</li>
+          <li>Lets you branch and revisit concepts in a cyclical learning graph</li>
+          <li>Keeps public graph choices in your browser; no evidence or personal data is submitted</li>
+          <li>Provides a handoff into the full Canonical product training workspace</li>
+        </ul>
+        <p class="boundary-note">
+          Canonical Plus helps teams prepare. Training is not an audit opinion, certification,
+          authorization, approval, legal advice, regulator determination, or guaranteed result.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="training-tracks-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Three structured training paths</span>
+        <h2 id="training-tracks-title">Turn compliance into a competitive advantage by learning how to operate the controls</h2>
+        <p>
+          The public adventure below teaches the readiness model interactively. The full curriculum
+          remains available in the Canonical application, where training can connect to readiness
+          worksheets and the rest of the customer workflow.
+        </p>
+      </header>
+
+      <div class="card-grid card-grid--three">
+        {tracks.map((track) => (
+          <article class="deliverable">
+            <strong>{track.title}</strong>
+            <p class="page-hero__eyebrow">{track.meta}</p>
+            <p>{track.copy}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="action-row" style="justify-content: center;">
+        <a href={appTrainingHref} class="btn btn--secondary" data-application-link="training">Explore the full training program</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section training-shell" id="interactive-training" aria-labelledby="training-title">
+    <div class="container">
+      <header class="section-header section-header--center training-intro">
+        <span class="badge">Interactive readiness lab</span>
+        <h2>Choose a scenario and learn by following the graph</h2>
+        <p>
+          Each screen is a graph node. Complete the checkpoints to unlock the outgoing edges,
+          revisit earlier concepts when useful, and choose another adventure after an outcome.
+        </p>
+      </header>
+
+      <div class="training-toolbar">
+        <div>
+          <span class="badge" id="training-kind">Scenario</span>
+          <p id="training-location" class="training-location" aria-live="polite">Loading training path…</p>
+        </div>
+        <div class="training-toolbar__actions">
+          <button class="btn btn--secondary" type="button" id="training-back">Back</button>
+          <button class="btn btn--secondary" type="button" id="training-start-over">Start over</button>
+        </div>
+      </div>
+
+      <article class="card training-card" data-training-app aria-live="polite">
+        <header class="training-card__header">
+          <p class="page-hero__eyebrow" id="training-node-id">Training node</p>
+          <h2 id="training-title" tabindex="-1">Loading…</h2>
+          <p id="training-prompt"></p>
+        </header>
+
+        <section class="training-block" aria-labelledby="training-objectives-title">
+          <h3 id="training-objectives-title">What you should understand</h3>
+          <ul id="training-objectives" class="check-list"></ul>
+        </section>
+
+        <fieldset class="training-block training-checkpoints" id="training-checkpoints">
+          <legend>Confirm the checkpoints to unlock your next choices</legend>
+        </fieldset>
+
+        <section class="training-block" aria-labelledby="training-choices-title">
+          <div class="training-block__heading">
+            <h3 id="training-choices-title">Where do you want to go next?</h3>
+            <span id="training-unlock-status" class="training-status">Complete required checkpoints first.</span>
+          </div>
+          <div id="training-choices" class="training-choices"></div>
+        </section>
+
+        <aside id="training-outcome" class="training-outcome" hidden>
+          <strong>Readiness operating-model suggestion</strong>
+          <p id="training-outcome-message"></p>
+          <div class="action-row">
+            <a class="btn btn--primary" href={pricesHref}>Compare the three packages</a>
+            <a class="btn btn--secondary" href={appTrainingHref} data-application-link="training">Continue in product training</a>
+          </div>
+        </aside>
+      </article>
+
+      <noscript>
+        <div class="card training-noscript">
+          <h2>JavaScript is required for the interactive graph.</h2>
+          <p>The training content is public, but the choose-your-path interface needs JavaScript to move between graph nodes.</p>
+          <a class="btn btn--secondary" href={appTrainingHref}>Open the full product training workspace</a>
+        </div>
+      </noscript>
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="cta-panel">
+        <span class="badge">From learning to evidence</span>
+        <h2>Continue into the product workspace when you need saved readiness work</h2>
+        <p>
+          The public graph stays a no-PII learning surface. Use the authenticated Canonical application
+          when you want curriculum progress connected to readiness worksheets, evidence, or remediation planning.
+        </p>
+        <div class="action-row">
+          <a href={appTrainingHref} class="btn btn--primary btn--large" data-application-link="training">Open Canonical training</a>
+          <a href={pricesHref} class="btn btn--secondary btn--large">Compare readiness packages</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import graph from '../../contracts/training-graph/v1/instances/TrainingGraph/valid/canonical.json';
+
+  const nodes = new Map(graph.nodes.map((node) => [node.id, node]));
+  const kind = document.querySelector('#training-kind');
+  const locationLabel = document.querySelector('#training-location');
+  const nodeIdLabel = document.querySelector('#training-node-id');
+  const title = document.querySelector('#training-title');
+  const prompt = document.querySelector('#training-prompt');
+  const objectives = document.querySelector('#training-objectives');
+  const checkpoints = document.querySelector('#training-checkpoints');
+  const choices = document.querySelector('#training-choices');
+  const unlockStatus = document.querySelector('#training-unlock-status');
+  const outcome = document.querySelector('#training-outcome');
+  const outcomeMessage = document.querySelector('#training-outcome-message');
+  const back = document.querySelector('#training-back');
+  const startOver = document.querySelector('#training-start-over');
+
+  const nodeFromLocation = () => {
+    const candidate = new URL(window.location.href).searchParams.get('node');
+    return candidate && nodes.has(candidate) ? candidate : graph.entryNodeId;
+  };
+
+  const createTextElement = (tagName, text) => {
+    const element = document.createElement(tagName);
+    element.textContent = text;
+    return element;
+  };
+
+  const setLocation = (nodeId, mode) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('node', nodeId);
+    const state = { trainingNodeId: nodeId };
+    if (mode === 'push') window.history.pushState(state, '', url);
+    if (mode === 'replace') window.history.replaceState(state, '', url);
+  };
+
+  const requiredCheckpointsComplete = () =>
+    [...checkpoints.querySelectorAll('input[data-required="true"]')].every((input) => input.checked);
+
+  const syncChoiceAvailability = () => {
+    const unlocked = requiredCheckpointsComplete();
+    for (const button of choices.querySelectorAll('button[data-next-node]')) {
+      button.disabled = !unlocked;
+    }
+    unlockStatus.textContent = unlocked
+      ? 'Checkpoints complete. Choose your next path.'
+      : 'Complete required checkpoints first.';
+  };
+
+  const render = (nodeId, historyMode = 'push') => {
+    const node = nodes.get(nodeId) ?? nodes.get(graph.entryNodeId);
+    if (!node) throw new Error('training graph entry node is missing');
+
+    if (historyMode !== 'none') setLocation(node.id, historyMode);
+
+    kind.textContent = node.kind[0].toUpperCase() + node.kind.slice(1);
+    locationLabel.textContent = `${graph.title} · ${node.id}`;
+    nodeIdLabel.textContent = `Node · ${node.id}`;
+    title.textContent = node.title;
+    prompt.textContent = node.prompt;
+
+    objectives.replaceChildren(
+      ...node.learningObjectives.map((item) => createTextElement('li', item)),
+    );
+
+    const checkpointNodes = node.checkpoints.map((checkpoint) => {
+      const label = document.createElement('label');
+      label.className = 'training-checkpoint';
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.dataset.required = String(checkpoint.required);
+      input.addEventListener('change', syncChoiceAvailability);
+      const copy = createTextElement('span', checkpoint.label);
+      label.append(input, copy);
+      return label;
+    });
+    checkpoints.replaceChildren(
+      createTextElement('legend', 'Confirm the checkpoints to unlock your next choices'),
+      ...checkpointNodes,
+    );
+
+    const choiceNodes = node.choices.map((choice) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'training-choice';
+      button.dataset.nextNode = choice.nextNodeId;
+      const label = createTextElement('strong', choice.label);
+      button.append(label);
+      if (choice.summary) button.append(createTextElement('span', choice.summary));
+      button.addEventListener('click', () => render(choice.nextNodeId, 'push'));
+      return button;
+    });
+    choices.replaceChildren(...choiceNodes);
+
+    if (node.outcome) {
+      outcome.hidden = false;
+      outcome.dataset.tierId = node.outcome.tierId ?? '';
+      outcomeMessage.textContent = node.outcome.message;
+    } else {
+      outcome.hidden = true;
+      outcome.dataset.tierId = '';
+      outcomeMessage.textContent = '';
+    }
+
+    back.disabled = window.history.length <= 1;
+    syncChoiceAvailability();
+    title.focus({ preventScroll: true });
+  };
+
+  back.addEventListener('click', () => window.history.back());
+  startOver.addEventListener('click', () => render(graph.entryNodeId, 'push'));
+  window.addEventListener('popstate', () => render(nodeFromLocation(), 'none'));
+
+  const initialNode = nodeFromLocation();
+  render(initialNode, 'replace');
+</script>
+
+<style>
+  .training-intro {
+    margin-bottom: var(--space-xl);
+  }
+
+  .training-shell {
+    padding-top: var(--space-xl);
+  }
+
+  .training-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+  }
+
+  .training-toolbar__actions,
+  .training-block__heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .training-location,
+  .training-status {
+    color: var(--av-text-secondary);
+    margin: 0.5rem 0 0;
+  }
+
+  .training-card {
+    display: grid;
+    gap: var(--space-lg);
+    max-width: 980px;
+    margin: 0 auto;
+  }
+
+  .training-card__header,
+  .training-block {
+    display: grid;
+    gap: var(--space-sm);
+  }
+
+  .training-card__header h2 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    margin: 0;
+  }
+
+  .training-checkpoints {
+    border: 1px solid var(--av-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+  }
+
+  .training-checkpoints legend {
+    color: var(--av-text-primary);
+    font-weight: 700;
+    padding: 0 0.5rem;
+  }
+
+  .training-checkpoint {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    color: var(--av-text-secondary);
+    cursor: pointer;
+  }
+
+  .training-checkpoint input {
+    width: 1.2rem;
+    height: 1.2rem;
+    margin-top: 0.15rem;
+    accent-color: var(--av-teal);
+  }
+
+  .training-block__heading {
+    justify-content: space-between;
+  }
+
+  .training-choices {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sm);
+  }
+
+  .training-choice {
+    min-height: 92px;
+    display: grid;
+    gap: 0.4rem;
+    text-align: left;
+    padding: 1rem;
+    border: 1px solid var(--av-border-hover);
+    border-radius: var(--radius-md);
+    background: var(--av-card-bg);
+    color: var(--av-text-primary);
+    cursor: pointer;
+    transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  }
+
+  .training-choice span {
+    color: var(--av-text-secondary);
+  }
+
+  .training-choice:not(:disabled):hover,
+  .training-choice:not(:disabled):focus-visible {
+    border-color: var(--av-teal);
+    transform: translateY(-2px);
+  }
+
+  .training-choice:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .training-outcome,
+  .training-noscript {
+    border: 1px solid var(--av-teal);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    background: color-mix(in srgb, var(--av-teal) 7%, var(--av-card-bg));
+  }
+
+  .training-outcome p {
+    color: var(--av-text-secondary);
+  }
+
+  @media (max-width: 760px) {
+    .training-toolbar,
+    .training-block__heading {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .training-choices {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

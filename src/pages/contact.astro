@@ -1,0 +1,93 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const pricingHref = `${baseNoSlash}/pricing/`;
+const trainingHref = `${baseNoSlash}/training/`;
+const securityHref = `${baseNoSlash}/security/`;
+const quoteHref = 'https://app.canonical.plus/u/readiness';
+---
+
+<BaseLayout
+  title="Contact"
+  description="Contact Canonical Plus about compliance readiness, security engineering, training, pricing, and assessment scoping."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Contact Canonical Plus</span>
+        <p class="page-hero__eyebrow">One public contact address</p>
+        <h1 class="page-hero__title hero__title">
+          Start with the problem,
+          <span class="gradient-text">not a sales form.</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Tell us what you are trying to prepare for, where the hard technical gaps are, and what
+          timeline or independent review you are working toward. We can use that context to scope the
+          right next step.
+        </p>
+        <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href="mailto:hello@canonical.plus">Email hello@canonical.plus</a>
+          <a class="btn btn--secondary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+        </div>
+      </div>
+      <aside class="page-hero__panel" aria-label="Useful context for an introduction">
+        <h2>Useful context to include</h2>
+        <ul class="check-list">
+          <li>Frameworks, customer requirements, or review type</li>
+          <li>Cloud, application, and deployment footprint</li>
+          <li>Known security or evidence gaps</li>
+          <li>Target timeline and decision points</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="paths-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Self-serve paths</span>
+        <h2 id="paths-title">Explore before you contact us.</h2>
+        <p>Use the public pages to understand scope, service depth, and the readiness boundary first.</p>
+      </header>
+      <div class="contact-grid">
+        <a class="card contact-card" href={pricingHref}>
+          <h3>Pricing</h3>
+          <p>Review the three proposed readiness tiers and their starting assumptions.</p>
+        </a>
+        <a class="card contact-card" href={trainingHref}>
+          <h3>Training</h3>
+          <p>Walk through the readiness model and evidence concepts without an account.</p>
+        </a>
+        <a class="card contact-card" href={securityHref}>
+          <h3>Security</h3>
+          <p>See how security requirements translate into accountable engineering and evidence work.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .contact-card {
+    display: block;
+  }
+
+  .contact-card:hover {
+    border-color: var(--av-teal);
+  }
+
+  @media (max-width: 900px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

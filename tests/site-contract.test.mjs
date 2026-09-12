@@ -45,10 +45,14 @@ test("framework catalog covers the approved readiness portfolio", () => {
 });
 
 test("primary calls to action stay on reviewed boundaries", () => {
+  const publicSources = [page, readiness, frameworks, compare, layout].join("\n");
   assert.match(page, /href=\{quoteHref\}/);
   assert.match(page, /href=\{readinessHref\}/);
-  assert.match(page, /href="mailto:compliance@canonical\.cloud"/);
-  assert.doesNotMatch([page, readiness, frameworks, compare, layout].join("\n"), /javascript:/i);
+  assert.match(page, /href="mailto:hello@canonical\.plus"/);
+  assert.match(frameworks, /href="mailto:hello@canonical\.plus"/);
+  assert.match(compare, /href="mailto:hello@canonical\.plus"/);
+  assert.doesNotMatch(publicSources, /compliance@canonical\.(?:plus|cloud)/i);
+  assert.doesNotMatch(publicSources, /javascript:/i);
 });
 
 test("layout keeps production metadata and viewport controls", () => {

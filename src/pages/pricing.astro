@@ -1,0 +1,188 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import catalog from '../data/service-tiers.json';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const trainingHref = `${baseNoSlash}/training/`;
+const readinessHref = `${baseNoSlash}/readiness/`;
+const quoteHref = 'https://app.canonical.plus/u/readiness';
+const money = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: catalog.source.currency,
+  maximumFractionDigits: 0,
+});
+---
+
+<BaseLayout
+  title="Readiness packages and pricing"
+  description="Three proposed Canonical Plus readiness and pre-audit service tiers for software and cloud teams: Foundation Readiness, Managed Readiness, and Assurance Engineering."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Readiness and pre-audit services</span>
+        <p class="page-hero__eyebrow">Three levels of support</p>
+        <h1 class="page-hero__title hero__title">
+          Choose the depth of readiness support your team
+          <span class="gradient-text">actually needs</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Start with a scoped baseline, keep readiness operating continuously, or add hands-on
+          assurance engineering. These are readiness services: independent auditors, assessors,
+          certification bodies, regulators, and legal counsel make formal determinations.
+        </p>
+        <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--secondary btn--large" href={trainingHref}>Try the compliance training</a>
+        </div>
+      </div>
+      <aside class="page-hero__panel" aria-label="Pricing status">
+        <h2>Proposed starting prices</h2>
+        <p>
+          The catalog is currently <strong>{catalog.source.publicationStatus}</strong>, as of
+          <strong>{catalog.source.asOf}</strong>. A signed statement of work controls actual price,
+          scope, allowances, term, dependencies, and billing.
+        </p>
+        <p class="boundary-note">
+          No package promises an audit opinion, certification, authorization, legal conclusion,
+          or successful outcome from an independent reviewer.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="packages-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Packages</span>
+        <h2 id="packages-title">A three-tier readiness model</h2>
+        <p>Each tier builds on the previous one without changing the independence boundary.</p>
+      </header>
+
+      <div class="pricing-grid">
+        {catalog.tiers.map((tier, index) => (
+          <article class={`card pricing-card ${index === 1 ? 'pricing-card--featured' : ''}`}>
+            <div class="pricing-card__header">
+              <span class="pricing-card__number">{String(index + 1).padStart(2, '0')}</span>
+              <h3>{tier.name}</h3>
+              <p class="pricing-card__price">
+                <strong>{money.format(tier.monthlyUsd)}</strong>
+                <span>/ month starting assumption</span>
+              </p>
+            </div>
+            <p>{tier.summary}</p>
+            <p class="pricing-card__fit"><strong>Best fit:</strong> {tier.idealFor}</p>
+            <h4>Typical readiness scope</h4>
+            <ul class="check-list">
+              {tier.includes.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container package-boundary">
+      <div>
+        <span class="badge">What all three tiers share</span>
+        <h2>Preparation stays separate from independent assurance.</h2>
+        <p>
+          Canonical Plus can scope controls, identify gaps, help implement remediation, organize
+          evidence, and prepare a handoff. The qualified independent party you select remains
+          responsible for any audit, certification, authorization, regulatory, or legal conclusion.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Not sure which tier fits?</h3>
+        <p>Use the public training path to understand controls, evidence, remediation, and the review boundary before choosing a package.</p>
+        <div class="action-row">
+          <a class="btn btn--secondary" href={trainingHref}>Open training</a>
+          <a class="btn btn--secondary" href={readinessHref}>Readiness overview</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">Scope before commitment</span>
+        <h2>Turn the package into a customer-specific SOW.</h2>
+        <p>
+          The public prices are proposed starting assumptions. Final commercial terms belong in a
+          reviewed and signed statement of work after scope, dependencies, environments, and timeline are known.
+        </p>
+        <div class="action-row">
+          <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--secondary btn--large" href="mailto:hello@canonical.plus">Discuss a package</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .pricing-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .pricing-card--featured {
+    border-color: var(--av-teal);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--av-teal) 35%, transparent), var(--shadow-md);
+  }
+
+  .pricing-card__header {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .pricing-card__number {
+    color: var(--av-teal);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .pricing-card__price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 0;
+  }
+
+  .pricing-card__price strong {
+    color: var(--av-text-primary);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+  }
+
+  .pricing-card__price span,
+  .pricing-card__fit {
+    color: var(--av-text-secondary);
+  }
+
+  .package-boundary {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: var(--space-xl);
+    align-items: start;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 900px) {
+    .pricing-grid,
+    .package-boundary {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

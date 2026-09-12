@@ -71,7 +71,7 @@ test("playwright: contact CTA preserves the application and email boundaries", a
   );
   assert.equal(
     await page.locator("#cta-contact-btn").getAttribute("href"),
-    "mailto:compliance@canonical.cloud",
+    "mailto:hello@canonical.plus",
   );
   assert.deepEqual(pageErrors, []);
 });

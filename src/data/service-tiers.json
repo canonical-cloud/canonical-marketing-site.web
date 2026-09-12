@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "repository": "canonical-cloud/canonical-interfaces",
+    "revision": "85c3aaf4e849cdf38a7c1b3bc0aac546314ef887",
+    "contract": "contracts/commercial-service-tier/v1",
+    "publicationStatus": "proposed",
+    "currency": "USD",
+    "asOf": "2026-09-11"
+  },
+  "tiers": [
+    {
+      "id": "foundation-readiness",
+      "name": "Foundation Readiness",
+      "monthlyUsd": 2500,
+      "summary": "Establish the scope, gaps, owners, and remediation sequence for a first or newly expanded compliance target.",
+      "idealFor": "Teams that need a defensible baseline before committing to a larger readiness program.",
+      "includes": [
+        "Target-framework and in-scope system map",
+        "Initial control and evidence gap register",
+        "Prioritized 30/60/90-day remediation roadmap",
+        "Readiness checkpoint and independent-review handoff notes"
+      ]
+    },
+    {
+      "id": "managed-readiness",
+      "name": "Managed Readiness",
+      "monthlyUsd": 7500,
+      "summary": "Operate readiness as a recurring program so controls, evidence, exceptions, and ownership stay current.",
+      "idealFor": "Growing teams preparing for a customer, assessor, certification-body, or regulator review on an active timeline.",
+      "includes": [
+        "Everything in Foundation Readiness",
+        "Recurring evidence-freshness and exception reviews",
+        "Control-owner working sessions and readiness scorecards",
+        "Ongoing remediation tracking and assessor handoff preparation"
+      ]
+    },
+    {
+      "id": "assurance-engineering",
+      "name": "Assurance Engineering",
+      "monthlyUsd": 20000,
+      "summary": "Pair readiness leadership with hands-on technical remediation and evidence automation across the engineering stack.",
+      "idealFor": "Teams with material technical gaps, multiple environments or frameworks, or a compressed independent-review timeline.",
+      "includes": [
+        "Everything in Managed Readiness",
+        "Hands-on cloud, IAM, SDLC, logging, and data-control remediation where in scope",
+        "Evidence-pipeline and control-validation automation support",
+        "Intensive pre-review exercises and independent assessor coordination support"
+      ]
+    }
+  ]
+}

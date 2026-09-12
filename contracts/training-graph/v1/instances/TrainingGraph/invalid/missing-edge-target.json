@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "1.0.0",
+  "graphId": "canonical-compliance-training-v1",
+  "title": "Invalid training graph fixture",
+  "summary": "The choice intentionally omits nextNodeId.",
+  "entryNodeId": "start",
+  "nodes": [
+    {
+      "id": "start",
+      "kind": "scenario",
+      "title": "Invalid node",
+      "prompt": "This fixture must be rejected by both authorities.",
+      "learningObjectives": ["Reject structurally incomplete edges."],
+      "checkpoints": [
+        { "id": "confirm", "label": "Confirm", "required": true }
+      ],
+      "choices": [
+        { "id": "broken", "label": "Broken edge" }
+      ]
+    }
+  ]
+}

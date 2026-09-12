@@ -1,0 +1,136 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const readinessHref = `${baseNoSlash}/readiness/`;
+const frameworksHref = `${baseNoSlash}/frameworks/`;
+const pricingHref = `${baseNoSlash}/pricing/`;
+const quoteHref = 'https://app.canonical.plus/u/readiness';
+---
+
+<BaseLayout
+  title="Security readiness"
+  description="Security readiness engineering for software and cloud teams: control scoping, architecture review, evidence preparation, remediation planning, and independent-review handoff."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Security readiness</span>
+        <p class="page-hero__eyebrow">Controls that connect to the systems that enforce them</p>
+        <h1 class="page-hero__title hero__title">
+          Turn security requirements into
+          <span class="gradient-text">testable engineering work.</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Canonical Plus helps teams scope controls, map technical ownership, identify gaps,
+          implement remediation, and organize evidence for an independent reviewer. We do not
+          replace your auditor, assessor, regulator, certification body, or legal counsel.
+        </p>
+        <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--secondary btn--large" href={frameworksHref}>Browse frameworks</a>
+        </div>
+      </div>
+      <aside class="page-hero__panel" aria-label="Security engagement boundary">
+        <h2>Engineering-focused, evidence-aware</h2>
+        <p>
+          The goal is to make security controls concrete enough to own, test, monitor, and explain
+          without turning preparation work into a claim of independent assurance.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="security-work-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">What we work on</span>
+        <h2 id="security-work-title">From control language to operating evidence.</h2>
+        <p>Typical security-readiness work spans architecture, implementation, operations, and evidence quality.</p>
+      </header>
+      <div class="security-grid">
+        <article class="card">
+          <h3>Architecture and identity</h3>
+          <p>Map trust boundaries, authentication and authorization flows, tenant isolation, privileged access, secrets, and administrative planes.</p>
+        </article>
+        <article class="card">
+          <h3>Application and platform controls</h3>
+          <p>Review secure defaults, input and output boundaries, dependency posture, change controls, deployment paths, logging, and monitoring.</p>
+        </article>
+        <article class="card">
+          <h3>Evidence and operations</h3>
+          <p>Connect policies and control statements to owners, procedures, technical checks, retained evidence, exceptions, and remediation records.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise" aria-labelledby="security-process-title">
+    <div class="container security-split">
+      <div>
+        <span class="badge">Readiness loop</span>
+        <h2 id="security-process-title">Scope. Verify. Remediate. Re-check.</h2>
+        <p>
+          Security readiness works best as a repeatable engineering loop rather than a one-time
+          document collection exercise. Findings should resolve to accountable changes and evidence
+          that can be reproduced when the environment changes.
+        </p>
+      </div>
+      <div class="card">
+        <h3>Typical outputs</h3>
+        <ul class="check-list">
+          <li>Control-to-system ownership map</li>
+          <li>Prioritized security and evidence gaps</li>
+          <li>Remediation backlog with verification criteria</li>
+          <li>Evidence inventory and reviewer-ready handoff</li>
+          <li>Explicit unresolved risks and dependencies</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">Keep the boundary clear</span>
+        <h2>Prepare deeply without pretending preparation is certification.</h2>
+        <p>
+          Canonical Plus can help your team become ready for independent review. The independent
+          party you select remains responsible for audit opinions, certifications, authorizations,
+          regulatory conclusions, and other formal determinations.
+        </p>
+        <div class="action-row">
+          <a class="btn btn--primary btn--large" href={readinessHref}>Readiness overview</a>
+          <a class="btn btn--secondary btn--large" href={pricingHref}>See pricing</a>
+          <a class="btn btn--secondary btn--large" href="mailto:hello@canonical.plus">hello@canonical.plus</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .security-split {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: var(--space-xl);
+    align-items: start;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 900px) {
+    .security-grid,
+    .security-split {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,116 @@
+name: Training graph and pricing projection contract
+
+on:
+  pull_request:
+    paths:
+      - 'contracts/training-graph/**'
+      - 'src/data/service-tiers.json'
+      - 'src/pages/prices.astro'
+      - 'src/pages/training.astro'
+      - 'tests/training-pricing-contract.test.mjs'
+      - '.github/workflows/training-graph-contract.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'contracts/training-graph/**'
+      - 'src/data/service-tiers.json'
+      - 'src/pages/prices.astro'
+      - 'src/pages/training.astro'
+      - 'tests/training-pricing-contract.test.mjs'
+      - '.github/workflows/training-graph-contract.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: training-graph-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  graph-and-peer-authority:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out exact candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          show-progress: false
+
+      - name: Verify pricing projection and graph semantics
+        run: node --test tests/training-pricing-contract.test.mjs
+
+      - name: Check out pinned TJSV
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: ORESoftware/typespec-json-schema-validator
+          ref: 5bab34e08856c47af3600adf40a4aa860fa71c01
+          path: .deps/tjsv
+          persist-credentials: false
+          show-progress: false
+
+      - name: Set up Node 22.16
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22.16.0'
+
+      - name: Install TJSV and build only the pinned flags2env native dependency
+        working-directory: .deps/tjsv
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          npm rebuild @oresoftware/f2e
+          test -s node_modules/@oresoftware/f2e/clients/nodejs/build/Release/flags2env.node
+
+      - name: Check independent training TypeSpec and JSON Schema authorities
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          node .deps/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/training-graph/v1/main.tsp \
+            --schema=contracts/training-graph/v1/authored.schema.json \
+            --instances=contracts/training-graph/v1/instances \
+            --report=artifacts/training-graph.parity.json \
+            --max-probes=128
+          jq -e '.status == "passed"' artifacts/training-graph.parity.json >/dev/null
+          jq -e '(.findings | length) == 0' artifacts/training-graph.parity.json >/dev/null
+
+      - name: Prove structural authority drift is rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          cp contracts/training-graph/v1/authored.schema.json /tmp/training-drift.schema.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          path = Path('/tmp/training-drift.schema.json')
+          doc = json.loads(path.read_text())
+          doc['$defs']['TrainingChoice']['properties']['nextNodeId']['type'] = 'number'
+          path.write_text(json.dumps(doc, indent=2) + '\n')
+          PY
+          set +e
+          node .deps/tjsv/bin/typespec-json-schema-validator.mjs check \
+            --typespec=contracts/training-graph/v1/main.tsp \
+            --schema=/tmp/training-drift.schema.json \
+            --instances=contracts/training-graph/v1/instances \
+            --report=/tmp/training-drift.report.json \
+            --max-probes=128
+          code=$?
+          set -e
+          test "$code" -eq 2
+          jq -e '.status == "stopped_for_evaluation"' /tmp/training-drift.report.json >/dev/null
+          jq -e '(.findings | length) > 0' /tmp/training-drift.report.json >/dev/null
+
+      - name: Retain parity evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: training-graph-tjsv
+          path: artifacts/training-graph.parity.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 30
