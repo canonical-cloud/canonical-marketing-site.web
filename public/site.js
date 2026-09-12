@@ -19,6 +19,28 @@ const configureApplicationLinks = () => {
 
 configureApplicationLinks();
 
+const configurePeopleNavigation = () => {
+  const readinessLink = document.getElementById('nav-services');
+  const signInLink = document.getElementById('nav-sign-in');
+
+  if (!(readinessLink instanceof HTMLAnchorElement) || !(signInLink instanceof HTMLAnchorElement)) {
+    return;
+  }
+
+  if (document.getElementById('nav-people')) {
+    return;
+  }
+
+  const peopleLink = document.createElement('a');
+  peopleLink.id = 'nav-people';
+  peopleLink.className = 'nav__link';
+  peopleLink.textContent = 'People';
+  peopleLink.href = new URL('../people/', readinessLink.href).href;
+  signInLink.before(peopleLink);
+};
+
+configurePeopleNavigation();
+
 const nav = document.getElementById('main-nav');
 
 if (nav) {
@@ -139,4 +161,14 @@ if (toggle && links) {
   });
 
   mobileNavigation.addEventListener('change', () => setNavigationOpen(false));
+}
+
+for (const image of document.querySelectorAll('[data-people-photo]')) {
+  if (!(image instanceof HTMLImageElement)) {
+    continue;
+  }
+
+  image.addEventListener('error', () => {
+    image.hidden = true;
+  });
 }
