@@ -10,9 +10,10 @@ const expectedPeople = [
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
+  ['Eugene Li', 'business/legal counsel'],
 ];
 
-test('puppeteer: people page renders six cards in a responsive 3-by-2 desktop grid', async (t) => {
+test('puppeteer: people page renders seven cards with responsive 3-to-2-to-1 columns', async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
@@ -51,6 +52,8 @@ test('puppeteer: people page renders six cards in a responsive 3-by-2 desktop gr
   );
 
   assert.equal(await columnCount(), 3);
+  const eugeneColumn = await page.$eval('[data-person-id="eugene-li"]', (card) => getComputedStyle(card).gridColumnStart);
+  assert.equal(eugeneColumn, '2');
 
   await page.setViewport({ height: 900, width: 800 });
   assert.equal(await columnCount(), 2);
@@ -71,5 +74,5 @@ test('puppeteer: people page renders six cards in a responsive 3-by-2 desktop gr
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL']);
 });
