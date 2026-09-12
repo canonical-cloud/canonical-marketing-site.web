@@ -53,3 +53,6 @@ env/dec
 !/env/enc/dev.env.enc
 !/env/enc/prod.env.enc
 # END ores-sops dotenv policy
+
+# Sanctioned scratch locations - AGENTS.md requires both, trailing-slash form
+temp/
