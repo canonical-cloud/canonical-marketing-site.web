@@ -9,6 +9,8 @@ const paths = [
   "../src/pages/readiness.astro",
   "../src/pages/frameworks.astro",
   "../src/pages/compare.astro",
+  "../src/pages/prices.astro",
+  "../src/pages/training.astro",
 ];
 
 const corpus = (
