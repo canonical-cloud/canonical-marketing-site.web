@@ -41,9 +41,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 1
           path: .tooling/tjsv
-      - name: Install exact TJSV dependencies
+      - name: Install exact TJSV dependencies and native flags-2-env binding
         working-directory: .tooling/tjsv
-        run: npm ci --ignore-scripts --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
       - name: Enforce People TypeSpec and JSON Schema peer-authority parity
         run: |
           set -euo pipefail
