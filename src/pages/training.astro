@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const appTrainingHref = 'https://app.canonical.plus/training';
+const readinessHref = 'https://app.canonical.plus/app/readiness';
+const quoteHref = 'https://app.canonical.plus/u/quote';
+
+const tracks = [
+  {
+    title: 'SOC 2 Foundations',
+    meta: '4 modules · about 2 hours · Beginner',
+    copy: 'Build a shared understanding of scope, Trust Services Criteria, control ownership, evidence quality, and the readiness journey.',
+  },
+  {
+    title: 'Control Owner Workshop',
+    meta: '6 modules · about 4 hours · Intermediate',
+    copy: 'Role-based training for engineering, IT, security, and operations teams that need to operate controls continuously.',
+  },
+  {
+    title: 'Audit Readiness Bootcamp',
+    meta: 'Hands-on cohort · scope-dependent · Advanced',
+    copy: 'Work from gap assessment through evidence review and readiness rehearsal before an independent SOC 2 examination.',
+  },
+];
+---
+
+<BaseLayout
+  title="Compliance readiness training"
+  description="Practical SOC 2 readiness training for SaaS and AI teams, with foundations, control-owner workshops, and audit-readiness bootcamps."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge animate-fade-in-up">Canonical Cloud Training</span>
+        <p class="page-hero__eyebrow animate-fade-in-up stagger-1">Readiness education for operating teams</p>
+        <h1 class="page-hero__title animate-fade-in-up stagger-2">
+          Turn compliance into a
+          <span class="gradient-text">competitive advantage</span>
+        </h1>
+        <p class="page-hero__subtitle animate-fade-in-up stagger-2">
+          Practical SOC 2 readiness training for SaaS and AI teams. Learn the operating habits,
+          evidence expectations, and ownership patterns that make independent review less chaotic.
+        </p>
+        <div class="page-hero__actions animate-fade-in-up stagger-3">
+          <a href={appTrainingHref} class="btn btn--primary btn--large" data-application-link="training">
+            Explore the training program
+          </a>
+          <a href={readinessHref} class="btn btn--secondary btn--large" data-application-link="readiness">
+            Start readiness assessment
+          </a>
+        </div>
+      </div>
+
+      <aside class="page-hero__panel animate-fade-in-up stagger-3">
+        <h2>Training is for readiness</h2>
+        <p>
+          Canonical Plus helps teams prepare. It does not issue an audit opinion, certification,
+          authorization, approval, or guaranteed result.
+        </p>
+        <ul class="check-list">
+          <li>Founder and program-lead foundations</li>
+          <li>Engineering and control-owner practice</li>
+          <li>Evidence and readiness rehearsal</li>
+          <li>Clear handoff to an independent evaluator</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Three training paths</span>
+        <h2>Learn enough to operate the controls, not just talk about them</h2>
+        <p>
+          The full curriculum lives in the Canonical application so training can connect directly
+          to readiness worksheets and the rest of the customer workflow.
+        </p>
+      </header>
+
+      <div class="card-grid card-grid--three">
+        {tracks.map((track) => (
+          <article class="deliverable">
+            <strong>{track.title}</strong>
+            <p class="page-hero__eyebrow">{track.meta}</p>
+            <p>{track.copy}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="cta-panel">
+        <span class="badge">From learning to evidence</span>
+        <h2>Continue in the product training workspace</h2>
+        <p>
+          Use the full training page for the curriculum, then move directly into readiness
+          assessment and remediation planning. The marketing site stays a discovery surface;
+          the Rust application remains the product authority.
+        </p>
+        <div class="action-row">
+          <a href={appTrainingHref} class="btn btn--primary btn--large" data-application-link="training">
+            Open Canonical training
+          </a>
+          <a href={quoteHref} class="btn btn--secondary btn--large" data-application-link="quote">
+            Talk to an expert
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
