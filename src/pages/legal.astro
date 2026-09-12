@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const pricingHref = `${baseNoSlash}/pricing/`;
+const trainingHref = `${baseNoSlash}/training/`;
+const securityHref = `${baseNoSlash}/security/`;
+const contactHref = `${baseNoSlash}/contact/`;
+---
+
+<BaseLayout
+  title="Legal and engagement boundary"
+  description="How Canonical Plus readiness, pre-audit, training, and security-readiness work is scoped: readiness preparation only, not audits, attestations, certifications, or legal advice."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Legal</span>
+        <p class="page-hero__eyebrow">Readiness, not independent assurance</p>
+        <h1 class="page-hero__title hero__title">
+          Clear boundaries for
+          <span class="gradient-text">readiness engagements.</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Canonical Plus provides audit-readiness and pre-audit preparation. We are not a CPA firm,
+          law firm, certification body, or assessor. We do not issue audit opinions, attestations,
+          certifications, or authorizations, and nothing we provide is legal advice.
+        </p>
+      </div>
+      <aside class="page-hero__panel" aria-label="Engagement boundary summary" data-legal-boundary>
+        <h2>Who decides what</h2>
+        <p>
+          Your independent auditor, assessor, certification body, or regulator makes assurance
+          determinations under its own standards. Your own legal counsel advises on legal
+          obligations. We help you prepare systems, controls, and evidence for that review.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="legal-scope-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Engagement scope</span>
+        <h2 id="legal-scope-title">What readiness work includes, and what it never includes.</h2>
+      </header>
+      <div class="security-grid">
+        <article class="card" data-legal-card="includes">
+          <h3>Included readiness work</h3>
+          <p>
+            Scoping, readiness diagnostics, gap registers, remediation roadmaps, control and policy
+            implementation support, evidence organization, management preparation, training, and
+            coordination with an evaluator you engage directly.
+          </p>
+        </article>
+        <article class="card" data-legal-card="excludes">
+          <h3>Never included</h3>
+          <p>
+            Audit or attestation engagements, SOC reports, ISO certificates, PCI compliance reports,
+            FedRAMP or CMMC authorizations, HIPAA determinations, legal opinions, or any guarantee
+            that you will pass, be certified, or avoid findings.
+          </p>
+        </article>
+        <article class="card" data-legal-card="signals">
+          <h3>Readiness signals stay internal</h3>
+          <p>
+            Readiness scores, dashboard status, training completion, and signed readiness
+            observations are preparation signals. They are not audit opinions and should not be
+            presented to third parties as independent assurance.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise" aria-labelledby="legal-documents-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Contract stack</span>
+        <h2 id="legal-documents-title">Customer agreements are provided during onboarding.</h2>
+        <p>
+          Every engagement is governed by a signed agreement. The signed agreement controls over
+          website copy, pricing summaries, and training content.
+        </p>
+      </header>
+      <div class="security-grid">
+        <article class="card">
+          <h3>Master Services Agreement and Statement of Work</h3>
+          <p>
+            Scope, deliverables, fees, acceptance, and change control for each readiness tier. Public
+            <a href={pricingHref}>pricing</a> shows planning ranges, not an offer.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Terms of Service, Privacy Policy, and Acceptable Use</h3>
+          <p>
+            Online terms for self-service use of the readiness workspace, how we handle personal
+            data, and prohibited uses of the platform.
+          </p>
+        </article>
+        <article class="card">
+          <h3>Data Processing Agreement and security testing authorization</h3>
+          <p>
+            Processor terms for customer evidence, plus separate written authorization and rules of
+            engagement before any active <a href={securityHref}>security assessment</a>.
+          </p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="legal-contact-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <h2 id="legal-contact-title">Request agreement copies</h2>
+        <p>
+          Email <a href="mailto:hello@canonical.plus">hello@canonical.plus</a> or use the
+          <a href={contactHref}>contact page</a> to request current agreement drafts. Compliance
+          <a href={trainingHref}>training</a> is educational and is not legal advice.
+        </p>
+      </header>
+    </div>
+  </section>
+</BaseLayout>
