@@ -11,7 +11,7 @@ const people = directory.people;
 
 <BaseLayout
   title="People"
-  description="Meet the people working across integrations, security, client platforms, go-to-market, operations, and engineering at Canonical Plus."
+  description="Meet the people working across integrations, security, client platforms, go-to-market, operations, engineering, and business/legal counsel at Canonical Plus."
 >
   <section class="people-hero section--hero bg-grid bg-radial">
     <div class="container people-hero__content">
@@ -22,7 +22,7 @@ const people = directory.people;
       </h1>
       <p class="people-hero__subtitle animate-fade-in-up stagger-2">
         A small team spanning infrastructure, security, client experiences, go-to-market,
-        operations, and engineering.
+        operations, engineering, and business/legal counsel.
       </p>
     </div>
   </section>
@@ -31,7 +31,7 @@ const people = directory.people;
     <div class="container">
       <header class="section-header section-header--center">
         <span class="badge">Team</span>
-        <h2 id="people-grid-title">Six people, one readiness platform</h2>
+        <h2 id="people-grid-title">Seven people, one readiness platform</h2>
       </header>
 
       <div class="people-grid" data-people-grid>
@@ -66,7 +66,7 @@ const people = directory.people;
       </div>
 
       <p class="people-source-note">
-        Selected headshots are reused from Benefactor's public team directory. John and Jack use
+        Selected headshots are reused from Benefactor's public team directory. John, Jack, and Eugene use
         neutral profile placeholders until verified portraits are available.
       </p>
 
@@ -135,6 +135,10 @@ const people = directory.people;
         transform var(--duration-normal) var(--ease-out),
         border-color var(--duration-normal) var(--ease-out),
         box-shadow var(--duration-normal) var(--ease-out);
+    }
+
+    .person-card:last-child:nth-child(3n + 1) {
+      grid-column: 2;
     }
 
     .person-card:hover {
@@ -254,6 +258,10 @@ const people = directory.people;
     @media (max-width: 900px) {
       .people-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .person-card:last-child:nth-child(3n + 1) {
+        grid-column: auto;
       }
 
       .people-cta {
