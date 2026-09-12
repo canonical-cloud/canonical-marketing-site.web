@@ -14,13 +14,33 @@ async function launchBrowser(t) {
 }
 
 async function assertNoHorizontalOverflow(page, label) {
-  const dimensions = await page.evaluate(() => ({
-    clientWidth: document.documentElement.clientWidth,
-    scrollWidth: document.documentElement.scrollWidth,
-  }));
+  const diagnostics = await page.evaluate(() => {
+    const root = document.documentElement;
+    const offenders = [...document.querySelectorAll('body *')]
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          id: element.id || null,
+          className: typeof element.className === 'string' ? element.className : null,
+          left: Math.round(rect.left * 100) / 100,
+          right: Math.round(rect.right * 100) / 100,
+          width: Math.round(rect.width * 100) / 100,
+        };
+      })
+      .filter(({ left, right }) => left < -1 || right > window.innerWidth + 1)
+      .slice(0, 12);
+
+    return {
+      clientWidth: root.clientWidth,
+      scrollWidth: root.scrollWidth,
+      innerWidth: window.innerWidth,
+      offenders,
+    };
+  });
   assert.ok(
-    dimensions.scrollWidth <= dimensions.clientWidth + 1,
-    `${label} overflowed horizontally: ${JSON.stringify(dimensions)}`,
+    diagnostics.scrollWidth <= diagnostics.clientWidth + 1,
+    `${label} overflowed horizontally: ${JSON.stringify(diagnostics)}`,
   );
 }
 
