@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "1.0.0",
+  "graphId": "canonical-compliance-training-v1",
+  "title": "Compliance readiness — choose your path",
+  "summary": "A public, no-PII learning graph for understanding controls, evidence, remediation, and independent-review boundaries.",
+  "entryNodeId": "start",
+  "nodes": [
+    {
+      "id": "start",
+      "kind": "scenario",
+      "title": "What brought you here?",
+      "prompt": "Choose the situation closest to your job today. You can loop back and take another path at any time.",
+      "learningObjectives": [
+        "Separate readiness work from an independent assurance decision.",
+        "Choose a path based on the work you need to understand, not a framework acronym alone."
+      ],
+      "checkpoints": [
+        { "id": "public-training", "label": "I understand this public training does not collect evidence or make an audit determination.", "required": true },
+        { "id": "readiness-boundary", "label": "I understand Canonical Plus prepares readiness work while qualified independent parties make formal determinations.", "required": true }
+      ],
+      "choices": [
+        { "id": "founder", "label": "A buyer asked whether we are compliant", "summary": "Start with scope, commitments, and the buyer request.", "nextNodeId": "buyer-request", "tags": ["leadership", "scope"] },
+        { "id": "engineer", "label": "I need to turn a gap into engineering work", "summary": "Start from a system change and work backward to control intent.", "nextNodeId": "engineering-change", "tags": ["engineering", "remediation"] },
+        { "id": "security", "label": "I own security or compliance controls", "summary": "Start with control design and proof.", "nextNodeId": "control-design", "tags": ["security", "controls"] },
+        { "id": "evidence", "label": "I keep rebuilding evidence for every review", "summary": "Start with durable evidence operations.", "nextNodeId": "evidence-ops", "tags": ["evidence", "operations"] }
+      ]
+    },
+    {
+      "id": "buyer-request",
+      "kind": "lesson",
+      "title": "Translate the buyer request into a readiness scope",
+      "prompt": "A request such as “Are you SOC 2 compliant?” is not yet a project plan. Identify the product, environments, data, entities, time horizon, and the independent artifact the buyer actually expects.",
+      "learningObjectives": [
+        "Turn a broad compliance question into an explicit system and framework scope.",
+        "Distinguish a readiness estimate from a completed independent report or certification."
+      ],
+      "checkpoints": [
+        { "id": "scope-first", "label": "I would define the in-scope system before promising an outcome or date.", "required": true },
+        { "id": "artifact-owner", "label": "I would identify which independent party, if any, must issue the final report, certification, or authorization.", "required": true }
+      ],
+      "choices": [
+        { "id": "map-framework", "label": "Map the request to frameworks and shared controls", "nextNodeId": "framework-map", "tags": ["framework"] },
+        { "id": "build-evidence", "label": "Understand what evidence the buyer or assessor will need", "nextNodeId": "evidence-ops", "tags": ["evidence"] }
+      ]
+    },
+    {
+      "id": "engineering-change",
+      "kind": "scenario",
+      "title": "A finding becomes an engineering change",
+      "prompt": "Suppose the gap is weak production access. The readiness task is not “be compliant”; it is a bounded change such as stronger identity, least privilege, approval, logging, review, and evidence of operation.",
+      "learningObjectives": [
+        "Translate a compliance gap into technical acceptance criteria.",
+        "Keep the control objective distinct from one specific implementation."
+      ],
+      "checkpoints": [
+        { "id": "acceptance-criteria", "label": "I can describe the desired security outcome and how we will prove it operates.", "required": true },
+        { "id": "implementation-choice", "label": "I understand a framework control rarely mandates one vendor or code pattern.", "required": true }
+      ],
+      "choices": [
+        { "id": "design-control", "label": "Design the control before implementing it", "nextNodeId": "control-design", "tags": ["controls"] },
+        { "id": "exception-path", "label": "What if we cannot finish the change before review?", "nextNodeId": "incident-exception", "tags": ["exception"] }
+      ]
+    },
+    {
+      "id": "control-design",
+      "kind": "lesson",
+      "title": "A control needs an owner, trigger, action, and proof",
+      "prompt": "A useful control explains who performs it, when it runs, what system or population it covers, how exceptions are handled, and what durable evidence shows it operated.",
+      "learningObjectives": [
+        "Recognize operational control components beyond policy text.",
+        "Design evidence as part of the control instead of after the fact."
+      ],
+      "checkpoints": [
+        { "id": "owner-trigger", "label": "I can name an owner and trigger for the control.", "required": true },
+        { "id": "proof-designed", "label": "I can name the system-generated or review evidence the control should leave behind.", "required": true }
+      ],
+      "choices": [
+        { "id": "operate-evidence", "label": "Turn that proof into an evidence operation", "nextNodeId": "evidence-ops", "tags": ["evidence"] },
+        { "id": "reuse-control", "label": "See how one control maps to multiple frameworks", "nextNodeId": "framework-map", "tags": ["framework"] }
+      ]
+    },
+    {
+      "id": "framework-map",
+      "kind": "lesson",
+      "title": "Frameworks overlap; implementations should not multiply blindly",
+      "prompt": "Access control, change management, incident handling, vendor risk, backups, and logging often satisfy multiple obligations. Map one real control to many requirements rather than creating a separate process for every framework row.",
+      "learningObjectives": [
+        "Use common-control mapping to reduce duplicate work.",
+        "Preserve framework-specific qualifiers even when implementation is shared."
+      ],
+      "checkpoints": [
+        { "id": "common-control", "label": "I would reuse a real control across frameworks when the control objective truly overlaps.", "required": true },
+        { "id": "qualifiers", "label": "I would still record framework-specific scope, evidence, or assessor expectations.", "required": true }
+      ],
+      "choices": [
+        { "id": "classify-gap", "label": "Classify what is actually missing", "nextNodeId": "gap-classification", "tags": ["gap"] }
+      ]
+    },
+    {
+      "id": "evidence-ops",
+      "kind": "lesson",
+      "title": "Evidence is an operating system, not a screenshot scramble",
+      "prompt": "Good evidence has an owner, source, population, period, freshness rule, retention rule, and a way to explain exceptions. Prefer durable system records over one-off screenshots when the system can produce better proof.",
+      "learningObjectives": [
+        "Distinguish a control from evidence that the control operated.",
+        "Define evidence freshness, provenance, and retention deliberately."
+      ],
+      "checkpoints": [
+        { "id": "evidence-source", "label": "I can identify the authoritative source for at least one important control.", "required": true },
+        { "id": "freshness", "label": "I can explain when that evidence becomes stale or incomplete.", "required": true }
+      ],
+      "choices": [
+        { "id": "classify-gap", "label": "Distinguish missing control from missing proof", "nextNodeId": "gap-classification", "tags": ["gap"] },
+        { "id": "exceptions", "label": "Learn how incidents and exceptions affect evidence", "nextNodeId": "incident-exception", "tags": ["exception"] }
+      ]
+    },
+    {
+      "id": "gap-classification",
+      "kind": "checkpoint",
+      "title": "Classify the gap before assigning remediation",
+      "prompt": "A finding can mean the control does not exist, exists but is badly designed, exists but did not operate, operated but lacks proof, or is out of scope because the boundary was wrong. Those are different problems.",
+      "learningObjectives": [
+        "Classify findings before prescribing fixes.",
+        "Avoid engineering work that only papers over an evidence problem."
+      ],
+      "checkpoints": [
+        { "id": "design-vs-proof", "label": "I can distinguish a control-design gap from an evidence gap.", "required": true },
+        { "id": "scope-check", "label": "I would re-check scope before treating every observation as a remediation task.", "required": true }
+      ],
+      "choices": [
+        { "id": "plan-remediation", "label": "Build the remediation sequence", "nextNodeId": "remediation-plan", "tags": ["remediation"] }
+      ]
+    },
+    {
+      "id": "incident-exception",
+      "kind": "scenario",
+      "title": "Exceptions should be explicit, bounded, and reviewable",
+      "prompt": "A missed control or security incident does not disappear because a review date is close. Record the fact, owner, risk, compensating measures, remediation date, and evidence. Independent reviewers decide how that history affects their conclusion.",
+      "learningObjectives": [
+        "Treat exceptions as governed records instead of hidden failures.",
+        "Keep compensating controls and remediation evidence explicit."
+      ],
+      "checkpoints": [
+        { "id": "no-hide", "label": "I would not delete or conceal an exception to make a readiness score look better.", "required": true },
+        { "id": "bounded-exception", "label": "I would record owner, risk, compensating measures, and a remediation target.", "required": true }
+      ],
+      "choices": [
+        { "id": "remediate", "label": "Move the exception into a remediation plan", "nextNodeId": "remediation-plan", "tags": ["remediation"] },
+        { "id": "evidence-loop", "label": "Revisit durable evidence operations", "nextNodeId": "evidence-ops", "tags": ["evidence", "cycle"] }
+      ]
+    },
+    {
+      "id": "remediation-plan",
+      "kind": "lesson",
+      "title": "Prioritize by risk, dependency, and proof",
+      "prompt": "A useful roadmap names the gap, desired state, owner, dependencies, acceptance criteria, evidence, due date, and rollback or exception path. Sequence identity, logging, change control, data, and infrastructure work so later controls can rely on earlier ones.",
+      "learningObjectives": [
+        "Turn observations into reviewable engineering and operating tasks.",
+        "Sequence work by dependency rather than checklist order alone."
+      ],
+      "checkpoints": [
+        { "id": "owner-evidence", "label": "Every remediation item I create will have an owner and evidence expectation.", "required": true },
+        { "id": "dependency-order", "label": "I will order dependent controls instead of treating every row as independent work.", "required": true }
+      ],
+      "choices": [
+        { "id": "handoff", "label": "Prepare for independent review", "nextNodeId": "independent-review", "tags": ["handoff"] }
+      ]
+    },
+    {
+      "id": "independent-review",
+      "kind": "lesson",
+      "title": "Know where readiness stops",
+      "prompt": "Canonical Plus can help organize scope, controls, evidence, remediation, and open questions. The independent auditor, assessor, certification body, regulator, or legal adviser applies the formal criteria and issues any conclusion within their authority.",
+      "learningObjectives": [
+        "Preserve independence between preparation and formal determination.",
+        "Hand over evidence with assumptions and exceptions intact."
+      ],
+      "checkpoints": [
+        { "id": "no-opinion", "label": "I will not describe a readiness score as an audit opinion, certification, or authorization.", "required": true },
+        { "id": "open-questions", "label": "I will include unresolved assumptions and exceptions in the handoff rather than hiding them.", "required": true }
+      ],
+      "choices": [
+        { "id": "recap", "label": "Finish this training path", "nextNodeId": "final-recap", "tags": ["outcome"] },
+        { "id": "framework-loop", "label": "Loop back and practice framework mapping again", "nextNodeId": "framework-map", "tags": ["cycle", "framework"] }
+      ]
+    },
+    {
+      "id": "final-recap",
+      "kind": "checkpoint",
+      "title": "Choose the operating model that fits your next step",
+      "prompt": "You now have the core readiness model. Pick the kind of help that best matches the work in front of your team; this is a learning recommendation, not a binding quote.",
+      "learningObjectives": [
+        "Connect readiness work to an appropriate operating cadence.",
+        "Keep commercial scope subordinate to a reviewed statement of work."
+      ],
+      "checkpoints": [
+        { "id": "boundary-recap", "label": "I understand package selection does not change the independent-review boundary.", "required": true },
+        { "id": "sow-recap", "label": "I understand actual scope and price are controlled by a signed SOW.", "required": true }
+      ],
+      "choices": [
+        { "id": "baseline", "label": "We need a scoped baseline and remediation roadmap", "summary": "Explore Foundation Readiness.", "nextNodeId": "outcome-foundation", "tags": ["foundation-readiness"] },
+        { "id": "operating", "label": "We need recurring evidence and readiness operations", "summary": "Explore Managed Readiness.", "nextNodeId": "outcome-managed", "tags": ["managed-readiness"] },
+        { "id": "engineering", "label": "We need hands-on technical remediation and automation", "summary": "Explore Assurance Engineering.", "nextNodeId": "outcome-assurance", "tags": ["assurance-engineering"] }
+      ]
+    },
+    {
+      "id": "outcome-foundation",
+      "kind": "outcome",
+      "title": "Your next learning path: Foundation Readiness",
+      "prompt": "A baseline is useful when the main uncertainty is scope, gap classification, ownership, and remediation order.",
+      "learningObjectives": ["Know when a baseline readiness engagement is sufficient before moving into recurring operations."],
+      "checkpoints": [
+        { "id": "foundation-not-offer", "label": "I understand this recommendation is educational and the public price is a proposed starting assumption.", "required": true }
+      ],
+      "choices": [
+        { "id": "again", "label": "Choose another adventure", "nextNodeId": "start", "tags": ["cycle"] },
+        { "id": "framework-practice", "label": "Practice framework mapping", "nextNodeId": "framework-map", "tags": ["cycle", "framework"] }
+      ],
+      "outcome": { "tierId": "foundation-readiness", "message": "Start with scope, a gap register, and an executable remediation roadmap." }
+    },
+    {
+      "id": "outcome-managed",
+      "kind": "outcome",
+      "title": "Your next learning path: Managed Readiness",
+      "prompt": "Recurring operations are useful when evidence freshness, control ownership, exceptions, and review preparation need an operating cadence.",
+      "learningObjectives": ["Know when continuous evidence and control-owner routines matter more than another one-time checklist."],
+      "checkpoints": [
+        { "id": "managed-not-offer", "label": "I understand this recommendation is educational and the public price is a proposed starting assumption.", "required": true }
+      ],
+      "choices": [
+        { "id": "again", "label": "Choose another adventure", "nextNodeId": "start", "tags": ["cycle"] },
+        { "id": "evidence-practice", "label": "Practice evidence operations", "nextNodeId": "evidence-ops", "tags": ["cycle", "evidence"] }
+      ],
+      "outcome": { "tierId": "managed-readiness", "message": "Operate controls, evidence freshness, exceptions, and handoff preparation continuously." }
+    },
+    {
+      "id": "outcome-assurance",
+      "kind": "outcome",
+      "title": "Your next learning path: Assurance Engineering",
+      "prompt": "Hands-on assurance engineering is useful when the blockers are materially technical and the team needs help implementing or automating the remediation itself.",
+      "learningObjectives": ["Know when readiness work should include direct engineering remediation support."],
+      "checkpoints": [
+        { "id": "assurance-not-audit", "label": "I understand assurance engineering still does not make Canonical Plus the independent auditor or certification body.", "required": true }
+      ],
+      "choices": [
+        { "id": "again", "label": "Choose another adventure", "nextNodeId": "start", "tags": ["cycle"] },
+        { "id": "engineering-practice", "label": "Practice an engineering finding again", "nextNodeId": "engineering-change", "tags": ["cycle", "engineering"] }
+      ],
+      "outcome": { "tierId": "assurance-engineering", "message": "Pair readiness leadership with hands-on remediation and evidence automation." }
+    }
+  ]
+}
