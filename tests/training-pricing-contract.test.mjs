@@ -47,7 +47,7 @@ test('people, pricing, training, and security routes are concrete public pages',
   assert.match(trainingPage, /<BaseLayout/);
   assert.match(securityPage, /<BaseLayout/);
   assert.match(securityPage, /security readiness/i);
-  assert.match(securityPage, /independent party/i);
+  assert.match(securityPage, /independent\s+party/i);
 });
 
 test('global discovery and contact use the canonical.plus hello address', () => {
