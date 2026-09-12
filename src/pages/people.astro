@@ -1,55 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import directory from '../../contracts/people/v1/instances/PeopleDirectory/valid/canonical.json';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
-const photoSource = 'https://benefactor.cc/team';
-
-const people = [
-  {
-    name: 'Alexander Mills',
-    role: 'Integrations and DevOps',
-    initials: 'AM',
-    photo: `${photoSource}/alex-mills.jpg`,
-  },
-  {
-    name: 'John Siciliano',
-    role: 'Security and Ops',
-    initials: 'JS',
-    photo: null,
-  },
-  {
-    name: 'Jack Johnson',
-    role: 'Browser, Mobile, Clientside',
-    initials: 'JJ',
-    photo: null,
-  },
-  {
-    name: 'Vikkie Pandey',
-    role: 'Marketing and Sales',
-    initials: 'VP',
-    photo: `${photoSource}/vinayak-pandey.png`,
-  },
-  {
-    name: 'Elijah Gizzarelli',
-    role: 'Ops & HR',
-    initials: 'EG',
-    photo: `${photoSource}/elijah-gizzarelli.jpeg`,
-  },
-  {
-    name: 'Marcus Gerlach',
-    role: 'Engineering',
-    initials: 'MG',
-    photo: `${photoSource}/marcus-gerlach.jpg`,
-  },
-];
+const people = directory.people;
 ---
 
 <BaseLayout
   title="People"
-  description="Meet the people working across integrations, security, client platforms, go-to-market, operations, and engineering at Canonical Plus."
+  description="Meet the people working across integrations, security, client platforms, go-to-market, operations, engineering, and business/legal counsel at Canonical Plus."
 >
   <section class="people-hero section--hero bg-grid bg-radial">
     <div class="container people-hero__content">
@@ -60,7 +22,7 @@ const people = [
       </h1>
       <p class="people-hero__subtitle animate-fade-in-up stagger-2">
         A small team spanning infrastructure, security, client experiences, go-to-market,
-        operations, and engineering.
+        operations, engineering, and business/legal counsel.
       </p>
     </div>
   </section>
@@ -69,12 +31,12 @@ const people = [
     <div class="container">
       <header class="section-header section-header--center">
         <span class="badge">Team</span>
-        <h2 id="people-grid-title">Six people, one readiness platform</h2>
+        <h2 id="people-grid-title">Seven people, one readiness platform</h2>
       </header>
 
       <div class="people-grid" data-people-grid>
         {people.map((person) => (
-          <article class="person-card" data-person-card>
+          <article class="person-card" data-person-card data-person-id={person.id}>
             <div class="person-card__portrait-shell">
               <div class="person-card__fallback" aria-hidden="true">
                 <svg viewBox="0 0 80 80" role="presentation" focusable="false">
@@ -83,9 +45,9 @@ const people = [
                 </svg>
                 <span>{person.initials}</span>
               </div>
-              {person.photo && (
+              {person.photoUrl && (
                 <img
-                  src={person.photo}
+                  src={person.photoUrl}
                   alt={`${person.name} headshot`}
                   class="person-card__photo"
                   loading="lazy"
@@ -104,7 +66,7 @@ const people = [
       </div>
 
       <p class="people-source-note">
-        Selected headshots are reused from Benefactor's public team directory. John and Jack use
+        Selected headshots are reused from Benefactor's public team directory. John, Jack, and Eugene use
         neutral profile placeholders until verified portraits are available.
       </p>
 
@@ -173,6 +135,10 @@ const people = [
         transform var(--duration-normal) var(--ease-out),
         border-color var(--duration-normal) var(--ease-out),
         box-shadow var(--duration-normal) var(--ease-out);
+    }
+
+    .person-card:last-child:nth-child(3n + 1) {
+      grid-column: 2;
     }
 
     .person-card:hover {
@@ -292,6 +258,10 @@ const people = [
     @media (max-width: 900px) {
       .people-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .person-card:last-child:nth-child(3n + 1) {
+        grid-column: auto;
       }
 
       .people-cta {
