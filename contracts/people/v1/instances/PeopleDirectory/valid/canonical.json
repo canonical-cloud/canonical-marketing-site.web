@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "canonical-cloud.people/v1",
+  "people": [
+    {
+      "id": "alexander-mills",
+      "name": "Alexander Mills",
+      "role": "Integrations and DevOps",
+      "initials": "AM",
+      "photoUrl": "https://benefactor.cc/team/alex-mills.jpg"
+    },
+    {
+      "id": "john-siciliano",
+      "name": "John Siciliano",
+      "role": "Security and Ops",
+      "initials": "JS"
+    },
+    {
+      "id": "jack-johnson",
+      "name": "Jack Johnson",
+      "role": "Browser, Mobile, Clientside",
+      "initials": "JJ"
+    },
+    {
+      "id": "vikkie-pandey",
+      "name": "Vikkie Pandey",
+      "role": "Marketing and Sales",
+      "initials": "VP",
+      "photoUrl": "https://benefactor.cc/team/vinayak-pandey.png"
+    },
+    {
+      "id": "elijah-gizzarelli",
+      "name": "Elijah Gizzarelli",
+      "role": "Ops & HR",
+      "initials": "EG",
+      "photoUrl": "https://benefactor.cc/team/elijah-gizzarelli.jpeg"
+    },
+    {
+      "id": "marcus-gerlach",
+      "name": "Marcus Gerlach",
+      "role": "Engineering",
+      "initials": "MG",
+      "photoUrl": "https://benefactor.cc/team/marcus-gerlach.jpg"
+    },
+    {
+      "id": "eugene-li",
+      "name": "Eugene Li",
+      "role": "Business/Legal Counsel",
+      "initials": "EL"
+    }
+  ]
+}
