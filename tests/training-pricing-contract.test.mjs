@@ -6,7 +6,12 @@ const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 const graph = JSON.parse(await read('../contracts/training-graph/v1/instances/TrainingGraph/valid/canonical.json'));
 const prices = JSON.parse(await read('../src/data/service-tiers.json'));
 const pricesPage = await read('../src/pages/prices.astro');
+const pricingPage = await read('../src/pages/pricing.astro');
 const trainingPage = await read('../src/pages/training.astro');
+const peoplePage = await read('../src/pages/people.astro');
+const securityPage = await read('../src/pages/security.astro');
+const contactPage = await read('../src/pages/contact.astro');
+const baseLayout = await read('../src/layouts/BaseLayout.astro');
 const typeSpec = await read('../contracts/training-graph/v1/main.tsp');
 const authoredSchema = JSON.parse(await read('../contracts/training-graph/v1/authored.schema.json'));
 const workflow = await read('../.github/workflows/training-graph-contract.yml').catch(() => '');
@@ -28,9 +33,33 @@ test('public pricing projects the reviewed Canonical commercial contract exactly
       { id: 'assurance-engineering', name: 'Assurance Engineering', monthlyUsd: 20000 },
     ],
   );
-  assert.match(pricesPage, /proposed starting prices/i);
-  assert.match(pricesPage, /signed statement of work/i);
-  assert.match(pricesPage, /No package promises an audit opinion, certification, authorization, legal conclusion/i);
+  for (const page of [pricesPage, pricingPage]) {
+    assert.match(page, /proposed starting prices/i);
+    assert.match(page, /signed statement of work/i);
+    assert.match(page, /No package promises an audit opinion, certification, authorization, legal conclusion/i);
+    assert.match(page, /mailto:hello@canonical\.plus/);
+  }
+});
+
+test('people, pricing, training, and security routes are concrete public pages', () => {
+  assert.match(peoplePage, /<BaseLayout/);
+  assert.match(pricingPage, /<BaseLayout/);
+  assert.match(trainingPage, /<BaseLayout/);
+  assert.match(securityPage, /<BaseLayout/);
+  assert.match(securityPage, /security readiness/i);
+  assert.match(securityPage, /independent party/i);
+});
+
+test('global discovery and contact use the canonical.plus hello address', () => {
+  for (const route of ['/people/', '/pricing/', '/training/', '/security/', '/contact/']) {
+    assert.ok(baseLayout.includes(route), `footer must expose ${route}`);
+  }
+  assert.match(baseLayout, /mailto:hello@canonical\.plus/);
+  assert.match(contactPage, /hello@canonical\.plus/);
+  assert.match(contactPage, /Start readiness assessment/);
+  for (const source of [baseLayout, pricesPage, pricingPage, securityPage, contactPage]) {
+    assert.doesNotMatch(source, /compliance@canonical\.(?:plus|cloud)/i);
+  }
 });
 
 test('training graph has unique nodes, valid edges, full reachability, and a real cycle', () => {
