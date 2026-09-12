@@ -40,6 +40,12 @@
       "role": "Engineering",
       "initials": "MG",
       "photoUrl": "https://benefactor.cc/team/marcus-gerlach.jpg"
+    },
+    {
+      "id": "eugene-li",
+      "name": "Eugene Li",
+      "role": "business/legal counsel",
+      "initials": "EL"
     }
   ]
 }
