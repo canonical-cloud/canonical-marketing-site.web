@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:canonical-cloud:training-graph:v1",
+  "$defs": {
+    "TrainingNodeKind": {
+      "anyOf": [
+        { "type": "string", "const": "checkpoint" },
+        { "type": "string", "const": "lesson" },
+        { "type": "string", "const": "outcome" },
+        { "type": "string", "const": "scenario" }
+      ]
+    },
+    "TrainingCheckpoint": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "required": { "type": "boolean" }
+      },
+      "required": ["id", "label", "required"],
+      "unevaluatedProperties": false
+    },
+    "TrainingChoice": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "label": { "type": "string" },
+        "summary": { "type": "string" },
+        "nextNodeId": { "type": "string" },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "required": ["id", "label", "nextNodeId"],
+      "unevaluatedProperties": false
+    },
+    "TrainingOutcome": {
+      "type": "object",
+      "properties": {
+        "tierId": { "type": "string" },
+        "message": { "type": "string" }
+      },
+      "required": ["message"],
+      "unevaluatedProperties": false
+    },
+    "TrainingNode": {
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "kind": { "$ref": "urn:canonical-cloud:training-graph:v1#/$defs/TrainingNodeKind" },
+        "title": { "type": "string" },
+        "prompt": { "type": "string" },
+        "learningObjectives": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "checkpoints": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:training-graph:v1#/$defs/TrainingCheckpoint" }
+        },
+        "choices": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:training-graph:v1#/$defs/TrainingChoice" }
+        },
+        "outcome": { "$ref": "urn:canonical-cloud:training-graph:v1#/$defs/TrainingOutcome" }
+      },
+      "required": ["id", "kind", "title", "prompt", "learningObjectives", "checkpoints", "choices"],
+      "unevaluatedProperties": false
+    },
+    "TrainingGraph": {
+      "type": "object",
+      "properties": {
+        "schemaVersion": { "type": "string", "const": "1.0.0" },
+        "graphId": { "type": "string", "const": "canonical-compliance-training-v1" },
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "entryNodeId": { "type": "string" },
+        "nodes": {
+          "type": "array",
+          "items": { "$ref": "urn:canonical-cloud:training-graph:v1#/$defs/TrainingNode" }
+        }
+      },
+      "required": ["schemaVersion", "graphId", "title", "summary", "entryNodeId", "nodes"],
+      "unevaluatedProperties": false
+    }
+  }
+}
