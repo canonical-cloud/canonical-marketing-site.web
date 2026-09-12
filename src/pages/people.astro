@@ -1,17 +1,16 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import directory from '../../contracts/people/v1/instances/PeopleDirectory/valid/canonical.json';
+import PeopleGrid from '../components/PeopleGrid.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
-const people = directory.people;
 ---
 
 <BaseLayout
   title="People"
-  description="Meet the people working across integrations, security, client platforms, go-to-market, operations, and engineering at Canonical Plus."
+  description="Meet the people working across engineering, security, infrastructure, business, and legal at Canonical Plus."
 >
   <section class="people-hero section--hero bg-grid bg-radial">
     <div class="container people-hero__content">
@@ -22,7 +21,7 @@ const people = directory.people;
       </h1>
       <p class="people-hero__subtitle animate-fade-in-up stagger-2">
         A small team spanning infrastructure, security, client experiences, go-to-market,
-        operations, and engineering.
+        operations, accounting, and legal.
       </p>
     </div>
   </section>
@@ -31,44 +30,10 @@ const people = directory.people;
     <div class="container">
       <header class="section-header section-header--center">
         <span class="badge">Team</span>
-        <h2 id="people-grid-title">Six people, one readiness platform</h2>
+        <h2 id="people-grid-title">Eight people, one readiness platform</h2>
       </header>
 
-      <div class="people-grid" data-people-grid>
-        {people.map((person) => (
-          <article class="person-card" data-person-card data-person-id={person.id}>
-            <div class="person-card__portrait-shell">
-              <div class="person-card__fallback" aria-hidden="true">
-                <svg viewBox="0 0 80 80" role="presentation" focusable="false">
-                  <circle cx="40" cy="28" r="15" fill="currentColor" opacity="0.72" />
-                  <path d="M14 70c2-18 12-27 26-27s24 9 26 27" fill="currentColor" opacity="0.46" />
-                </svg>
-                <span>{person.initials}</span>
-              </div>
-              {person.photoUrl && (
-                <img
-                  src={person.photoUrl}
-                  alt={`${person.name} headshot`}
-                  class="person-card__photo"
-                  loading="lazy"
-                  decoding="async"
-                  referrerpolicy="no-referrer"
-                  data-people-photo
-                />
-              )}
-            </div>
-            <div class="person-card__body">
-              <h3>{person.name}</h3>
-              <p>{person.role}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      <p class="people-source-note">
-        Selected headshots are reused from Benefactor's public team directory. John and Jack use
-        neutral profile placeholders until verified portraits are available.
-      </p>
+      <PeopleGrid />
 
       <div class="people-cta">
         <p>Need help preparing your systems and evidence for independent review?</p>
@@ -113,125 +78,6 @@ const people = directory.people;
       padding-top: var(--space-2xl);
     }
 
-    .people-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: var(--space-xl);
-      margin-top: var(--space-2xl);
-    }
-
-    .person-card {
-      display: flex;
-      min-width: 0;
-      flex-direction: column;
-      align-items: center;
-      padding: clamp(1.4rem, 3vw, 2.2rem);
-      border: 1px solid var(--av-border);
-      border-radius: var(--radius-lg);
-      background: var(--av-surface);
-      box-shadow: var(--shadow-sm);
-      text-align: center;
-      transition:
-        transform var(--duration-normal) var(--ease-out),
-        border-color var(--duration-normal) var(--ease-out),
-        box-shadow var(--duration-normal) var(--ease-out);
-    }
-
-    .person-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--av-border-active);
-      box-shadow: var(--shadow-md);
-    }
-
-    .person-card__portrait-shell {
-      position: relative;
-      width: min(190px, 70vw);
-      aspect-ratio: 1;
-      overflow: hidden;
-      border: 3px solid var(--av-border-hover);
-      border-radius: 50%;
-      background: var(--av-surface-hover);
-      box-shadow: inset 0 0 0 1px var(--av-highlight);
-    }
-
-    .person-card__photo,
-    .person-card__fallback {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    .person-card__photo {
-      z-index: 2;
-      object-fit: cover;
-      object-position: center top;
-      filter: saturate(0.86) contrast(1.02);
-      transition: filter var(--duration-normal) var(--ease-out);
-    }
-
-    .person-card:hover .person-card__photo {
-      filter: saturate(1) contrast(1.03);
-    }
-
-    .person-card__fallback {
-      display: grid;
-      place-items: center;
-      color: var(--av-teal);
-      background:
-        radial-gradient(circle at 50% 30%, var(--av-emerald-glow), transparent 58%),
-        var(--av-surface-hover);
-    }
-
-    .person-card__fallback svg {
-      position: absolute;
-      width: 72%;
-      height: 72%;
-      color: var(--av-text-muted);
-    }
-
-    .person-card__fallback span {
-      position: absolute;
-      right: 0.8rem;
-      bottom: 0.7rem;
-      z-index: 1;
-      min-width: 2.15rem;
-      padding: 0.35rem 0.45rem;
-      border: 1px solid var(--av-border-active);
-      border-radius: var(--radius-full);
-      background: var(--av-nav-bg-strong);
-      color: var(--av-text-primary);
-      font-size: 0.72rem;
-      font-weight: 800;
-      letter-spacing: 0.05em;
-    }
-
-    .person-card__body {
-      margin-top: var(--space-lg);
-    }
-
-    .person-card__body h3 {
-      color: var(--av-text-primary);
-      font-size: 1.2rem;
-    }
-
-    .person-card__body p {
-      margin-top: 0.35rem;
-      color: var(--av-teal);
-      font-size: 0.92rem;
-      font-weight: 700;
-      line-height: 1.45;
-    }
-
-    .people-source-note {
-      max-width: 760px;
-      margin: var(--space-xl) auto 0;
-      color: var(--av-text-muted);
-      font-size: 0.82rem;
-      line-height: 1.6;
-      text-align: center;
-    }
-
     .people-cta {
       display: flex;
       align-items: center;
@@ -252,23 +98,9 @@ const people = directory.people;
     }
 
     @media (max-width: 900px) {
-      .people-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
       .people-cta {
         align-items: flex-start;
         flex-direction: column;
-      }
-    }
-
-    @media (max-width: 620px) {
-      .people-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .person-card__portrait-shell {
-        width: min(170px, 62vw);
       }
     }
   </style>

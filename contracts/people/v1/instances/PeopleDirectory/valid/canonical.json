@@ -6,12 +6,12 @@
       "name": "Alexander Mills",
       "role": "Integrations and DevOps",
       "initials": "AM",
-      "photoUrl": "https://benefactor.cc/team/alex-mills.jpg"
+      "photoUrl": "/team/alex-mills.jpg"
     },
     {
       "id": "john-siciliano",
-      "name": "John Siciliano",
-      "role": "Security and Ops",
+      "name": "John Siliciano",
+      "role": "DevOps, Security & Infrastructure Expert",
       "initials": "JS"
     },
     {
@@ -25,21 +25,33 @@
       "name": "Vikkie Pandey",
       "role": "Marketing and Sales",
       "initials": "VP",
-      "photoUrl": "https://benefactor.cc/team/vinayak-pandey.png"
+      "photoUrl": "/team/vinayak-pandey.png"
     },
     {
       "id": "elijah-gizzarelli",
       "name": "Elijah Gizzarelli",
       "role": "Ops & HR",
       "initials": "EG",
-      "photoUrl": "https://benefactor.cc/team/elijah-gizzarelli.jpeg"
+      "photoUrl": "/team/elijah-gizzarelli.jpeg"
     },
     {
       "id": "marcus-gerlach",
       "name": "Marcus Gerlach",
       "role": "Engineering",
       "initials": "MG",
-      "photoUrl": "https://benefactor.cc/team/marcus-gerlach.jpg"
+      "photoUrl": "/team/marcus-gerlach.jpg"
+    },
+    {
+      "id": "eugene-li",
+      "name": "Eugene Li",
+      "role": "CPA & Legal",
+      "initials": "EL"
+    },
+    {
+      "id": "tom-mensch",
+      "name": "Tom Mensch",
+      "role": "Software & Legal",
+      "initials": "TM"
     }
   ]
 }

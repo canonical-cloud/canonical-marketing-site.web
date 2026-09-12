@@ -5,6 +5,8 @@ on:
     paths:
       - "contracts/people/**"
       - "src/pages/people.astro"
+      - "src/pages/index.astro"
+      - "src/components/PeopleGrid.astro"
       - "tests/people-page.test.mjs"
       - ".github/workflows/people-contract.yml"
   push:
@@ -12,6 +14,8 @@ on:
     paths:
       - "contracts/people/**"
       - "src/pages/people.astro"
+      - "src/pages/index.astro"
+      - "src/components/PeopleGrid.astro"
       - "tests/people-page.test.mjs"
       - ".github/workflows/people-contract.yml"
 

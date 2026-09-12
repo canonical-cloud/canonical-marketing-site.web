@@ -4,6 +4,8 @@ import { test } from 'node:test';
 
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 const source = await read('../src/pages/people.astro');
+const grid = await read('../src/components/PeopleGrid.astro');
+const home = await read('../src/pages/index.astro');
 const siteScript = await read('../public/site.js');
 const nginx = await read('../nginx.conf');
 const typeSpec = await read('../contracts/people/v1/main.tsp');
@@ -14,60 +16,66 @@ const workflow = await read('../.github/workflows/people-contract.yml');
 
 const roster = [
   ['Alexander Mills', 'Integrations and DevOps'],
-  ['John Siciliano', 'Security and Ops'],
+  ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
   ['Jack Johnson', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
-  ['Eugene Li', 'business/legal counsel'],
+  ['Eugene Li', 'CPA & Legal'],
+  ['Tom Mensch', 'Software & Legal'],
 ];
 
-test('people directory has exactly seven named roles in the requested order', () => {
+test('people directory has exactly eight named roles in the requested order', () => {
   assert.equal(directory.schemaVersion, 'canonical-cloud.people/v1');
   assert.deepEqual(directory.people.map(({ name, role }) => [name, role]), roster);
-  assert.equal(directory.people.length, 7);
-  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 7, 'person ids must be unique');
-  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 7, 'initials must be unique');
+  assert.equal(directory.people.length, 8);
+  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 8, 'person ids must be unique');
+  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 8, 'initials must be unique');
 });
 
-test('people page renders the validated directory instead of duplicating roster data', () => {
-  assert.match(source, /contracts\/people\/v1\/instances\/PeopleDirectory\/valid\/canonical\.json/);
-  assert.match(source, /const people = directory\.people/);
-  assert.match(source, /people\.map\(\(person\)/);
-  assert.match(source, /data-person-id=\{person\.id\}/);
-  assert.match(source, /Seven people, one readiness platform/);
-  assert.match(source, /business\/legal counsel/);
+test('homepage and people page share the validated directory', () => {
+  assert.match(grid, /contracts\/people\/v1\/instances\/PeopleDirectory\/valid\/canonical\.json/);
+  assert.match(grid, /const people = directory\.people/);
+  assert.match(grid, /people\.map\(\(person\)/);
+  assert.match(grid, /data-person-id=\{person\.id\}/);
+  assert.match(source, /Eight people, one readiness platform/);
+  for (const page of [source, home]) assert.match(page, /<PeopleGrid\s*\/>/);
 });
 
-test('desktop layout keeps a three-column grid and intentionally centers the seventh card', () => {
-  assert.match(source, /grid-template-columns:\s*repeat\(3,\s*minmax\(0,\s*1fr\)\)/);
-  assert.match(source, /\.person-card:last-child:nth-child\(3n \+ 1\)[\s\S]*grid-column:\s*2/);
-  assert.match(source, /@media \(max-width: 900px\)[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
-  assert.match(source, /@media \(max-width: 620px\)[\s\S]*grid-template-columns:\s*1fr/);
-  assert.match(source, /data-people-grid/);
-  assert.match(source, /data-person-card/);
+test('desktop layout has two rows of four with tablet and mobile layouts', () => {
+  assert.match(grid, /grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
+  assert.match(grid, /@media \(max-width: 1000px\)[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
+  assert.match(grid, /@media \(max-width: 620px\)[\s\S]*grid-template-columns:\s*1fr/);
+  assert.match(grid, /data-people-grid/);
+  assert.match(grid, /data-person-card/);
 });
 
 test('four verified Benefactor headshots are used and unresolved identities stay neutral', () => {
   const photos = directory.people.filter(({ photoUrl }) => photoUrl).map(({ photoUrl }) => photoUrl);
   assert.deepEqual(photos, [
-    'https://benefactor.cc/team/alex-mills.jpg',
-    'https://benefactor.cc/team/vinayak-pandey.png',
-    'https://benefactor.cc/team/elijah-gizzarelli.jpeg',
-    'https://benefactor.cc/team/marcus-gerlach.jpg',
+    '/team/alex-mills.jpg',
+    '/team/vinayak-pandey.png',
+    '/team/elijah-gizzarelli.jpeg',
+    '/team/marcus-gerlach.jpg',
   ]);
 
-  for (const name of ['John Siciliano', 'Jack Johnson', 'Eugene Li']) {
+  for (const name of ['John Siliciano', 'Jack Johnson', 'Eugene Li', 'Tom Mensch']) {
     assert.equal(directory.people.find((person) => person.name === name)?.photoUrl, undefined);
   }
-  assert.match(source, /John, Jack, and Eugene use[\s\S]*neutral profile placeholders/);
+  assert.match(grid, /person-card__fallback/);
   assert.doesNotMatch(JSON.stringify(directory), /linkedin\.com|avatars\.githubusercontent\.com/i);
 });
 
-test('people image dependency is restricted to Benefactor and covered by CSP', () => {
+test('Benefactor portraits are served locally and remain base-aware', async () => {
   for (const person of directory.people) {
-    if (person.photoUrl) assert.match(person.photoUrl, /^https:\/\/benefactor\.cc\/team\//);
+    if (person.photoUrl) {
+      assert.match(person.photoUrl, /^\/team\/[a-z-]+\.(?:jpe?g|png)$/);
+      const image = await readFile(new URL(`../public${person.photoUrl}`, import.meta.url));
+      assert.ok(image.length > 0);
+    }
   }
+  assert.match(grid, /import\.meta\.env\.BASE_URL/);
+  assert.match(grid, /src=\{`\$\{baseNoSlash\}\$\{person\.photoUrl\}`\}/);
   assert.match(nginx, /img-src 'self' data: https:\/\/benefactor\.cc;/);
 });
 
@@ -79,8 +87,8 @@ test('people navigation is base-aware and inserted before account actions', () =
 });
 
 test('failed remote portraits fall back without inline handlers', () => {
-  assert.match(source, /data-people-photo/);
-  assert.doesNotMatch(source, /\sonerror\s*=/i);
+  assert.match(grid, /data-people-photo/);
+  assert.doesNotMatch(grid, /\sonerror\s*=/i);
   assert.match(siteScript, /querySelectorAll\('\[data-people-photo\]'\)/);
   assert.match(siteScript, /image\.hidden = true/);
 });

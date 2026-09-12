@@ -5,15 +5,16 @@ import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 
 const expectedPeople = [
   ['Alexander Mills', 'Integrations and DevOps'],
-  ['John Siciliano', 'Security and Ops'],
+  ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
   ['Jack Johnson', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
-  ['Eugene Li', 'business/legal counsel'],
+  ['Eugene Li', 'CPA & Legal'],
+  ['Tom Mensch', 'Software & Legal'],
 ];
 
-test('puppeteer: people page renders seven cards with responsive 3-to-2-to-1 columns', async (t) => {
+test('puppeteer: people page renders eight cards with responsive 4-to-2-to-1 columns', async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
@@ -27,7 +28,7 @@ test('puppeteer: people page renders seven cards with responsive 3-to-2-to-1 col
   const page = await browser.newPage();
   await page.setRequestInterception(true);
   page.on('request', (request) => {
-    if (request.url().startsWith('https://benefactor.cc/team/')) {
+    if (new URL(request.url()).pathname.startsWith('/team/')) {
       request.abort();
       return;
     }
@@ -51,9 +52,11 @@ test('puppeteer: people page renders seven cards with responsive 3-to-2-to-1 col
     getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length,
   );
 
-  assert.equal(await columnCount(), 3);
-  const eugeneColumn = await page.$eval('[data-person-id="eugene-li"]', (card) => getComputedStyle(card).gridColumnStart);
-  assert.equal(eugeneColumn, '2');
+  assert.equal(await columnCount(), 4);
+  const rows = await page.$$eval('[data-person-card]', (cards) =>
+    new Set(cards.map((card) => Math.round(card.getBoundingClientRect().top))).size,
+  );
+  assert.equal(rows, 2);
 
   await page.setViewport({ height: 900, width: 800 });
   assert.equal(await columnCount(), 2);
@@ -74,5 +77,19 @@ test('puppeteer: people page renders seven cards with responsive 3-to-2-to-1 col
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL', 'TM']);
+
+  await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
+  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 8);
+  for (const [width, columns] of [[1440, 4], [1024, 4], [800, 2], [375, 1]]) {
+    await page.setViewport({ height: 900, width });
+    assert.equal(await columnCount(), columns);
+    assert.equal(await page.$eval('[data-people-grid]', (grid) => {
+      const bounds = grid.getBoundingClientRect();
+      return [...grid.querySelectorAll('[data-person-card]')].every((card) => {
+        const rect = card.getBoundingClientRect();
+        return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1 && card.scrollWidth <= card.clientWidth + 1;
+      });
+    }), true, `cards must fit at ${width}px`);
+  }
 });
