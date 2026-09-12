@@ -6,11 +6,30 @@ import '../styles/marketing-pages.css';
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const pricesHref = `${baseNoSlash}/prices/`;
 const readinessHref = `${baseNoSlash}/readiness/`;
+const appTrainingHref = 'https://app.canonical.plus/training';
+
+const tracks = [
+  {
+    title: 'SOC 2 Foundations',
+    meta: '4 modules · about 2 hours · Beginner',
+    copy: 'Build a shared understanding of scope, Trust Services Criteria, control ownership, evidence quality, and the readiness journey.',
+  },
+  {
+    title: 'Control Owner Workshop',
+    meta: '6 modules · about 4 hours · Intermediate',
+    copy: 'Role-based training for engineering, IT, security, and operations teams that need to operate controls continuously.',
+  },
+  {
+    title: 'Audit Readiness Bootcamp',
+    meta: 'Hands-on cohort · scope-dependent · Advanced',
+    copy: 'Work from gap assessment through evidence review and readiness rehearsal before an independent SOC 2 examination.',
+  },
+];
 ---
 
 <BaseLayout
   title="Interactive compliance readiness training"
-  description="Choose-your-own-adventure compliance readiness training for software and cloud teams, covering controls, evidence, remediation, framework mapping, and independent-review boundaries."
+  description="Choose-your-own-adventure compliance readiness training for software and cloud teams, plus structured SOC 2 foundations, control-owner workshops, and audit-readiness training."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">
@@ -26,27 +45,66 @@ const readinessHref = `${baseNoSlash}/readiness/`;
           answers take you. You can loop back, take another path, or revisit a concept at any time.
         </p>
         <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href={appTrainingHref} data-application-link="training">Open full product curriculum</a>
           <a class="btn btn--secondary btn--large" href={pricesHref}>See readiness packages</a>
           <a class="btn btn--secondary btn--large" href={readinessHref}>Readiness overview</a>
         </div>
       </div>
       <aside class="page-hero__panel" aria-label="Training boundaries">
-        <h2>What this training does</h2>
+        <h2>Training is for readiness</h2>
         <ul class="check-list">
           <li>Teaches scope, controls, evidence, remediation, and handoff concepts</li>
           <li>Lets you branch and revisit concepts in a cyclical learning graph</li>
-          <li>Keeps all choices in your browser; no evidence or personal data is submitted</li>
+          <li>Keeps public graph choices in your browser; no evidence or personal data is submitted</li>
+          <li>Provides a handoff into the full Canonical product training workspace</li>
         </ul>
         <p class="boundary-note">
-          Training is educational readiness support. It is not an audit opinion, certification,
-          authorization, legal advice, or regulator determination.
+          Canonical Plus helps teams prepare. Training is not an audit opinion, certification,
+          authorization, approval, legal advice, regulator determination, or guaranteed result.
         </p>
       </aside>
     </div>
   </section>
 
-  <section class="section training-shell" aria-labelledby="training-title">
+  <section class="section" aria-labelledby="training-tracks-title">
     <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Three structured training paths</span>
+        <h2 id="training-tracks-title">Turn compliance into a competitive advantage by learning how to operate the controls</h2>
+        <p>
+          The public adventure below teaches the readiness model interactively. The full curriculum
+          remains available in the Canonical application, where training can connect to readiness
+          worksheets and the rest of the customer workflow.
+        </p>
+      </header>
+
+      <div class="card-grid card-grid--three">
+        {tracks.map((track) => (
+          <article class="deliverable">
+            <strong>{track.title}</strong>
+            <p class="page-hero__eyebrow">{track.meta}</p>
+            <p>{track.copy}</p>
+          </article>
+        ))}
+      </div>
+
+      <div class="action-row" style="justify-content: center;">
+        <a href={appTrainingHref} class="btn btn--secondary" data-application-link="training">Explore the full training program</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section training-shell" id="interactive-training" aria-labelledby="training-title">
+    <div class="container">
+      <header class="section-header section-header--center training-intro">
+        <span class="badge">Interactive readiness lab</span>
+        <h2>Choose a scenario and learn by following the graph</h2>
+        <p>
+          Each screen is a graph node. Complete the checkpoints to unlock the outgoing edges,
+          revisit earlier concepts when useful, and choose another adventure after an outcome.
+        </p>
+      </header>
+
       <div class="training-toolbar">
         <div>
           <span class="badge" id="training-kind">Scenario</span>
@@ -85,7 +143,10 @@ const readinessHref = `${baseNoSlash}/readiness/`;
         <aside id="training-outcome" class="training-outcome" hidden>
           <strong>Readiness operating-model suggestion</strong>
           <p id="training-outcome-message"></p>
-          <a class="btn btn--primary" href={pricesHref}>Compare the three packages</a>
+          <div class="action-row">
+            <a class="btn btn--primary" href={pricesHref}>Compare the three packages</a>
+            <a class="btn btn--secondary" href={appTrainingHref} data-application-link="training">Continue in product training</a>
+          </div>
         </aside>
       </article>
 
@@ -93,8 +154,26 @@ const readinessHref = `${baseNoSlash}/readiness/`;
         <div class="card training-noscript">
           <h2>JavaScript is required for the interactive graph.</h2>
           <p>The training content is public, but the choose-your-path interface needs JavaScript to move between graph nodes.</p>
+          <a class="btn btn--secondary" href={appTrainingHref}>Open the full product training workspace</a>
         </div>
       </noscript>
+    </div>
+  </section>
+
+  <section class="section bg-noise">
+    <div class="container" style="position: relative; z-index: 1;">
+      <div class="cta-panel">
+        <span class="badge">From learning to evidence</span>
+        <h2>Continue into the product workspace when you need saved readiness work</h2>
+        <p>
+          The public graph stays a no-PII learning surface. Use the authenticated Canonical application
+          when you want curriculum progress connected to readiness worksheets, evidence, or remediation planning.
+        </p>
+        <div class="action-row">
+          <a href={appTrainingHref} class="btn btn--primary btn--large" data-application-link="training">Open Canonical training</a>
+          <a href={pricesHref} class="btn btn--secondary btn--large">Compare readiness packages</a>
+        </div>
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -218,6 +297,10 @@ const readinessHref = `${baseNoSlash}/readiness/`;
 </script>
 
 <style>
+  .training-intro {
+    margin-bottom: var(--space-xl);
+  }
+
   .training-shell {
     padding-top: var(--space-xl);
   }
