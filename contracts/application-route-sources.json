@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "canonicalTarget": "https://app.canonical.plus/u/quote",
+  "sources": {
+    "productInformationArchitecture": {
+      "repository": "canonical-cloud/canonical-docs",
+      "revision": "aa6f34f8b4370f89f7a155028557abb5f6ee2c90",
+      "path": "docs/market-positioning.md"
+    },
+    "customerWebRoute": {
+      "repository": "canonical-cloud/canonical-web-server.rs",
+      "revision": "83412da6ddd95b641bb4bd4b3039b19f31dd0b4b",
+      "path": "src/routes/mod.rs"
+    }
+  }
+}
