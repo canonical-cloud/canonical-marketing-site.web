@@ -38,9 +38,12 @@ tests/
   *-puppeteer.test.mjs
 ```
 
-The authenticated assessment entry point is exactly
-`https://app.canonical.plus/u/readiness`. Marketing pages must not place tokens,
-identity assertions, return destinations, or other credentials in that URL.
+The authenticated assessment/quote entry point currently supported by the
+customer web server is exactly `https://app.canonical.plus/u/quote`. Marketing
+pages must not invent an unimplemented readiness path or place tokens, identity
+assertions, tenant identifiers, return destinations, or other credentials in
+that URL. A future dedicated readiness workspace route must first land in the
+shared route authority and customer web server before marketing links change.
 
 ## People directory
 
