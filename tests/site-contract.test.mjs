@@ -149,12 +149,13 @@ test("mobile navigation has a real open state and synchronized accessibility sta
   assert.match(siteScript, /matchMedia\('\(max-width: 768px\)'\)/);
 });
 
-test("quote and sign-in links use the canonical application boundary", () => {
+test("quote and sign-in links use the supported customer quote boundary", () => {
   assert.match(siteScript, /const APP_SCHEME = 'https'/);
   assert.match(siteScript, /const APP_HOST = 'app\.canonical\.plus'/);
   assert.match(siteScript, /\[APP_SCHEME, APP_HOST\]\.join\('\:\/\/'\)/);
-  assert.match(siteScript, /const READINESS_PATH = '\/u\/readiness'/);
-  assert.match(siteScript, /new URL\(READINESS_PATH, APP_ORIGIN\)/);
+  assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
+  assert.match(siteScript, /new URL\(QUOTE_PATH, APP_ORIGIN\)/);
+  assert.doesNotMatch(siteScript, /\/u\/readiness/);
   assert.doesNotMatch(siteScript, /\/auth\/start|return_to/);
   assert.doesNotMatch(siteScript, /access_token|refresh_token|id_token/i);
 });
