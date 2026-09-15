@@ -8,7 +8,7 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = 'https://app.canonical.plus/u/quote';
 
 const featuredFrameworks = [
   ['SOC 2', 'Trust Services Criteria readiness'],
@@ -82,22 +82,10 @@ const featuredFrameworks = [
 
   <section class="outcome-strip" aria-label="Readiness deliverables">
     <div class="container outcome-strip__grid">
-      <div class="outcome-strip__item">
-        <strong>Gap map</strong>
-        <span>What is missing or not yet evidenced</span>
-      </div>
-      <div class="outcome-strip__item">
-        <strong>Control roadmap</strong>
-        <span>What to implement, in what order, and why</span>
-      </div>
-      <div class="outcome-strip__item">
-        <strong>Evidence plan</strong>
-        <span>What an independent reviewer is likely to request</span>
-      </div>
-      <div class="outcome-strip__item">
-        <strong>Handoff boundary</strong>
-        <span>What Canonical prepares versus what an assessor decides</span>
-      </div>
+      <div class="outcome-strip__item"><strong>Gap map</strong><span>What is missing or not yet evidenced</span></div>
+      <div class="outcome-strip__item"><strong>Control roadmap</strong><span>What to implement, in what order, and why</span></div>
+      <div class="outcome-strip__item"><strong>Evidence plan</strong><span>What an independent reviewer is likely to request</span></div>
+      <div class="outcome-strip__item"><strong>Handoff boundary</strong><span>What Canonical prepares versus what an assessor decides</span></div>
     </div>
   </section>
 
@@ -105,223 +93,45 @@ const featuredFrameworks = [
     <div class="container">
       <header class="section-header section-header--center">
         <span class="badge animate-fade-in-up">What we deliver</span>
-        <h2 class="animate-fade-in-up stagger-1">
-          A readiness program your engineering team can
-          <span class="gradient-text">actually execute</span>
-        </h2>
-        <p class="animate-fade-in-up stagger-2">
-          The initial focus is readiness and remediation. Independent audit, certification,
-          authorization, or legal work remains with qualified third parties.
-        </p>
+        <h2 class="animate-fade-in-up stagger-1">A readiness program your engineering team can <span class="gradient-text">actually execute</span></h2>
+        <p class="animate-fade-in-up stagger-2">The initial focus is readiness and remediation. Independent audit, certification, authorization, or legal work remains with qualified third parties.</p>
       </header>
-
       <div class="card-grid services__grid">
-        <article class="card service-card services__card animate-fade-in-up stagger-1">
-          <span class="service-card__number">01</span>
-          <h3>Readiness assessment</h3>
-          <p>Scope the target framework, systems, data, people, vendors, and current program maturity.</p>
-          <ul>
-            <li>Framework and system boundary</li>
-            <li>Control and evidence gap register</li>
-            <li>Readiness risks and dependencies</li>
-          </ul>
-        </article>
-
-        <article class="card service-card services__card animate-fade-in-up stagger-2">
-          <span class="service-card__number">02</span>
-          <h3>Technical remediation roadmap</h3>
-          <p>Turn gaps into concrete engineering, policy, ownership, and operating tasks.</p>
-          <ul>
-            <li>Prioritized implementation sequence</li>
-            <li>Cloud, identity, SDLC, and data controls</li>
-            <li>Owners, acceptance criteria, and evidence</li>
-          </ul>
-        </article>
-
-        <article class="card service-card services__card animate-fade-in-up stagger-3">
-          <span class="service-card__number">03</span>
-          <h3>Evidence operations</h3>
-          <p>Define durable evidence sources so teams do not rebuild the same package for every review.</p>
-          <ul>
-            <li>Evidence inventory and freshness rules</li>
-            <li>Cross-framework control mapping</li>
-            <li>Exception and remediation tracking</li>
-          </ul>
-        </article>
-
-        <article class="card service-card services__card animate-fade-in-up stagger-4">
-          <span class="service-card__number">04</span>
-          <h3>Independent-review handoff</h3>
-          <p>Prepare a structured package and coordinate open questions without blurring independence.</p>
-          <ul>
-            <li>Assessor-ready scope and evidence index</li>
-            <li>Responsibility and independence matrix</li>
-            <li>Findings-to-remediation workflow</li>
-          </ul>
-        </article>
+        <article class="card service-card services__card animate-fade-in-up stagger-1"><span class="service-card__number">01</span><h3>Readiness assessment</h3><p>Scope the target framework, systems, data, people, vendors, and current program maturity.</p><ul><li>Framework and system boundary</li><li>Control and evidence gap register</li><li>Readiness risks and dependencies</li></ul></article>
+        <article class="card service-card services__card animate-fade-in-up stagger-2"><span class="service-card__number">02</span><h3>Technical remediation roadmap</h3><p>Turn gaps into concrete engineering, policy, ownership, and operating tasks.</p><ul><li>Prioritized implementation sequence</li><li>Cloud, identity, SDLC, and data controls</li><li>Owners, acceptance criteria, and evidence</li></ul></article>
+        <article class="card service-card services__card animate-fade-in-up stagger-3"><span class="service-card__number">03</span><h3>Evidence operations</h3><p>Define durable evidence sources so teams do not rebuild the same package for every review.</p><ul><li>Evidence inventory and freshness rules</li><li>Cross-framework control mapping</li><li>Exception and remediation tracking</li></ul></article>
+        <article class="card service-card services__card animate-fade-in-up stagger-4"><span class="service-card__number">04</span><h3>Independent-review handoff</h3><p>Prepare a structured package and coordinate open questions without blurring independence.</p><ul><li>Assessor-ready scope and evidence index</li><li>Responsibility and independence matrix</li><li>Findings-to-remediation workflow</li></ul></article>
       </div>
     </div>
   </section>
 
   <section class="section bg-noise" id="process">
     <div class="container" style="position: relative; z-index: 1;">
-      <header class="section-header">
-        <span class="badge animate-fade-in-up">How it works</span>
-        <h2 class="animate-fade-in-up stagger-1">
-          Readiness before
-          <span class="gradient-text">assurance</span>
-        </h2>
-        <p class="animate-fade-in-up stagger-2">
-          Each phase produces a reviewable artifact. No phase silently converts a readiness
-          recommendation into an independent conclusion.
-        </p>
-      </header>
-
+      <header class="section-header"><span class="badge animate-fade-in-up">How it works</span><h2 class="animate-fade-in-up stagger-1">Readiness before <span class="gradient-text">assurance</span></h2><p class="animate-fade-in-up stagger-2">Each phase produces a reviewable artifact. No phase silently converts a readiness recommendation into an independent conclusion.</p></header>
       <div class="process-list">
-        <article class="process-step animate-fade-in-up stagger-1">
-          <div>
-            <h3>Scope the real system</h3>
-            <p>Choose target frameworks and define products, cloud accounts, data, vendors, and organizational boundaries.</p>
-          </div>
-        </article>
-        <article class="process-step animate-fade-in-up stagger-2">
-          <div>
-            <h3>Assess controls and evidence</h3>
-            <p>Map current practices to requirements, distinguish missing controls from missing proof, and record assumptions.</p>
-          </div>
-        </article>
-        <article class="process-step animate-fade-in-up stagger-3">
-          <div>
-            <h3>Remediate by risk and dependency</h3>
-            <p>Sequence the work, assign owners, define acceptance criteria, and keep exceptions explicit.</p>
-          </div>
-        </article>
-        <article class="process-step animate-fade-in-up stagger-4">
-          <div>
-            <h3>Prepare the independent handoff</h3>
-            <p>Package scope, controls, evidence, exceptions, and open questions for the qualified reviewer you select.</p>
-          </div>
-        </article>
+        <article class="process-step animate-fade-in-up stagger-1"><div><h3>Scope the real system</h3><p>Choose target frameworks and define products, cloud accounts, data, vendors, and organizational boundaries.</p></div></article>
+        <article class="process-step animate-fade-in-up stagger-2"><div><h3>Assess controls and evidence</h3><p>Map current practices to requirements, distinguish missing controls from missing proof, and record assumptions.</p></div></article>
+        <article class="process-step animate-fade-in-up stagger-3"><div><h3>Remediate by risk and dependency</h3><p>Sequence the work, assign owners, define acceptance criteria, and keep exceptions explicit.</p></div></article>
+        <article class="process-step animate-fade-in-up stagger-4"><div><h3>Prepare the independent handoff</h3><p>Package scope, controls, evidence, exceptions, and open questions for the qualified reviewer you select.</p></div></article>
       </div>
     </div>
   </section>
 
   <section class="section" id="frameworks">
     <div class="container">
-      <header class="section-header section-header--center">
-        <span class="badge animate-fade-in-up">Framework coverage</span>
-        <h2 class="animate-fade-in-up stagger-1">
-          Start with the obligations that matter to
-          <span class="gradient-text">your customers and market</span>
-        </h2>
-        <p class="animate-fade-in-up stagger-2">
-          Canonical Plus can scope readiness across overlapping security, privacy, cloud,
-          payment, healthcare, and public-sector requirements.
-        </p>
-      </header>
-
-      <div class="frameworks__grid">
-        {featuredFrameworks.map(([name, scope], index) => (
-          <article class={`frameworks__item animate-fade-in-up stagger-${(index % 6) + 1}`}>
-            <h4>{name}</h4>
-            <p>{scope}</p>
-          </article>
-        ))}
-      </div>
-
-      <div class="action-row" style="justify-content: center;">
-        <a href={frameworksHref} class="btn btn--secondary">View the full framework catalog</a>
-      </div>
+      <header class="section-header section-header--center"><span class="badge animate-fade-in-up">Framework coverage</span><h2 class="animate-fade-in-up stagger-1">Start with the obligations that matter to <span class="gradient-text">your customers and market</span></h2><p class="animate-fade-in-up stagger-2">Canonical Plus can scope readiness across overlapping security, privacy, cloud, payment, healthcare, and public-sector requirements.</p></header>
+      <div class="frameworks__grid">{featuredFrameworks.map(([name, scope], index) => (<article class={`frameworks__item animate-fade-in-up stagger-${(index % 6) + 1}`}><h4>{name}</h4><p>{scope}</p></article>))}</div>
+      <div class="action-row" style="justify-content: center;"><a href={frameworksHref} class="btn btn--secondary">View the full framework catalog</a></div>
     </div>
   </section>
 
-  <section class="section" id="about">
-    <div class="container">
-      <header class="section-header">
-        <span class="badge animate-fade-in-up">Why Canonical Plus</span>
-        <h2 class="animate-fade-in-up stagger-1">
-          Honest boundaries and
-          <span class="gradient-text">technical depth</span>
-        </h2>
-      </header>
+  <section class="section" id="about"><div class="container"><header class="section-header"><span class="badge animate-fade-in-up">Why Canonical Plus</span><h2 class="animate-fade-in-up stagger-1">Honest boundaries and <span class="gradient-text">technical depth</span></h2></header><div class="why__grid"><article class="why__item animate-fade-in-up stagger-1"><div class="why__number">01</div><h4>Readiness before assurance</h4><p>We separate preparation from the independent decision so buyers know exactly what they are purchasing.</p></article><article class="why__item animate-fade-in-up stagger-2"><div class="why__number">02</div><h4>Engineering-aware remediation</h4><p>Findings become implementation work across cloud, identity, software delivery, data, and operations.</p></article><article class="why__item animate-fade-in-up stagger-3"><div class="why__number">03</div><h4>Reusable control mapping</h4><p>Shared controls and evidence are mapped across frameworks instead of recreated for each new requirement.</p></article><article class="why__item animate-fade-in-up stagger-4"><div class="why__number">04</div><h4>Transparent platform fit</h4><p>We say when a full automation platform, audit firm, certification body, or legal adviser is the better next step.</p></article></div><div class="action-row"><a href={compareHref} class="btn btn--secondary">Compare approaches</a></div></div></section>
 
-      <div class="why__grid">
-        <article class="why__item animate-fade-in-up stagger-1">
-          <div class="why__number">01</div>
-          <h4>Readiness before assurance</h4>
-          <p>We separate preparation from the independent decision so buyers know exactly what they are purchasing.</p>
-        </article>
-        <article class="why__item animate-fade-in-up stagger-2">
-          <div class="why__number">02</div>
-          <h4>Engineering-aware remediation</h4>
-          <p>Findings become implementation work across cloud, identity, software delivery, data, and operations.</p>
-        </article>
-        <article class="why__item animate-fade-in-up stagger-3">
-          <div class="why__number">03</div>
-          <h4>Reusable control mapping</h4>
-          <p>Shared controls and evidence are mapped across frameworks instead of recreated for each new requirement.</p>
-        </article>
-        <article class="why__item animate-fade-in-up stagger-4">
-          <div class="why__number">04</div>
-          <h4>Transparent platform fit</h4>
-          <p>We say when a full automation platform, audit firm, certification body, or legal adviser is the better next step.</p>
-        </article>
-      </div>
+  <section class="section" id="people" aria-labelledby="team-title"><div class="container"><header class="section-header section-header--center"><span class="badge">Our people</span><h2 id="team-title">The people behind <span class="gradient-text">your readiness</span></h2><p>Engineering, security, infrastructure, business, and legal perspectives on the same team.</p></header><PeopleGrid /></div></section>
 
-      <div class="action-row">
-        <a href={compareHref} class="btn btn--secondary">Compare approaches</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="people" aria-labelledby="team-title">
-    <div class="container">
-      <header class="section-header section-header--center">
-        <span class="badge">Our people</span>
-        <h2 id="team-title">The people behind <span class="gradient-text">your readiness</span></h2>
-        <p>Engineering, security, infrastructure, business, and legal perspectives on the same team.</p>
-      </header>
-      <PeopleGrid />
-    </div>
-  </section>
-
-  <section class="section" id="contact">
-    <div class="container">
-      <div class="cta-panel animate-fade-in-up">
-        <span class="badge">Start with scope</span>
-        <h2>Get a preliminary readiness estimate</h2>
-        <p>
-          Tell us the frameworks, systems, data sensitivity, and current program stage.
-          The result is an initial estimate and planning input—not an audit opinion or certification.
-        </p>
-        <div class="action-row">
-          <a
-            href={quoteHref}
-            class="btn btn--primary btn--large"
-            id="cta-readiness-btn"
-            data-application-link="quote"
-          >
-            Start readiness assessment
-          </a>
-          <a
-            href="mailto:hello@canonical.plus"
-            class="btn btn--secondary btn--large"
-            id="cta-contact-btn"
-          >
-            Discuss your scope
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
+  <section class="section" id="contact"><div class="container"><div class="cta-panel animate-fade-in-up"><span class="badge">Start with scope</span><h2>Get a preliminary readiness estimate</h2><p>Tell us the frameworks, systems, data sensitivity, and current program stage. The result is an initial estimate and planning input—not an audit opinion or certification.</p><div class="action-row"><a href={quoteHref} class="btn btn--primary btn--large" id="cta-readiness-btn" data-application-link="quote">Start readiness assessment</a><a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large" id="cta-contact-btn">Discuss your scope</a></div></div></div></section>
 </BaseLayout>
 
 <style>
-  .badge__dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--av-success);
-    display: inline-block;
-  }
+  .badge__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--av-success); display: inline-block; }
 </style>
