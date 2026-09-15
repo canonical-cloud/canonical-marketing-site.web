@@ -1,9 +1,9 @@
 const APP_SCHEME = 'https';
 const APP_HOST = 'app.canonical.plus';
 const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
-const READINESS_PATH = '/u/readiness';
-const readinessUrl = new URL(READINESS_PATH, APP_ORIGIN);
-const signInUrl = new URL(READINESS_PATH, APP_ORIGIN);
+const QUOTE_PATH = '/u/quote';
+const quoteUrl = new URL(QUOTE_PATH, APP_ORIGIN);
+const signInUrl = new URL(QUOTE_PATH, APP_ORIGIN);
 
 const configureApplicationLinks = () => {
   for (const link of document.querySelectorAll('[data-application-link]')) {
@@ -12,7 +12,7 @@ const configureApplicationLinks = () => {
     }
 
     const kind = link.dataset.applicationLink;
-    link.href = kind === 'sign-in' ? signInUrl.href : readinessUrl.href;
+    link.href = kind === 'sign-in' ? signInUrl.href : quoteUrl.href;
     link.rel = 'noopener';
   }
 };
