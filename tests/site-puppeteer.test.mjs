@@ -44,11 +44,11 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   );
   assert.equal(
     await page.$eval("#nav-sign-in", (element) => element.href),
-    "https://app.canonical.plus/u/readiness",
+    "https://app.canonical.plus/u/quote",
   );
   assert.equal(
     await page.$eval("#nav-quote", (element) => element.href),
-    "https://app.canonical.plus/u/readiness",
+    "https://app.canonical.plus/u/quote",
   );
 
   const serviceCards = await page.$$eval("#services .services__card h3", (nodes) =>
