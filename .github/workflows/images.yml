@@ -18,14 +18,17 @@ concurrency:
 jobs:
   dkf-drift:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with: { node-version: 22 }
-      - run: curl -fsSL https://raw.githubusercontent.com/ORESoftware/ores-gha-workflows/main/scripts/render-dkf.mjs -o /tmp/render-dkf.mjs && node /tmp/render-dkf.mjs . --check
+      - run: curl -fsSL https://raw.githubusercontent.com/ORESoftware/ores-gha-workflows/f0725007da6d592ca912b8d3f841fb16d0a7513e/scripts/render-dkf.mjs -o /tmp/render-dkf.mjs && node /tmp/render-dkf.mjs . --check
   images:
     needs: dkf-drift
-    uses: ORESoftware/ores-gha-workflows/.github/workflows/container-images.yml@main
+    uses: ORESoftware/ores-gha-workflows/.github/workflows/container-images.yml@f0725007da6d592ca912b8d3f841fb16d0a7513e
     with:
       image-name: canonical-cloud/canonical-marketing-site.web
       gcp-project: canonical-cloud
