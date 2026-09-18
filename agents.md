@@ -79,6 +79,7 @@ To sync:
 
 Integrate with **`git merge` / `git pull`**. **Never `git rebase` to sync** — it
 rewrites history and breaks shared branches.
+
 <!-- ore-primary-branch-policy:begin -->
 ## Primary branch and concurrent-agent policy
 
