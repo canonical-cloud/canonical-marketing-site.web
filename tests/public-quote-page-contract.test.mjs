@@ -11,14 +11,15 @@ test("public quote page reuses the canonical service-tier catalog", () => {
   assert.deepEqual(catalog.tiers.map((tier) => tier.monthlyUsd), [2500, 7500, 20000]);
 });
 
-test("public quote submission is idempotent and server mediated", () => {
-  assert.match(page, /crypto\.randomUUID\(\)/);
-  assert.match(page, /idempotency-key/);
-  assert.match(page, /https:\/\/api\.canonical\.plus/);
-  assert.match(page, /\/v1\/quote-requests/);
-  assert.doesNotMatch(page, /service_role|SUPABASE_SERVICE|NEON_DATABASE_URL/i);
+test("public quote page hands off to the authenticated application quote workflow", () => {
+  assert.match(page, /const appQuoteUrl = 'https:\/\/app\.canonical\.plus\/quote'/);
+  assert.match(page, /Start secure quote/);
+  assert.doesNotMatch(page, /service_role|SUPABASE_SERVICE|NEON_DATABASE_URL|\/v1\/quote-requests/i);
 });
 
-test("signed-in continuation has a stable app quote URL", () => {
-  assert.match(page, /https:\/\/app\.canonical\.plus\/quote/);
+test("marketing page explains the secure quote scope without duplicating the form", () => {
+  assert.match(page, /employee count/);
+  assert.match(page, /Frameworks such as SOC 2/);
+  assert.match(page, /Infrastructure and data-sensitivity categories/);
+  assert.match(page, /Do not submit credentials, PHI, cardholder data, or production evidence/);
 });
