@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import catalog from '../data/service-tiers.json';
+
+const money = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: catalog.source.currency,
+  maximumFractionDigits: 0,
+});
+---
+
+<BaseLayout
+  title="Request a readiness quote"
+  description="Request a scoped Canonical Plus readiness quote using the same three-tier catalog published on the pricing page."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Public quote intake</span>
+        <p class="page-hero__eyebrow">One catalog · one scope conversation</p>
+        <h1 class="page-hero__title hero__title">Start with a package.<br /><span class="gradient-text">Finish with a scoped SOW.</span></h1>
+        <p class="page-hero__subtitle">Choose a readiness service level and tell us which standards, systems, and deadlines matter. The published prices remain proposed starting assumptions; a reviewed and signed statement of work controls final scope and price.</p>
+      </div>
+      <aside class="page-hero__panel">
+        <h2>Three published starting points</h2>
+        <ul class="compact-tiers">
+          {catalog.tiers.map((tier) => <li><strong>{tier.name}</strong><span>{money.format(tier.monthlyUsd)} / month</span></li>)}
+        </ul>
+        <p><a href="/prices/">Compare the full package matrix →</a></p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container quote-layout">
+      <div>
+        <span class="badge">Scope inputs</span>
+        <h2>Enough detail for a useful first quote.</h2>
+        <p>Submitting this form does not create an audit opinion, certification, authorization, legal conclusion, or promise of an independent review outcome.</p>
+        <p>Already signed in? Continue at <a href="https://app.canonical.plus/quote">app.canonical.plus/quote</a>.</p>
+      </div>
+      <form class="card quote-form" data-quote-form data-api-origin="https://api.canonical.plus">
+        <input type="hidden" name="submission_id" />
+        <input type="hidden" name="catalog_as_of" value={catalog.source.asOf} />
+        <label><span>Name</span><input name="name" autocomplete="name" maxlength="160" required /></label>
+        <label><span>Work email</span><input type="email" name="email" autocomplete="email" maxlength="320" required /></label>
+        <label><span>Organization</span><input name="organization" autocomplete="organization" maxlength="200" required /></label>
+        <label>
+          <span>Readiness package</span>
+          <select name="tier" required>
+            <option value="">Choose a package</option>
+            {catalog.tiers.map((tier) => <option value={tier.id}>{tier.name} — {money.format(tier.monthlyUsd)} / month</option>)}
+          </select>
+        </label>
+        <label><span>Standards or frameworks in scope</span><input name="frameworks" maxlength="500" placeholder="SOC 2, ISO 27001, HIPAA, NIST, GDPR…" required /></label>
+        <label><span>Systems and environments in scope</span><textarea name="systems" minlength="20" maxlength="4000" rows="5" required></textarea></label>
+        <label><span>Target review, customer, or deadline</span><input name="target_date_or_event" maxlength="500" /></label>
+        <label><span>Current readiness state and biggest gaps</span><textarea name="readiness_context" minlength="30" maxlength="5000" rows="7" required></textarea></label>
+        <button class="btn btn--primary btn--large" type="submit">Request scoped quote</button>
+        <p class="quote-status" role="status" aria-live="polite" data-quote-status></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector('[data-quote-form]');
+  const status = document.querySelector('[data-quote-status]');
+  if (form instanceof HTMLFormElement) {
+    const submission = form.elements.namedItem('submission_id');
+    if (submission instanceof HTMLInputElement) submission.value = crypto.randomUUID();
+    const tier = new URL(window.location.href).searchParams.get('tier');
+    const tierSelect = form.elements.namedItem('tier');
+    if (tier && tierSelect instanceof HTMLSelectElement) tierSelect.value = tier;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const button = form.querySelector('button[type="submit"]');
+      if (button instanceof HTMLButtonElement) button.disabled = true;
+      if (status) status.textContent = 'Submitting securely…';
+      const payload = Object.fromEntries([...new FormData(form).entries()].map(([key, value]) => [key, String(value).trim()]));
+      try {
+        const response = await fetch(`${form.dataset.apiOrigin}/v1/quote-requests`, {
+          method: 'POST',
+          mode: 'cors',
+          credentials: 'omit',
+          redirect: 'error',
+          headers: { 'content-type': 'application/json', 'idempotency-key': `public-quote:${payload.submission_id}` },
+          body: JSON.stringify(payload),
+        });
+        if (!response.ok) throw new Error('quote request rejected');
+        const receipt = await response.json();
+        if (typeof receipt?.submission_id !== 'string') throw new Error('invalid receipt');
+        if (status) status.textContent = `Received. Quote request ${receipt.submission_id} is ready for scoping.`;
+        form.querySelectorAll('input, select, textarea, button').forEach((control) => { control.disabled = true; });
+      } catch {
+        if (status) status.textContent = 'We could not confirm storage of the quote request. Please retry; the same submission ID is safe to reuse.';
+        if (button instanceof HTMLButtonElement) button.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .compact-tiers { display: grid; gap: .8rem; list-style: none; padding: 0; }
+  .compact-tiers li { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--av-border); padding-bottom: .8rem; }
+  .compact-tiers span { color: var(--av-text-secondary); }
+  .quote-layout { display: grid; grid-template-columns: .8fr 1.2fr; gap: var(--space-xl); align-items: start; }
+  .quote-layout > div > p { color: var(--av-text-secondary); line-height: 1.65; }
+  .quote-form { display: grid; gap: var(--space-md); }
+  .quote-form label { display: grid; gap: .4rem; font-weight: 650; }
+  .quote-form input, .quote-form select, .quote-form textarea { width: 100%; box-sizing: border-box; border: 1px solid var(--av-border); border-radius: var(--radius-sm); padding: .8rem 1rem; background: var(--av-bg-primary); color: var(--av-text-primary); font: inherit; }
+  .quote-form textarea { resize: vertical; }
+  .quote-status { min-height: 1.5rem; margin: 0; color: var(--av-text-secondary); }
+  @media (max-width: 900px) { .quote-layout { grid-template-columns: 1fr; } .compact-tiers li { flex-direction: column; } }
+</style>
