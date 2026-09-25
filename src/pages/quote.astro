@@ -1,0 +1,272 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import catalog from '../data/service-tiers.json';
+
+const submitted = Astro.url.searchParams.get('submitted') === '1';
+const money = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: catalog.source.currency,
+  maximumFractionDigits: 0,
+});
+---
+
+<BaseLayout
+  title="Get a readiness quote"
+  description="Request a Canonical Plus compliance-readiness quote and choose from Foundation Readiness, Managed Readiness, or Assurance Engineering."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Public quote request</span>
+        <p class="page-hero__eyebrow">Scope before commitment</p>
+        <h1 class="page-hero__title hero__title">
+          Turn your compliance target into a
+          <span class="gradient-text">reviewable readiness plan</span>
+        </h1>
+        <p class="page-hero__subtitle">
+          Pick a starting service level and tell us what you are preparing for. Public pricing is a
+          planning assumption; a signed statement of work controls final scope, fees, dependencies,
+          and delivery terms.
+        </p>
+      </div>
+      <aside class="page-hero__panel">
+        <h2>Readiness, not the audit</h2>
+        <p>
+          Canonical Plus can scope, remediate, automate evidence, and prepare a handoff.
+          Independent auditors, assessors, certification bodies, regulators, and legal counsel
+          make their own formal determinations.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      {submitted && (
+        <div class="quote-receipt" role="status">
+          <strong>Quote request received.</strong>
+          <p>Your request was accepted and the follow-up notification was queued.</p>
+        </div>
+      )}
+
+      <header class="section-header">
+        <span class="badge">Three delivery levels</span>
+        <h2>Choose a starting package</h2>
+        <p>These are the same proposed packages published on the pricing page.</p>
+      </header>
+
+      <div class="quote-tier-grid">
+        {catalog.tiers.map((tier) => (
+          <article class="card quote-tier">
+            <h3>{tier.name}</h3>
+            <p class="quote-tier__price">{money.format(tier.monthlyUsd)} <span>/ month starting assumption</span></p>
+            <p>{tier.summary}</p>
+            <p><strong>Best fit:</strong> {tier.idealFor}</p>
+            <ul class="check-list">
+              {tier.includes.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <div class="card quote-form-card">
+        <h2>Request a scoped quote</h2>
+        <form
+          method="post"
+          action="/form-edge/submit/canonical-quote"
+          data-opto-sync-form="canonical.quote"
+          data-success-url="/quote?submitted=1"
+        >
+          <div class="quote-form-grid">
+            <label>
+              Contact name
+              <input name="contactName" maxlength="160" required />
+            </label>
+            <label>
+              Work email
+              <input type="email" name="email" maxlength="320" required />
+            </label>
+            <label>
+              Organization
+              <input name="organizationName" maxlength="200" required />
+            </label>
+            <label>
+              Public website
+              <input type="url" name="website" maxlength="2048" placeholder="https://example.com" />
+            </label>
+            <label>
+              Employees and long-term contractors
+              <input type="number" name="employeeCount" min="1" max="1000000" />
+            </label>
+            <label>
+              Current stage
+              <select name="currentStage" required>
+                <option value="">Choose one</option>
+                <option value="exploring">Exploring</option>
+                <option value="readiness">Readiness</option>
+                <option value="remediation">Remediation</option>
+                <option value="audit_ready">Audit ready</option>
+                <option value="renewal">Renewal</option>
+              </select>
+            </label>
+            <label>
+              Target date
+              <input type="date" name="targetDate" />
+            </label>
+          </div>
+
+          <fieldset>
+            <legend>Preferred package</legend>
+            <div class="quote-choice-grid">
+              {catalog.tiers.map((tier) => (
+                <label class="quote-choice">
+                  <input type="radio" name="preferredTier" value={tier.id} required />
+                  <span><strong>{tier.name}</strong> · {money.format(tier.monthlyUsd)}/mo starting</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Frameworks in scope</legend>
+            <div class="quote-choice-grid">
+              {[
+                ['soc2_type_1', 'SOC 2 Type I'],
+                ['soc2_type_2', 'SOC 2 Type II'],
+                ['nist_csf_2', 'NIST CSF 2.0'],
+                ['nist_800_53', 'NIST SP 800-53'],
+                ['hipaa', 'HIPAA'],
+                ['iso_27001', 'ISO 27001'],
+                ['pci_dss_4', 'PCI DSS 4'],
+                ['fedramp', 'FedRAMP'],
+                ['gdpr', 'GDPR'],
+                ['custom', 'Custom scope'],
+              ].map(([value, label]) => (
+                <label class="quote-choice">
+                  <input type="checkbox" name="frameworks" value={value} />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Infrastructure</legend>
+            <div class="quote-choice-grid">
+              {['AWS', 'Azure', 'GCP', 'Supabase', 'On-premises', 'Colocation', 'SaaS only', 'Multi-cloud', 'Other'].map((label) => (
+                <label class="quote-choice">
+                  <input type="checkbox" name="infrastructure" value={label.toLowerCase().replaceAll(' ', '_')} />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
+          <label>
+            Context or constraints
+            <textarea
+              name="notes"
+              rows="6"
+              maxlength="5000"
+              placeholder="Customer deadline, current gaps, environments, evidence constraints, or other scoping context."
+            ></textarea>
+          </label>
+
+          <button class="btn btn--primary btn--large" type="submit">Request quote</button>
+          <p class="quote-form-note">
+            With JavaScript, the Opto Sync form connector durably queues the submission before
+            transport. The same-origin form still submits normally with JavaScript disabled.
+          </p>
+          <noscript><p class="quote-form-note">JavaScript is disabled; normal form submission remains available.</p></noscript>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script is:inline type="module" src="/form-edge/client.js"></script>
+
+<style>
+  .quote-tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+    margin-bottom: var(--space-2xl);
+  }
+  .quote-tier__price {
+    color: var(--av-text-primary);
+    font-size: 1.35rem;
+    font-weight: 800;
+  }
+  .quote-tier__price span {
+    color: var(--av-text-muted);
+    font-size: .82rem;
+    font-weight: 500;
+  }
+  .quote-form-card {
+    max-width: 62rem;
+    margin-inline: auto;
+  }
+  .quote-form-card form,
+  .quote-form-card fieldset {
+    display: grid;
+    gap: var(--space-md);
+  }
+  .quote-form-card fieldset {
+    border: 1px solid var(--av-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-md) 0;
+  }
+  .quote-form-card label {
+    display: grid;
+    gap: .45rem;
+    font-weight: 650;
+  }
+  .quote-form-card input,
+  .quote-form-card textarea,
+  .quote-form-card select {
+    width: 100%;
+    padding: .8rem;
+    border: 1px solid var(--av-border-hover);
+    border-radius: var(--radius-sm);
+    background: var(--av-surface);
+    color: var(--av-text-primary);
+    font: inherit;
+  }
+  .quote-form-grid,
+  .quote-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md);
+  }
+  .quote-choice {
+    grid-template-columns: auto 1fr !important;
+    align-items: start;
+    font-weight: 500 !important;
+  }
+  .quote-choice input {
+    width: auto;
+    margin-top: .3rem;
+  }
+  .quote-form-note {
+    color: var(--av-text-muted);
+    font-size: .86rem;
+  }
+  .quote-receipt {
+    margin-bottom: var(--space-xl);
+    padding: var(--space-lg);
+    border: 1px solid var(--av-teal);
+    border-radius: var(--radius-md);
+    background: var(--av-emerald-glow);
+  }
+  @media (max-width: 800px) {
+    .quote-tier-grid,
+    .quote-form-grid,
+    .quote-choice-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
