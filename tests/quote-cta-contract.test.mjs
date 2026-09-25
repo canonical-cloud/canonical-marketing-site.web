@@ -7,14 +7,15 @@ const layout = await readFile(
   "utf8",
 );
 
-test("marketing navigation exposes the authenticated canonical.plus readiness entry point", () => {
-  assert.match(layout, /const quoteHref = 'https:\/\/app\.canonical\.plus\/u\/readiness';/);
-  assert.match(layout, /id="nav-sign-in"[^>]*>Sign in<\/a>/);
-  assert.match(layout, /id="nav-quote"[^>]*>Start readiness assessment<\/a>/);
+test("marketing navigation separates public quote and authenticated app entry", () => {
+  assert.match(layout, /const quoteHref = `\$\{baseNoSlash\}\/quote\/`;/);
+  assert.match(layout, /const signInHref = 'https:\/\/app\.canonical\.plus\/quote';/);
+  assert.match(layout, /href=\{signInHref\}[^>]*id="nav-sign-in"[^>]*>Sign in<\/a>/);
+  assert.match(layout, /href=\{quoteHref\}[^>]*id="nav-quote"[^>]*>Start readiness assessment<\/a>/);
 });
 
-test("quote links use one exact HTTPS destination and never carry tokens", () => {
-  const destinations = [...layout.matchAll(/href=\{quoteHref\}/g)];
-  assert.ok(destinations.length >= 4, "expected nav and footer quote links");
-  assert.doesNotMatch(layout, /app\.canonical\.plus\/u\/quote\?[^'"\s]*(?:token|jwt|access_token)=/i);
+test("quote links never carry bearer material", () => {
+  const publicDestinations = [...layout.matchAll(/href=\{quoteHref\}/g)];
+  assert.ok(publicDestinations.length >= 3, "expected public quote links in navigation and footer");
+  assert.doesNotMatch(layout, /(?:quote|readiness)\?[^'"\s]*(?:token|jwt|access_token)=/i);
 });
