@@ -24,7 +24,7 @@ const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
 const themeInitScriptHref = `${baseNoSlash}/theme-init.js`;
 const siteScriptHref = `${baseNoSlash}/site.js`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;\nconst signInHref = 'https://app.canonical.plus/quote';
 ---
 
 <!doctype html>
@@ -75,7 +75,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
           <a href={processHref} class="nav__link" id="nav-process">Process</a>
           <a href={frameworksHref} class="nav__link" id="nav-frameworks">Frameworks</a>
           <a href={compareHref} class="nav__link" id="nav-about">Compare</a>
-          <a href={quoteHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
+          <a href={signInHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
           <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote" data-application-link="quote">Start readiness assessment</a>
         </div>
 
@@ -171,7 +171,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
               <a href="mailto:hello@canonical.plus" class="footer__link">hello@canonical.plus</a>
               <a href={contactHref} class="footer__link">Contact Canonical Plus</a>
               <a href={legalHref} class="footer__link">Legal and engagement boundary</a>
-              <a href={quoteHref} class="footer__link" data-application-link="sign-in">Sign in</a>
+              <a href={signInHref} class="footer__link" data-application-link="sign-in">Sign in</a>
             </div>
           </nav>
         </div>
