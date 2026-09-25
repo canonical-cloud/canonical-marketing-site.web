@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import catalog from '../data/service-tiers.json';
+
+const money = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: catalog.source.currency,
+  maximumFractionDigits: 0,
+});
+const appQuoteUrl = 'https://app.canonical.plus/quote';
+---
+
+<BaseLayout
+  title="Request a readiness quote"
+  description="Compare Canonical Plus readiness service levels and continue into the secure signed-in quote workflow."
+>
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">Readiness quote</span>
+        <p class="page-hero__eyebrow">One catalog · one secure quote workflow</p>
+        <h1 class="page-hero__title hero__title">Start with a service level.<br /><span class="gradient-text">Finish with a scoped SOW.</span></h1>
+        <p class="page-hero__subtitle">Compare the same readiness packages published on our pricing page, then continue into the authenticated quote workflow. The published prices are proposed starting assumptions; a reviewed and signed statement of work controls final scope and price.</p>
+        <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href={appQuoteUrl}>Start secure quote</a>
+          <a class="btn btn--secondary btn--large" href="/prices/">Full pricing details</a>
+        </div>
+      </div>
+      <aside class="page-hero__panel">
+        <h2>What the secure quote asks</h2>
+        <ul>
+          <li>Organization, contact, employee count, and optional revenue band</li>
+          <li>Frameworks such as SOC 2, ISO 27001, HIPAA, NIST, PCI DSS, FedRAMP, and GDPR</li>
+          <li>Program stage and target date</li>
+          <li>Infrastructure and data-sensitivity categories</li>
+          <li>Existing security-program controls and optional notes</li>
+        </ul>
+        <p>Your verified account email is used in the quote. Do not submit credentials, PHI, cardholder data, or production evidence.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge">Service matrix</span>
+        <h2>Three published starting points</h2>
+        <p>Use the matrix to pick the closest delivery level. The secure quote workflow calculates scope from your actual environment and readiness inputs.</p>
+      </div>
+      <div class="quote-tier-grid" aria-label="Canonical readiness service levels">
+        {catalog.tiers.map((tier) => (
+          <article class="card quote-tier-card">
+            <div>
+              <p class="quote-tier-card__eyebrow">{tier.name}</p>
+              <p class="quote-tier-card__price"><strong>{money.format(tier.monthlyUsd)}</strong> <span>/ month</span></p>
+              <p>{tier.summary}</p>
+            </div>
+            <ul>{tier.includes.map((item) => <li>{item}</li>)}</ul>
+            <a class="btn btn--secondary" href={appQuoteUrl}>Continue securely</a>
+          </article>
+        ))}
+      </div>
+      <p class="quote-disclaimer">Submitting the authenticated quote form does not create an audit opinion, certification, authorization, legal conclusion, or promise of an independent review outcome.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .quote-tier-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); align-items: stretch; }
+  .quote-tier-card { display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-lg); }
+  .quote-tier-card__eyebrow { margin: 0; color: var(--av-accent); font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+  .quote-tier-card__price { margin: .5rem 0 1rem; }
+  .quote-tier-card__price strong { font-size: clamp(2rem, 4vw, 3rem); }
+  .quote-tier-card__price span, .quote-tier-card p, .quote-tier-card li, .quote-disclaimer { color: var(--av-text-secondary); }
+  .quote-tier-card ul { display: grid; gap: .65rem; padding-left: 1.2rem; }
+  .quote-disclaimer { margin-top: var(--space-xl); line-height: 1.6; }
+  @media (max-width: 900px) { .quote-tier-grid { grid-template-columns: 1fr; } }
+</style>
