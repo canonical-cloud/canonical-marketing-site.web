@@ -7,7 +7,7 @@ import catalog from '../data/service-tiers.json';
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const trainingHref = `${baseNoSlash}/training/`;
 const readinessHref = `${baseNoSlash}/readiness/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
 const money = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: catalog.source.currency,
