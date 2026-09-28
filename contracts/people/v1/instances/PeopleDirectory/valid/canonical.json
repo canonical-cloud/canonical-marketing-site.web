@@ -52,6 +52,18 @@
       "name": "Tom Mensch",
       "role": "Software & Legal",
       "initials": "TM"
+    },
+    {
+      "id": "rebecca-toni",
+      "name": "Rebecca Toni",
+      "role": "Team",
+      "initials": "RT"
+    },
+    {
+      "id": "georgiana-fabrecce",
+      "name": "Georgiana Fabrecce",
+      "role": "Team",
+      "initials": "GF"
     }
   ]
 }
