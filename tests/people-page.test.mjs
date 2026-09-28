@@ -23,14 +23,16 @@ const roster = [
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
   ['Tom Mensch', 'Software & Legal'],
+  ['Rebecca Toni', 'Team'],
+  ['Georgiana Fabrecce', 'Team'],
 ];
 
-test('people directory has exactly eight named roles in the requested order', () => {
+test('people directory has exactly ten named roles in the requested order', () => {
   assert.equal(directory.schemaVersion, 'canonical-cloud.people/v1');
   assert.deepEqual(directory.people.map(({ name, role }) => [name, role]), roster);
-  assert.equal(directory.people.length, 8);
-  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 8, 'person ids must be unique');
-  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 8, 'initials must be unique');
+  assert.equal(directory.people.length, 10);
+  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 10, 'person ids must be unique');
+  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 10, 'initials must be unique');
 });
 
 test('homepage and people page share the validated directory', () => {
@@ -38,11 +40,11 @@ test('homepage and people page share the validated directory', () => {
   assert.match(grid, /const people = directory\.people/);
   assert.match(grid, /people\.map\(\(person\)/);
   assert.match(grid, /data-person-id=\{person\.id\}/);
-  assert.match(source, /Eight people, one readiness platform/);
+  assert.match(source, /Ten people, one readiness platform/);
   for (const page of [source, home]) assert.match(page, /<PeopleGrid\s*\/>/);
 });
 
-test('desktop layout has two rows of four with tablet and mobile layouts', () => {
+test('desktop layout has four columns with tablet and mobile layouts', () => {
   assert.match(grid, /grid-template-columns:\s*repeat\(4,\s*minmax\(0,\s*1fr\)\)/);
   assert.match(grid, /@media \(max-width: 1000px\)[\s\S]*repeat\(2,\s*minmax\(0,\s*1fr\)\)/);
   assert.match(grid, /@media \(max-width: 620px\)[\s\S]*grid-template-columns:\s*1fr/);
@@ -59,7 +61,7 @@ test('four verified Benefactor headshots are used and unresolved identities stay
     '/team/marcus-gerlach.jpg',
   ]);
 
-  for (const name of ['John Siliciano', 'Jack Johnson', 'Eugene Li', 'Tom Mensch']) {
+  for (const name of ['John Siliciano', 'Jack Johnson', 'Eugene Li', 'Tom Mensch', 'Rebecca Toni', 'Georgiana Fabrecce']) {
     assert.equal(directory.people.find((person) => person.name === name)?.photoUrl, undefined);
   }
   assert.match(grid, /person-card__fallback/);
