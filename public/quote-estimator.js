@@ -1,21 +1,16 @@
 const root = document.querySelector('[data-quote-estimator]');
 
 if (root instanceof HTMLElement) {
-  const asFiniteNumber = (value, fallback) => {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-  };
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
-  const currencyCandidate = root.dataset.currency || 'USD';
-  const currency = /^[A-Z]{3}$/.test(currencyCandidate) ? currencyCandidate : 'USD';
-  const floor = asFiniteNumber(root.dataset.floor, 5000);
-  const ceiling = asFiniteNumber(root.dataset.ceiling, 15000);
-  const midpointFloor = asFiniteNumber(root.dataset.midpointFloor, floor);
-  const midpointCeiling = asFiniteNumber(root.dataset.midpointCeiling, ceiling);
-  const roundTo = asFiniteNumber(root.dataset.roundTo, 500);
-  const lowerFactor = asFiniteNumber(root.dataset.lowerFactor, 0.9);
-  const upperFactor = asFiniteNumber(root.dataset.upperFactor, 1.12);
+  const currency = root.dataset.currency || '';
+  const floor = Number(root.dataset.floor);
+  const ceiling = Number(root.dataset.ceiling);
+  const midpointFloor = Number(root.dataset.midpointFloor);
+  const midpointCeiling = Number(root.dataset.midpointCeiling);
+  const roundTo = Number(root.dataset.roundTo);
+  const lowerFactor = Number(root.dataset.lowerFactor);
+  const upperFactor = Number(root.dataset.upperFactor);
 
   const speedSlider = root.querySelector('[data-quote-speed-slider]');
   const speedLabel = root.querySelector('[data-speed-label]');
@@ -38,9 +33,19 @@ if (root instanceof HTMLElement) {
     base: Number(node.dataset.base),
     note: node.dataset.note || '',
   }));
+  const standardInputs = [...root.querySelectorAll('input[name="quote_standard"]')];
+  const depthInputs = [...root.querySelectorAll('input[name="quote_delivery_depth"]')];
+  const complexityInputs = [...root.querySelectorAll('input[name="quote_complexity"]')];
+  const pricedInputs = [...standardInputs, ...depthInputs, ...complexityInputs];
 
   const uniqueIndexes = new Set(speedOptions.map((option) => option.index));
+  const uniqueValues = (inputs) => new Set(inputs.map((input) => input.value)).size === inputs.length;
+  const pricedInputValid = (input) => {
+    const amount = Number(input.dataset.amount);
+    return input.value.length > 0 && (input.dataset.label || '').length > 0 && Number.isFinite(amount) && amount >= 0;
+  };
   const configurationValid =
+    /^[A-Z]{3}$/.test(currency) &&
     Number.isFinite(floor) &&
     floor >= 0 &&
     Number.isFinite(ceiling) &&
@@ -68,7 +73,14 @@ if (root instanceof HTMLElement) {
         option.label.length > 0 &&
         Number.isFinite(option.base) &&
         option.base >= 0,
-    );
+    ) &&
+    standardInputs.length > 0 &&
+    depthInputs.length > 0 &&
+    complexityInputs.length > 0 &&
+    uniqueValues(standardInputs) &&
+    uniqueValues(depthInputs) &&
+    uniqueValues(complexityInputs) &&
+    pricedInputs.every(pricedInputValid);
 
   const failClosed = () => {
     root.dataset.quoteRuntime = 'invalid';
@@ -105,9 +117,9 @@ if (root instanceof HTMLElement) {
       const depth = selectedRadio('quote_delivery_depth');
       const complexity = selectedRadio('quote_complexity');
 
-      const standardAmount = standards.reduce((total, input) => total + asFiniteNumber(input.dataset.amount, 0), 0);
-      const depthAmount = depth instanceof HTMLInputElement ? asFiniteNumber(depth.dataset.amount, 0) : 0;
-      const complexityAmount = complexity instanceof HTMLInputElement ? asFiniteNumber(complexity.dataset.amount, 0) : 0;
+      const standardAmount = standards.reduce((total, input) => total + Number(input.dataset.amount), 0);
+      const depthAmount = depth instanceof HTMLInputElement ? Number(depth.dataset.amount) : 0;
+      const complexityAmount = complexity instanceof HTMLInputElement ? Number(complexity.dataset.amount) : 0;
 
       const rawMidpoint = speed.base + standardAmount + depthAmount + complexityAmount;
       const midpoint = clamp(rawMidpoint, midpointFloor, midpointCeiling);
