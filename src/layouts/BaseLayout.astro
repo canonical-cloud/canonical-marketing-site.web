@@ -20,11 +20,12 @@ const trainingHref = `${baseNoSlash}/training/`;
 const securityHref = `${baseNoSlash}/security/`;
 const contactHref = `${baseNoSlash}/contact/`;
 const legalHref = `${baseNoSlash}/legal/`;
+const publicQuoteHref = `${baseNoSlash}/quote/`;
 const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
 const themeInitScriptHref = `${baseNoSlash}/theme-init.js`;
 const siteScriptHref = `${baseNoSlash}/site.js`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const applicationHref = 'https://app.canonical.plus/u/readiness';
 ---
 
 <!doctype html>
@@ -75,8 +76,8 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
           <a href={processHref} class="nav__link" id="nav-process">Process</a>
           <a href={frameworksHref} class="nav__link" id="nav-frameworks">Frameworks</a>
           <a href={compareHref} class="nav__link" id="nav-about">Compare</a>
-          <a href={quoteHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
-          <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote" data-application-link="quote">Start readiness assessment</a>
+          <a href={applicationHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
+          <a href={publicQuoteHref} class="btn btn--primary nav__cta" id="nav-quote">Get a quote</a>
         </div>
 
         <div class="nav__actions">
@@ -151,7 +152,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
               <h4 class="footer__col-title">Readiness</h4>
               <a href={readinessHref} class="footer__link">Readiness assessment</a>
               <a href={processHref} class="footer__link">How it works</a>
-              <a href={quoteHref} class="footer__link" data-application-link="quote">Start an assessment</a>
+              <a href={publicQuoteHref} class="footer__link">Build a quote</a>
             </div>
             <div class="footer__col">
               <h4 class="footer__col-title">Coverage</h4>
@@ -171,7 +172,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
               <a href="mailto:hello@canonical.plus" class="footer__link">hello@canonical.plus</a>
               <a href={contactHref} class="footer__link">Contact Canonical Plus</a>
               <a href={legalHref} class="footer__link">Legal and engagement boundary</a>
-              <a href={quoteHref} class="footer__link" data-application-link="sign-in">Sign in</a>
+              <a href={applicationHref} class="footer__link" data-application-link="sign-in">Sign in</a>
             </div>
           </nav>
         </div>
@@ -344,85 +345,113 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
         display: flex;
         align-items: center;
         gap: var(--space-sm);
-        margin-left: var(--space-md);
+      }
+
+      .theme-switcher {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-lg);
+      }
+
+      .theme-switcher--header {
+        gap: 0;
       }
 
       .theme-switcher__options {
         display: inline-flex;
         align-items: center;
-        gap: 3px;
+        gap: 2px;
         padding: 3px;
-        border: 1px solid var(--av-border-hover);
-        border-radius: var(--radius-full);
-        background: var(--av-switcher-bg);
-        box-shadow: inset 0 1px 0 var(--av-highlight);
+        border: 1px solid var(--av-border);
+        border-radius: 999px;
+        background: var(--av-surface);
       }
 
       .theme-switcher__option {
-        min-width: 2rem;
-        min-height: 2rem;
-        padding: 0.35rem 0.55rem;
-        border-radius: var(--radius-full);
-        color: var(--av-text-muted);
+        min-width: 30px;
+        height: 30px;
+        padding: 0 0.45rem;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: var(--av-text-secondary);
+        font: inherit;
         font-size: 0.72rem;
         font-weight: 800;
-        letter-spacing: 0.04em;
-        line-height: 1;
+        cursor: pointer;
         transition:
-          color var(--duration-fast) var(--ease-out),
           background-color var(--duration-fast) var(--ease-out),
-          box-shadow var(--duration-fast) var(--ease-out),
-          transform var(--duration-fast) var(--ease-out);
+          color var(--duration-fast) var(--ease-out),
+          box-shadow var(--duration-fast) var(--ease-out);
       }
 
       .theme-switcher__option:hover {
         color: var(--av-text-primary);
-        background: var(--av-surface-hover);
       }
 
       .theme-switcher__option[aria-pressed='true'] {
-        color: var(--av-theme-active-text);
-        background: var(--av-theme-active-bg);
-        box-shadow: var(--shadow-sm);
+        background: var(--av-accent-soft);
+        color: var(--av-accent-contrast);
+        box-shadow: inset 0 0 0 1px var(--av-accent-border);
       }
 
-      .theme-switcher__option:active {
-        transform: scale(0.96);
+      .theme-switcher__options--labeled .theme-switcher__option {
+        min-width: 54px;
       }
 
       .nav__mobile-toggle {
         display: none;
         flex-direction: column;
+        justify-content: center;
         gap: 5px;
-        padding: 11px;
-        min-height: 44px;
-        min-width: 44px;
+        width: 40px;
+        height: 40px;
+        padding: 8px;
+        border: 1px solid var(--av-border);
+        border-radius: var(--radius-sm);
+        background: var(--av-surface);
+        cursor: pointer;
       }
 
       .nav__mobile-toggle span {
         display: block;
-        width: 22px;
+        width: 100%;
         height: 2px;
-        background: var(--av-text-secondary);
+        background: var(--av-text-primary);
         border-radius: 2px;
+        transition: transform var(--duration-normal) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
+      }
+
+      .nav__mobile-toggle[aria-expanded='true'] span:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+
+      .nav__mobile-toggle[aria-expanded='true'] span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .nav__mobile-toggle[aria-expanded='true'] span:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
       }
 
       .footer {
         border-top: 1px solid var(--av-border);
-        padding: var(--space-3xl) 0 var(--space-xl);
         background: var(--av-footer-bg);
+        padding: var(--space-3xl) 0 var(--space-xl);
       }
 
       .footer__boundary {
         display: grid;
-        grid-template-columns: minmax(12rem, 0.45fr) 1.55fr;
-        gap: var(--space-lg);
-        padding: var(--space-lg);
-        margin-bottom: var(--space-3xl);
-        border: 1px solid var(--av-border-active);
+        gap: 0.35rem;
+        padding: var(--space-md) var(--space-lg);
+        margin-bottom: var(--space-2xl);
+        border: 1px solid var(--av-border);
         border-radius: var(--radius-md);
-        background: var(--av-emerald-glow);
+        background: var(--av-surface);
         color: var(--av-text-secondary);
+        font-size: 0.88rem;
+        line-height: 1.55;
       }
 
       .footer__boundary strong {
@@ -430,10 +459,11 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
       }
 
       .footer__top {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--space-4xl);
-        margin-bottom: var(--space-3xl);
+        display: grid;
+        grid-template-columns: 1.2fr 2fr;
+        gap: var(--space-3xl);
+        padding-bottom: var(--space-2xl);
+        border-bottom: 1px solid var(--av-border);
       }
 
       .footer__brand {
@@ -441,151 +471,144 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
       }
 
       .footer__tagline {
-        margin-top: var(--space-md);
-        font-size: 0.95rem;
-        color: var(--av-text-muted);
+        color: var(--av-text-secondary);
+        font-size: 0.9rem;
         line-height: 1.6;
+        margin-top: var(--space-md);
       }
 
       .footer__columns {
-        display: flex;
-        gap: var(--space-3xl);
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-xl);
       }
 
       .footer__col {
         display: flex;
         flex-direction: column;
-        gap: var(--space-sm);
+        gap: 0.75rem;
       }
 
       .footer__col-title {
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.78rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--av-text-primary);
-        margin-bottom: var(--space-sm);
+        color: var(--av-text-muted);
+        margin-bottom: 0.25rem;
       }
 
       .footer__link {
-        font-size: 0.9rem;
-        color: var(--av-text-muted);
+        font-size: 0.88rem;
+        color: var(--av-text-secondary);
         transition: color var(--duration-fast) var(--ease-out);
       }
 
       .footer__link:hover {
-        color: var(--av-teal);
-      }
-
-      .footer__bottom {
-        display: flex;
-        justify-content: space-between;
-        gap: var(--space-lg);
-        align-items: center;
-        padding-top: var(--space-xl);
-        border-top: 1px solid var(--av-border);
+        color: var(--av-text-primary);
       }
 
       .footer__theme {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: var(--space-xl);
-        padding: var(--space-lg) 0;
-        border-top: 1px solid var(--av-border);
+        padding: var(--space-xl) 0;
+        border-bottom: 1px solid var(--av-border);
       }
 
       .footer__theme-title {
+        margin: 0 0 0.35rem;
         color: var(--av-text-primary);
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         font-weight: 700;
       }
 
       .footer__theme-copy {
-        margin-top: 0.2rem;
-        color: var(--av-text-muted);
-        font-size: 0.8rem;
+        margin: 0;
+        max-width: 700px;
+        color: var(--av-text-secondary);
+        font-size: 0.82rem;
+        line-height: 1.55;
       }
 
-      .footer__theme-copy [data-theme-status] {
-        color: var(--av-teal);
-        white-space: nowrap;
-      }
-
-      .theme-switcher__options--labeled .theme-switcher__option {
-        min-width: auto;
-        padding-inline: 0.8rem;
+      .footer__bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-lg);
+        padding-top: var(--space-xl);
       }
 
       .footer__copy {
-        max-width: 42rem;
-        font-size: 0.8rem;
         color: var(--av-text-muted);
+        font-size: 0.8rem;
       }
 
       @media (max-width: 900px) {
-        .nav__links {
-          gap: var(--space-md);
-        }
-
-        .nav__cta {
-          display: none;
-        }
-
         .footer__top {
-          flex-direction: column;
-          gap: var(--space-2xl);
+          grid-template-columns: 1fr;
+        }
+
+        .footer__brand {
+          max-width: none;
         }
 
         .footer__columns {
-          flex-wrap: wrap;
-          gap: var(--space-2xl);
-        }
-
-        .footer__theme {
-          align-items: flex-start;
-          flex-direction: column;
+          grid-template-columns: repeat(2, 1fr);
         }
       }
 
       @media (max-width: 768px) {
-        .nav__links {
+        .theme-switcher--header {
           display: none;
-        }
-
-        .nav .nav__links.nav__links--open {
-          position: absolute;
-          top: var(--nav-height);
-          left: 0;
-          right: 0;
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          gap: 0;
-          padding: var(--space-md);
-          background: var(--av-nav-bg-strong);
-          border-bottom: 1px solid var(--av-border);
-        }
-
-        .nav .nav__links.nav__links--open .nav__link,
-        .nav .nav__links.nav__links--open .nav__cta {
-          display: flex;
-          min-height: 44px;
-          align-items: center;
-          padding: 0.75rem;
         }
 
         .nav__mobile-toggle {
           display: flex;
         }
 
-        .footer__boundary {
-          grid-template-columns: 1fr;
+        .nav__links {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          display: none;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          padding: var(--space-md) var(--space-lg) var(--space-lg);
+          background: var(--av-nav-menu-bg);
+          backdrop-filter: blur(20px) saturate(180%);
+          -webkit-backdrop-filter: blur(20px) saturate(180%);
+          border-bottom: 1px solid var(--av-border);
+          box-shadow: var(--shadow-md);
+        }
+
+        .nav__links.nav__links--open {
+          display: flex;
+        }
+
+        .nav__link {
+          padding: 0.75rem 0;
+        }
+
+        .nav__cta {
+          margin-top: 0.5rem;
+          text-align: center;
+        }
+
+        .theme-switcher {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .footer__columns {
+          grid-template-columns: 1fr 1fr;
+          gap: var(--space-xl) var(--space-lg);
         }
 
         .footer__bottom {
+          align-items: flex-start;
           flex-direction: column;
-          text-align: center;
         }
 
         .theme-switcher__options--labeled {
@@ -596,18 +619,8 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
           flex: 1;
         }
       }
-
-      @media (max-width: 480px) {
-        .nav > .nav__inner > .nav__logo .nav__logo-text {
-          display: none;
-        }
-
-        .nav__actions {
-          margin-left: 0;
-        }
-      }
     </style>
 
-    <script type="module" src={siteScriptHref}></script>
+    <script src={siteScriptHref}></script>
   </body>
 </html>
