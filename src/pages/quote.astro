@@ -10,6 +10,9 @@ const money = new Intl.NumberFormat('en-US', {
   currency: catalog.source.currency,
   maximumFractionDigits: 0,
 });
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const quoteEstimatorScriptHref = `${baseNoSlash}/quote-estimator.js`;
+const contactHref = `${baseNoSlash}/contact/`;
 const appQuoteUrl = 'https://app.canonical.plus/u/quote';
 const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === estimator.defaults.speedWeeks);
 ---
@@ -183,7 +186,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
         <p>This completion does not create an account, send data to Canonical Plus, or bind either party. You can change the inputs above at any time.</p>
         <div class="page-hero__actions">
           <a class="btn btn--primary" href={appQuoteUrl} data-quote-login>Sign in to save this scope</a>
-          <a class="btn btn--secondary" href="/contact/">Talk to us without an account</a>
+          <a class="btn btn--secondary" href={contactHref}>Talk to us without an account</a>
         </div>
       </section>
     </div>
@@ -213,7 +216,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
     </div>
   </section>
 
-  <script src="/quote-estimator.js" defer></script>
+  <script type="module" src={quoteEstimatorScriptHref}></script>
 </BaseLayout>
 
 <style>
