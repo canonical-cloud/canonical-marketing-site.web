@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "currency": "USD",
+  "estimateFloorUsd": 5000,
+  "estimateCeilingUsd": 15000,
+  "midpointFloorUsd": 5500,
+  "midpointCeilingUsd": 13500,
+  "roundToUsd": 500,
+  "lowerFactor": 0.9,
+  "upperFactor": 1.12,
+  "speeds": [
+    { "weeks": 9, "label": "9 weeks", "baseUsd": 5000, "note": "Standard pace with more room for evidence collection and remediation." },
+    { "weeks": 5, "label": "5 weeks", "baseUsd": 7500, "note": "Accelerated readiness program with tighter working sessions." },
+    { "weeks": 3, "label": "3 weeks", "baseUsd": 10500, "note": "Compressed delivery window with intensive coordination." }
+  ],
+  "standards": [
+    { "id": "soc2", "label": "SOC 2", "amountUsd": 0 },
+    { "id": "iso27001", "label": "ISO 27001", "amountUsd": 750 },
+    { "id": "nist", "label": "NIST CSF / 800-series", "amountUsd": 500 },
+    { "id": "gdpr", "label": "GDPR", "amountUsd": 750 },
+    { "id": "hipaa", "label": "HIPAA", "amountUsd": 1000 },
+    { "id": "pci", "label": "PCI DSS", "amountUsd": 1000 },
+    { "id": "fedramp", "label": "FedRAMP", "amountUsd": 1750 },
+    { "id": "cis", "label": "CIS Controls", "amountUsd": 350 }
+  ],
+  "deliveryDepths": [
+    { "id": "advisory", "label": "Advisory", "amountUsd": 0, "note": "Gap analysis, control mapping, roadmap, and review preparation." },
+    { "id": "managed", "label": "Managed readiness", "amountUsd": 1500, "note": "Adds recurring working sessions, evidence tracking, and owner follow-through." },
+    { "id": "remediation", "label": "Hands-on remediation", "amountUsd": 3000, "note": "Adds technical implementation support for cloud, IAM, SDLC, logging, and evidence automation." }
+  ],
+  "complexities": [
+    { "id": "focused", "label": "Focused scope", "amountUsd": 0, "note": "One primary cloud or application boundary with a small control-owner group." },
+    { "id": "growing", "label": "Growing environment", "amountUsd": 1000, "note": "Several systems, teams, vendors, or cloud accounts in scope." },
+    { "id": "complex", "label": "Complex / regulated", "amountUsd": 2000, "note": "Multi-cloud, sensitive data, substantial remediation, or broad evidence collection." }
+  ],
+  "defaults": {
+    "speedWeeks": 5,
+    "standardIds": ["soc2", "iso27001"],
+    "deliveryDepthId": "managed",
+    "complexityId": "growing"
+  }
+}

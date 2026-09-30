@@ -20,11 +20,12 @@ const trainingHref = `${baseNoSlash}/training/`;
 const securityHref = `${baseNoSlash}/security/`;
 const contactHref = `${baseNoSlash}/contact/`;
 const legalHref = `${baseNoSlash}/legal/`;
+const publicQuoteHref = `${baseNoSlash}/quote/`;
 const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
 const themeInitScriptHref = `${baseNoSlash}/theme-init.js`;
 const siteScriptHref = `${baseNoSlash}/site.js`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const applicationHref = 'https://app.canonical.plus/u/readiness';
 ---
 
 <!doctype html>
@@ -75,8 +76,8 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
           <a href={processHref} class="nav__link" id="nav-process">Process</a>
           <a href={frameworksHref} class="nav__link" id="nav-frameworks">Frameworks</a>
           <a href={compareHref} class="nav__link" id="nav-about">Compare</a>
-          <a href={quoteHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
-          <a href={quoteHref} class="btn btn--primary nav__cta" id="nav-quote" data-application-link="quote">Start readiness assessment</a>
+          <a href={applicationHref} class="nav__link" id="nav-sign-in" data-application-link="sign-in">Sign in</a>
+          <a href={publicQuoteHref} class="btn btn--primary nav__cta" id="nav-quote">Get a quote</a>
         </div>
 
         <div class="nav__actions">
@@ -151,7 +152,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
               <h4 class="footer__col-title">Readiness</h4>
               <a href={readinessHref} class="footer__link">Readiness assessment</a>
               <a href={processHref} class="footer__link">How it works</a>
-              <a href={quoteHref} class="footer__link" data-application-link="quote">Start an assessment</a>
+              <a href={publicQuoteHref} class="footer__link">Build a quote</a>
             </div>
             <div class="footer__col">
               <h4 class="footer__col-title">Coverage</h4>
@@ -171,7 +172,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
               <a href="mailto:hello@canonical.plus" class="footer__link">hello@canonical.plus</a>
               <a href={contactHref} class="footer__link">Contact Canonical Plus</a>
               <a href={legalHref} class="footer__link">Legal and engagement boundary</a>
-              <a href={quoteHref} class="footer__link" data-application-link="sign-in">Sign in</a>
+              <a href={applicationHref} class="footer__link" data-application-link="sign-in">Sign in</a>
             </div>
           </nav>
         </div>
