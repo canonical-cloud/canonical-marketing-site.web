@@ -85,13 +85,16 @@ test("quote estimator configuration is internally consistent and bounded", () =>
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* upperFactor\), lower, ceiling\)/);
 });
 
-test("runtime fails closed on invalid configuration instead of rendering bogus pricing", () => {
+test("runtime fails closed on invalid configuration instead of substituting pricing defaults", () => {
   assert.match(runtime, /const configurationValid =/);
+  assert.match(runtime, /\^\[A-Z\]\{3\}\$/);
   assert.match(runtime, /Number\.isFinite\(floor\)/);
   assert.match(runtime, /uniqueIndexes\.size === speedOptions\.length/);
+  assert.match(runtime, /pricedInputs\.every\(pricedInputValid\)/);
   assert.match(runtime, /root\.dataset\.quoteRuntime = 'invalid'/);
   assert.match(runtime, /Estimate unavailable/);
   assert.match(runtime, /completeButton\.disabled = true/);
+  assert.doesNotMatch(runtime, /root\.dataset\.(?:floor|ceiling|roundTo),\s*\d/);
 });
 
 test("completed quote snapshots cannot silently become stale", () => {
