@@ -5,16 +5,87 @@ import '../styles/marketing-pages.css';
 import catalog from '../data/service-tiers.json';
 import estimator from '../data/quote-estimator.json';
 
+const EXPECTED_ESTIMATOR_SCHEMA_VERSION = 1;
+const isFiniteNonnegative = (value: number) => Number.isFinite(value) && value >= 0;
+const idsAreUnique = (items: Array<{ id: string }>) => new Set(items.map((item) => item.id)).size === items.length;
+const pricedItemsAreValid = (items: Array<{ id: string; label: string; amountUsd: number }>) =>
+  idsAreUnique(items) && items.every((item) => item.id.length > 0 && item.label.length > 0 && isFiniteNonnegative(item.amountUsd));
+
+if (
+  estimator.schemaVersion !== EXPECTED_ESTIMATOR_SCHEMA_VERSION ||
+  !/^[A-Z]{3}$/.test(estimator.currency) ||
+  !isFiniteNonnegative(estimator.estimateFloorUsd) ||
+  !Number.isFinite(estimator.estimateCeilingUsd) ||
+  estimator.estimateCeilingUsd <= estimator.estimateFloorUsd ||
+  !Number.isFinite(estimator.midpointFloorUsd) ||
+  estimator.midpointFloorUsd < estimator.estimateFloorUsd ||
+  !Number.isFinite(estimator.midpointCeilingUsd) ||
+  estimator.midpointCeilingUsd < estimator.midpointFloorUsd ||
+  estimator.midpointCeilingUsd > estimator.estimateCeilingUsd ||
+  !Number.isFinite(estimator.roundToUsd) ||
+  estimator.roundToUsd <= 0 ||
+  !Number.isFinite(estimator.lowerFactor) ||
+  estimator.lowerFactor <= 0 ||
+  !Number.isFinite(estimator.upperFactor) ||
+  estimator.upperFactor < estimator.lowerFactor ||
+  estimator.speeds.length === 0 ||
+  new Set(estimator.speeds.map((speed) => speed.weeks)).size !== estimator.speeds.length ||
+  estimator.speeds.some((speed) => !Number.isInteger(speed.weeks) || speed.weeks <= 0 || !speed.label || !isFiniteNonnegative(speed.baseUsd)) ||
+  !pricedItemsAreValid(estimator.standards) ||
+  !pricedItemsAreValid(estimator.deliveryDepths) ||
+  !pricedItemsAreValid(estimator.complexities)
+) {
+  throw new Error('Invalid quote estimator configuration');
+}
+
+const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === estimator.defaults.speedWeeks);
+const defaultSpeed = estimator.speeds[defaultSpeedIndex];
+const defaultStandardIds = new Set(estimator.defaults.standardIds);
+const defaultStandards = estimator.standards.filter((standard) => defaultStandardIds.has(standard.id));
+const defaultDepth = estimator.deliveryDepths.find((depth) => depth.id === estimator.defaults.deliveryDepthId);
+const defaultComplexity = estimator.complexities.find((complexity) => complexity.id === estimator.defaults.complexityId);
+
+if (
+  defaultSpeedIndex < 0 ||
+  !defaultSpeed ||
+  defaultStandardIds.size === 0 ||
+  defaultStandards.length !== defaultStandardIds.size ||
+  !defaultDepth ||
+  !defaultComplexity
+) {
+  throw new Error('Invalid quote estimator defaults');
+}
+
 const money = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: catalog.source.currency,
   maximumFractionDigits: 0,
 });
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+const roundMoney = (value: number) => Math.round(value / estimator.roundToUsd) * estimator.roundToUsd;
+const defaultStandardAmount = defaultStandards.reduce((total, standard) => total + standard.amountUsd, 0);
+const defaultMidpoint = clamp(
+  defaultSpeed.baseUsd + defaultStandardAmount + defaultDepth.amountUsd + defaultComplexity.amountUsd,
+  estimator.midpointFloorUsd,
+  estimator.midpointCeilingUsd,
+);
+const defaultLower = clamp(
+  roundMoney(defaultMidpoint * estimator.lowerFactor),
+  estimator.estimateFloorUsd,
+  estimator.estimateCeilingUsd,
+);
+const defaultUpper = clamp(
+  roundMoney(defaultMidpoint * estimator.upperFactor),
+  defaultLower,
+  estimator.estimateCeilingUsd,
+);
+const initialRange = `${money.format(defaultLower)}–${money.format(defaultUpper)}`;
+const initialSummary = `${defaultSpeed.label} · ${defaultStandards.map((standard) => standard.label).join(' + ')} · ${defaultDepth.label} · ${defaultComplexity.label}`;
+
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const quoteEstimatorScriptHref = `${baseNoSlash}/quote-estimator.js`;
 const contactHref = `${baseNoSlash}/contact/`;
 const appQuoteUrl = 'https://app.canonical.plus/u/quote';
-const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === estimator.defaults.speedWeeks);
 ---
 
 <BaseLayout
@@ -60,6 +131,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
       <div
         class="quote-estimator"
         data-quote-estimator
+        data-schema-version={estimator.schemaVersion}
         data-currency={estimator.currency}
         data-floor={estimator.estimateFloorUsd}
         data-ceiling={estimator.estimateCeilingUsd}
@@ -74,7 +146,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
             <legend>1. Delivery speed</legend>
             <div class="quote-slider__heading">
               <span>More planning room</span>
-              <strong data-speed-label>{estimator.speeds[defaultSpeedIndex].label}</strong>
+              <strong data-speed-label>{defaultSpeed.label}</strong>
               <span>Faster delivery</span>
             </div>
             <input
@@ -86,13 +158,13 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
               step="1"
               value={defaultSpeedIndex}
               aria-label="Delivery speed"
-              aria-valuetext={estimator.speeds[defaultSpeedIndex].label}
+              aria-valuetext={defaultSpeed.label}
               data-quote-speed-slider
             />
             <div class="quote-slider__ticks" aria-hidden="true">
               {estimator.speeds.map((speed) => <span>{speed.label}</span>)}
             </div>
-            <p class="quote-control-note" data-speed-note>{estimator.speeds[defaultSpeedIndex].note}</p>
+            <p class="quote-control-note" data-speed-note>{defaultSpeed.note}</p>
             <div hidden aria-hidden="true">
               {estimator.speeds.map((speed, index) => (
                 <span
@@ -119,7 +191,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
                     value={standard.id}
                     data-label={standard.label}
                     data-amount={standard.amountUsd}
-                    checked={estimator.defaults.standardIds.includes(standard.id)}
+                    checked={defaultStandardIds.has(standard.id)}
                   />
                   <span>{standard.label}</span>
                 </label>
@@ -139,7 +211,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
                     value={depth.id}
                     data-label={depth.label}
                     data-amount={depth.amountUsd}
-                    checked={depth.id === estimator.defaults.deliveryDepthId}
+                    checked={depth.id === defaultDepth.id}
                   />
                   <span><strong>{depth.label}</strong><small>{depth.note}</small></span>
                 </label>
@@ -158,7 +230,7 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
                     value={complexity.id}
                     data-label={complexity.label}
                     data-amount={complexity.amountUsd}
-                    checked={complexity.id === estimator.defaults.complexityId}
+                    checked={complexity.id === defaultComplexity.id}
                   />
                   <span><strong>{complexity.label}</strong><small>{complexity.note}</small></span>
                 </label>
@@ -169,8 +241,8 @@ const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === 
 
         <aside class="quote-estimator__result" aria-live="polite" aria-atomic="true">
           <p class="quote-estimator__eyebrow">Estimated project range</p>
-          <p class="quote-estimator__price"><strong data-quote-range>$9,500–$12,000</strong></p>
-          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment</p>
+          <p class="quote-estimator__price"><strong data-quote-range>{initialRange}</strong></p>
+          <p class="quote-estimator__summary" data-quote-summary>{initialSummary}</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
           <p class="quote-estimator__boundary">Typical public estimator range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Final pricing depends on validated scope.</p>
           <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Complete quote without login</button>
