@@ -1,8 +1,10 @@
 const root = document.querySelector('[data-quote-estimator]');
 
 if (root instanceof HTMLElement) {
+  const EXPECTED_SCHEMA_VERSION = 1;
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
+  const schemaVersion = Number(root.dataset.schemaVersion);
   const currency = root.dataset.currency || '';
   const floor = Number(root.dataset.floor);
   const ceiling = Number(root.dataset.ceiling);
@@ -45,6 +47,7 @@ if (root instanceof HTMLElement) {
     return input.value.length > 0 && (input.dataset.label || '').length > 0 && Number.isFinite(amount) && amount >= 0;
   };
   const configurationValid =
+    schemaVersion === EXPECTED_SCHEMA_VERSION &&
     /^[A-Z]{3}$/.test(currency) &&
     Number.isFinite(floor) &&
     floor >= 0 &&
