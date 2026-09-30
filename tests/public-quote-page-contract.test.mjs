@@ -9,6 +9,38 @@ const estimator = JSON.parse(await readFile(new URL("../src/data/quote-estimator
 
 const idsAreUnique = (items) => new Set(items.map((item) => item.id)).size === items.length;
 const amountsAreSafe = (items) => items.every((item) => Number.isFinite(item.amountUsd) && item.amountUsd >= 0);
+const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+const roundMoney = (value) => Math.round(value / estimator.roundToUsd) * estimator.roundToUsd;
+const calculateEstimate = ({ speedBaseUsd, standardsUsd, depthUsd, complexityUsd }) => {
+  const midpoint = clamp(
+    speedBaseUsd + standardsUsd + depthUsd + complexityUsd,
+    estimator.midpointFloorUsd,
+    estimator.midpointCeilingUsd,
+  );
+  const lower = clamp(
+    roundMoney(midpoint * estimator.lowerFactor),
+    estimator.estimateFloorUsd,
+    estimator.estimateCeilingUsd,
+  );
+  const upper = clamp(
+    roundMoney(midpoint * estimator.upperFactor),
+    lower,
+    estimator.estimateCeilingUsd,
+  );
+  return { midpoint, lower, upper };
+};
+const nonEmptyStandardTotals = () => {
+  const totals = [];
+  const combinations = 1 << estimator.standards.length;
+  for (let mask = 1; mask < combinations; mask += 1) {
+    let total = 0;
+    for (let index = 0; index < estimator.standards.length; index += 1) {
+      if ((mask & (1 << index)) !== 0) total += estimator.standards[index].amountUsd;
+    }
+    totals.push(total);
+  }
+  return totals;
+};
 
 test("public quote page reuses the canonical recurring service-tier catalog", () => {
   assert.match(page, /import catalog from '\.\.\/data\/service-tiers\.json'/);
@@ -83,6 +115,70 @@ test("quote estimator configuration is internally consistent and bounded", () =>
   assert.equal(estimator.estimateCeilingUsd, 15000);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* upperFactor\), lower, ceiling\)/);
+});
+
+test("every supported pricing combination stays bounded and ordered", () => {
+  const standardTotals = nonEmptyStandardTotals();
+  let combinationsChecked = 0;
+
+  for (const speed of estimator.speeds) {
+    for (const standardsUsd of standardTotals) {
+      for (const depth of estimator.deliveryDepths) {
+        for (const complexity of estimator.complexities) {
+          const quote = calculateEstimate({
+            speedBaseUsd: speed.baseUsd,
+            standardsUsd,
+            depthUsd: depth.amountUsd,
+            complexityUsd: complexity.amountUsd,
+          });
+          assert.ok(quote.midpoint >= estimator.midpointFloorUsd);
+          assert.ok(quote.midpoint <= estimator.midpointCeilingUsd);
+          assert.ok(quote.lower >= estimator.estimateFloorUsd);
+          assert.ok(quote.upper <= estimator.estimateCeilingUsd);
+          assert.ok(quote.lower <= quote.upper);
+          combinationsChecked += 1;
+        }
+      }
+    }
+  }
+
+  assert.equal(combinationsChecked, 6885);
+});
+
+test("faster delivery, deeper service, and greater complexity never reduce pricing", () => {
+  const standardTotals = nonEmptyStandardTotals();
+  const orderedSpeeds = [...estimator.speeds].sort((left, right) => right.weeks - left.weeks);
+  const orderedDepths = estimator.deliveryDepths;
+  const orderedComplexities = estimator.complexities;
+
+  for (let index = 1; index < orderedSpeeds.length; index += 1) {
+    assert.ok(orderedSpeeds[index].weeks < orderedSpeeds[index - 1].weeks);
+    assert.ok(orderedSpeeds[index].baseUsd >= orderedSpeeds[index - 1].baseUsd);
+  }
+  for (let index = 1; index < orderedDepths.length; index += 1) {
+    assert.ok(orderedDepths[index].amountUsd >= orderedDepths[index - 1].amountUsd);
+  }
+  for (let index = 1; index < orderedComplexities.length; index += 1) {
+    assert.ok(orderedComplexities[index].amountUsd >= orderedComplexities[index - 1].amountUsd);
+  }
+
+  for (const standardsUsd of standardTotals) {
+    for (const depth of orderedDepths) {
+      for (const complexity of orderedComplexities) {
+        const quotes = orderedSpeeds.map((speed) => calculateEstimate({
+          speedBaseUsd: speed.baseUsd,
+          standardsUsd,
+          depthUsd: depth.amountUsd,
+          complexityUsd: complexity.amountUsd,
+        }));
+        for (let index = 1; index < quotes.length; index += 1) {
+          assert.ok(quotes[index].midpoint >= quotes[index - 1].midpoint);
+          assert.ok(quotes[index].lower >= quotes[index - 1].lower);
+          assert.ok(quotes[index].upper >= quotes[index - 1].upper);
+        }
+      }
+    }
+  }
 });
 
 test("runtime fails closed on invalid configuration instead of substituting pricing defaults", () => {
