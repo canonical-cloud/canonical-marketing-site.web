@@ -345,113 +345,85 @@ const applicationHref = 'https://app.canonical.plus/u/readiness';
         display: flex;
         align-items: center;
         gap: var(--space-sm);
-      }
-
-      .theme-switcher {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--space-lg);
-      }
-
-      .theme-switcher--header {
-        gap: 0;
+        margin-left: var(--space-md);
       }
 
       .theme-switcher__options {
         display: inline-flex;
         align-items: center;
-        gap: 2px;
+        gap: 3px;
         padding: 3px;
-        border: 1px solid var(--av-border);
-        border-radius: 999px;
-        background: var(--av-surface);
+        border: 1px solid var(--av-border-hover);
+        border-radius: var(--radius-full);
+        background: var(--av-switcher-bg);
+        box-shadow: inset 0 1px 0 var(--av-highlight);
       }
 
       .theme-switcher__option {
-        min-width: 30px;
-        height: 30px;
-        padding: 0 0.45rem;
-        border: 0;
-        border-radius: 999px;
-        background: transparent;
-        color: var(--av-text-secondary);
-        font: inherit;
+        min-width: 2rem;
+        min-height: 2rem;
+        padding: 0.35rem 0.55rem;
+        border-radius: var(--radius-full);
+        color: var(--av-text-muted);
         font-size: 0.72rem;
         font-weight: 800;
-        cursor: pointer;
+        letter-spacing: 0.04em;
+        line-height: 1;
         transition:
-          background-color var(--duration-fast) var(--ease-out),
           color var(--duration-fast) var(--ease-out),
-          box-shadow var(--duration-fast) var(--ease-out);
+          background-color var(--duration-fast) var(--ease-out),
+          box-shadow var(--duration-fast) var(--ease-out),
+          transform var(--duration-fast) var(--ease-out);
       }
 
       .theme-switcher__option:hover {
         color: var(--av-text-primary);
+        background: var(--av-surface-hover);
       }
 
       .theme-switcher__option[aria-pressed='true'] {
-        background: var(--av-accent-soft);
-        color: var(--av-accent-contrast);
-        box-shadow: inset 0 0 0 1px var(--av-accent-border);
+        color: var(--av-theme-active-text);
+        background: var(--av-theme-active-bg);
+        box-shadow: var(--shadow-sm);
       }
 
-      .theme-switcher__options--labeled .theme-switcher__option {
-        min-width: 54px;
+      .theme-switcher__option:active {
+        transform: scale(0.96);
       }
 
       .nav__mobile-toggle {
         display: none;
         flex-direction: column;
-        justify-content: center;
         gap: 5px;
-        width: 40px;
-        height: 40px;
-        padding: 8px;
-        border: 1px solid var(--av-border);
-        border-radius: var(--radius-sm);
-        background: var(--av-surface);
-        cursor: pointer;
+        padding: 11px;
+        min-height: 44px;
+        min-width: 44px;
       }
 
       .nav__mobile-toggle span {
         display: block;
-        width: 100%;
+        width: 22px;
         height: 2px;
-        background: var(--av-text-primary);
+        background: var(--av-text-secondary);
         border-radius: 2px;
-        transition: transform var(--duration-normal) var(--ease-out), opacity var(--duration-fast) var(--ease-out);
-      }
-
-      .nav__mobile-toggle[aria-expanded='true'] span:nth-child(1) {
-        transform: translateY(7px) rotate(45deg);
-      }
-
-      .nav__mobile-toggle[aria-expanded='true'] span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .nav__mobile-toggle[aria-expanded='true'] span:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg);
       }
 
       .footer {
         border-top: 1px solid var(--av-border);
-        background: var(--av-footer-bg);
         padding: var(--space-3xl) 0 var(--space-xl);
+        background: var(--av-footer-bg);
       }
 
       .footer__boundary {
         display: grid;
-        gap: 0.35rem;
-        padding: var(--space-md) var(--space-lg);
-        margin-bottom: var(--space-2xl);
-        border: 1px solid var(--av-border);
+        grid-template-columns: minmax(12rem, 0.45fr) 1.55fr;
+        gap: var(--space-lg);
+        padding: var(--space-lg);
+        margin-bottom: var(--space-3xl);
+        border: 1px solid var(--av-border-active);
         border-radius: var(--radius-md);
-        background: var(--av-surface);
+        background: var(--av-emerald-glow);
         color: var(--av-text-secondary);
-        font-size: 0.88rem;
-        line-height: 1.55;
       }
 
       .footer__boundary strong {
@@ -459,11 +431,10 @@ const applicationHref = 'https://app.canonical.plus/u/readiness';
       }
 
       .footer__top {
-        display: grid;
-        grid-template-columns: 1.2fr 2fr;
-        gap: var(--space-3xl);
-        padding-bottom: var(--space-2xl);
-        border-bottom: 1px solid var(--av-border);
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-4xl);
+        margin-bottom: var(--space-3xl);
       }
 
       .footer__brand {
@@ -471,144 +442,151 @@ const applicationHref = 'https://app.canonical.plus/u/readiness';
       }
 
       .footer__tagline {
-        color: var(--av-text-secondary);
-        font-size: 0.9rem;
-        line-height: 1.6;
         margin-top: var(--space-md);
+        font-size: 0.95rem;
+        color: var(--av-text-muted);
+        line-height: 1.6;
       }
 
       .footer__columns {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: var(--space-xl);
+        display: flex;
+        gap: var(--space-3xl);
       }
 
       .footer__col {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: var(--space-sm);
       }
 
       .footer__col-title {
-        font-size: 0.78rem;
-        font-weight: 700;
+        font-size: 0.85rem;
+        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        color: var(--av-text-muted);
-        margin-bottom: 0.25rem;
+        color: var(--av-text-primary);
+        margin-bottom: var(--space-sm);
       }
 
       .footer__link {
-        font-size: 0.88rem;
-        color: var(--av-text-secondary);
+        font-size: 0.9rem;
+        color: var(--av-text-muted);
         transition: color var(--duration-fast) var(--ease-out);
       }
 
       .footer__link:hover {
-        color: var(--av-text-primary);
-      }
-
-      .footer__theme {
-        padding: var(--space-xl) 0;
-        border-bottom: 1px solid var(--av-border);
-      }
-
-      .footer__theme-title {
-        margin: 0 0 0.35rem;
-        color: var(--av-text-primary);
-        font-size: 0.88rem;
-        font-weight: 700;
-      }
-
-      .footer__theme-copy {
-        margin: 0;
-        max-width: 700px;
-        color: var(--av-text-secondary);
-        font-size: 0.82rem;
-        line-height: 1.55;
+        color: var(--av-teal);
       }
 
       .footer__bottom {
         display: flex;
-        align-items: center;
         justify-content: space-between;
         gap: var(--space-lg);
+        align-items: center;
         padding-top: var(--space-xl);
+        border-top: 1px solid var(--av-border);
       }
 
-      .footer__copy {
+      .footer__theme {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: var(--space-xl);
+        padding: var(--space-lg) 0;
+        border-top: 1px solid var(--av-border);
+      }
+
+      .footer__theme-title {
+        color: var(--av-text-primary);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .footer__theme-copy {
+        margin-top: 0.2rem;
         color: var(--av-text-muted);
         font-size: 0.8rem;
       }
 
+      .footer__theme-copy [data-theme-status] {
+        color: var(--av-teal);
+        white-space: nowrap;
+      }
+
+      .theme-switcher__options--labeled .theme-switcher__option {
+        min-width: auto;
+        padding-inline: 0.8rem;
+      }
+
+      .footer__copy {
+        max-width: 42rem;
+        font-size: 0.8rem;
+        color: var(--av-text-muted);
+      }
+
       @media (max-width: 900px) {
-        .footer__top {
-          grid-template-columns: 1fr;
+        .nav__links {
+          gap: var(--space-md);
         }
 
-        .footer__brand {
-          max-width: none;
+        .nav__cta {
+          display: none;
+        }
+
+        .footer__top {
+          flex-direction: column;
+          gap: var(--space-2xl);
         }
 
         .footer__columns {
-          grid-template-columns: repeat(2, 1fr);
+          flex-wrap: wrap;
+          gap: var(--space-2xl);
+        }
+
+        .footer__theme {
+          align-items: flex-start;
+          flex-direction: column;
         }
       }
 
       @media (max-width: 768px) {
-        .theme-switcher--header {
+        .nav__links {
           display: none;
+        }
+
+        .nav .nav__links.nav__links--open {
+          position: absolute;
+          top: var(--nav-height);
+          left: 0;
+          right: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: stretch;
+          gap: 0;
+          padding: var(--space-md);
+          background: var(--av-nav-bg-strong);
+          border-bottom: 1px solid var(--av-border);
+        }
+
+        .nav .nav__links.nav__links--open .nav__link,
+        .nav .nav__links.nav__links--open .nav__cta {
+          display: flex;
+          min-height: 44px;
+          align-items: center;
+          padding: 0.75rem;
         }
 
         .nav__mobile-toggle {
           display: flex;
         }
 
-        .nav__links {
-          position: absolute;
-          top: 100%;
-          left: 0;
-          right: 0;
-          display: none;
-          flex-direction: column;
-          align-items: stretch;
-          gap: 0;
-          padding: var(--space-md) var(--space-lg) var(--space-lg);
-          background: var(--av-nav-menu-bg);
-          backdrop-filter: blur(20px) saturate(180%);
-          -webkit-backdrop-filter: blur(20px) saturate(180%);
-          border-bottom: 1px solid var(--av-border);
-          box-shadow: var(--shadow-md);
-        }
-
-        .nav__links.nav__links--open {
-          display: flex;
-        }
-
-        .nav__link {
-          padding: 0.75rem 0;
-        }
-
-        .nav__cta {
-          margin-top: 0.5rem;
-          text-align: center;
-        }
-
-        .theme-switcher {
-          align-items: flex-start;
-          flex-direction: column;
-        }
-      }
-
-      @media (max-width: 600px) {
-        .footer__columns {
-          grid-template-columns: 1fr 1fr;
-          gap: var(--space-xl) var(--space-lg);
+        .footer__boundary {
+          grid-template-columns: 1fr;
         }
 
         .footer__bottom {
-          align-items: flex-start;
           flex-direction: column;
+          text-align: center;
         }
 
         .theme-switcher__options--labeled {
@@ -617,6 +595,16 @@ const applicationHref = 'https://app.canonical.plus/u/readiness';
 
         .theme-switcher__options--labeled .theme-switcher__option {
           flex: 1;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .nav > .nav__inner > .nav__logo .nav__logo-text {
+          display: none;
+        }
+
+        .nav__actions {
+          margin-left: 0;
         }
       }
     </style>
