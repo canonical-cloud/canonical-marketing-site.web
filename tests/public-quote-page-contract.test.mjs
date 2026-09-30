@@ -7,26 +7,32 @@ const runtime = await readFile(new URL("../public/quote-estimator.js", import.me
 const catalog = JSON.parse(await readFile(new URL("../src/data/service-tiers.json", import.meta.url), "utf8"));
 const estimator = JSON.parse(await readFile(new URL("../src/data/quote-estimator.json", import.meta.url), "utf8"));
 
+const idsAreUnique = (items) => new Set(items.map((item) => item.id)).size === items.length;
+const amountsAreSafe = (items) => items.every((item) => Number.isFinite(item.amountUsd) && item.amountUsd >= 0);
+
 test("public quote page reuses the canonical recurring service-tier catalog", () => {
   assert.match(page, /import catalog from '\.\.\/data\/service-tiers\.json'/);
   assert.equal(catalog.tiers.length, 3);
   assert.deepEqual(catalog.tiers.map((tier) => tier.monthlyUsd), [2500, 7500, 20000]);
 });
 
-test("public estimator completes without authentication", () => {
+test("public estimator completes without authentication or browser persistence", () => {
   assert.match(page, /Complete quote without login/);
   assert.match(page, /No account required/);
   assert.match(page, /data-complete-public-quote/);
   assert.match(page, /data-quote-complete/);
-  assert.match(page, /exists only in this page's memory/);
+  assert.match(page, /stays in page memory and is not sent to Canonical Plus/);
   assert.match(runtime, /completedPanel\.hidden = false/);
-  assert.doesNotMatch(runtime, /fetch\(|XMLHttpRequest|localStorage|sessionStorage|indexedDB/i);
+  assert.doesNotMatch(runtime, /fetch\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|localStorage|sessionStorage|indexedDB/i);
 });
 
-test("login remains an optional save and continue path", () => {
+test("authenticated quote workflow is explicitly separate and carries no estimator state", () => {
   assert.match(page, /const appQuoteUrl = 'https:\/\/app\.canonical\.plus\/u\/quote'/);
-  assert.match(page, /Sign in to save \/ continue/);
-  assert.match(page, /Sign in to save this scope/);
+  assert.match(page, /Signing in starts the separate account quote workflow; this browser estimate is not automatically transferred/);
+  assert.match(page, />Sign in<\/a>/);
+  assert.match(page, /Sign in for account quote/);
+  assert.doesNotMatch(page, /save this scope|save \/ continue/i);
+  assert.doesNotMatch(page, /appQuoteUrl[^\n]*(?:\?|#)|new URL\([^\n]*appQuoteUrl/i);
 });
 
 test("estimator exposes speed, standards, service depth, and complexity", () => {
@@ -43,11 +49,67 @@ test("estimator exposes speed, standards, service depth, and complexity", () => 
   assert.match(page, /name="quote_complexity"/);
 });
 
-test("public estimate is bounded to the intended planning range", () => {
+test("quote estimator configuration is internally consistent and bounded", () => {
+  assert.equal(estimator.schemaVersion, 1);
+  assert.match(estimator.currency, /^[A-Z]{3}$/);
+  assert.ok(Number.isFinite(estimator.estimateFloorUsd));
+  assert.ok(Number.isFinite(estimator.estimateCeilingUsd));
+  assert.ok(estimator.estimateFloorUsd >= 0);
+  assert.ok(estimator.estimateCeilingUsd > estimator.estimateFloorUsd);
+  assert.ok(estimator.midpointFloorUsd >= estimator.estimateFloorUsd);
+  assert.ok(estimator.midpointCeilingUsd <= estimator.estimateCeilingUsd);
+  assert.ok(estimator.midpointCeilingUsd >= estimator.midpointFloorUsd);
+  assert.ok(Number.isFinite(estimator.roundToUsd) && estimator.roundToUsd > 0);
+  assert.ok(estimator.lowerFactor > 0 && estimator.upperFactor >= estimator.lowerFactor);
+
+  assert.ok(estimator.speeds.length > 0);
+  assert.equal(new Set(estimator.speeds.map((speed) => speed.weeks)).size, estimator.speeds.length);
+  assert.ok(estimator.speeds.every((speed) => Number.isInteger(speed.weeks) && speed.weeks > 0));
+  assert.ok(estimator.speeds.every((speed) => Number.isFinite(speed.baseUsd) && speed.baseUsd >= 0));
+  assert.ok(idsAreUnique(estimator.standards));
+  assert.ok(idsAreUnique(estimator.deliveryDepths));
+  assert.ok(idsAreUnique(estimator.complexities));
+  assert.ok(amountsAreSafe(estimator.standards));
+  assert.ok(amountsAreSafe(estimator.deliveryDepths));
+  assert.ok(amountsAreSafe(estimator.complexities));
+
+  assert.ok(estimator.speeds.some((speed) => speed.weeks === estimator.defaults.speedWeeks));
+  assert.ok(estimator.defaults.standardIds.length > 0);
+  assert.ok(estimator.defaults.standardIds.every((id) => estimator.standards.some((standard) => standard.id === id)));
+  assert.ok(estimator.deliveryDepths.some((item) => item.id === estimator.defaults.deliveryDepthId));
+  assert.ok(estimator.complexities.some((item) => item.id === estimator.defaults.complexityId));
+
   assert.equal(estimator.estimateFloorUsd, 5000);
   assert.equal(estimator.estimateCeilingUsd, 15000);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* upperFactor\), lower, ceiling\)/);
+});
+
+test("runtime fails closed on invalid configuration instead of rendering bogus pricing", () => {
+  assert.match(runtime, /const configurationValid =/);
+  assert.match(runtime, /Number\.isFinite\(floor\)/);
+  assert.match(runtime, /uniqueIndexes\.size === speedOptions\.length/);
+  assert.match(runtime, /root\.dataset\.quoteRuntime = 'invalid'/);
+  assert.match(runtime, /Estimate unavailable/);
+  assert.match(runtime, /completeButton\.disabled = true/);
+});
+
+test("completed quote snapshots cannot silently become stale", () => {
+  assert.match(runtime, /const invalidateCompletedQuote =/);
+  assert.match(runtime, /completedPanel\.hidden = true/);
+  assert.match(runtime, /root\.addEventListener\('input', handleEstimatorChange\)/);
+  assert.match(runtime, /root\.addEventListener\('change', handleEstimatorChange\)/);
+  assert.match(page, /Changing any input invalidates this completed snapshot/);
+});
+
+test("quote controls expose validation and reduced-motion accessibility semantics", () => {
+  assert.match(page, /aria-valuetext=\{estimator\.speeds\[defaultSpeedIndex\]\.label\}/);
+  assert.match(page, /aria-describedby="quote-standard-note quote-standard-error"/);
+  assert.match(page, /data-standard-error role="alert"/);
+  assert.match(runtime, /setAttribute\('aria-valuetext', quote\.speed\.label\)/);
+  assert.match(runtime, /setAttribute\('aria-invalid', 'true'\)/);
+  assert.match(runtime, /firstStandard\.focus\(\{ preventScroll: true \}\)/);
+  assert.match(runtime, /prefers-reduced-motion: reduce/);
 });
 
 test("public marketing page does not embed privileged quote credentials", () => {
