@@ -1,12 +1,19 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import catalog from '../data/service-tiers.json';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
+const pricingHref = `${baseNoSlash}/pricing/`;
 const quoteHref = 'https://app.canonical.plus/u/readiness';
+const money = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: catalog.source.currency,
+  maximumFractionDigits: 0,
+});
 
 const deliverables = [
   ['Scope memo', 'Systems, products, data, people, vendors, locations, and exclusions that define the readiness boundary.'],
@@ -20,7 +27,7 @@ const deliverables = [
 
 <BaseLayout
   title="Compliance readiness assessment"
-  description="Understand the difference between compliance readiness and an independent audit, and see the artifacts Canonical Plus prepares for software and cloud teams."
+  description="Understand the difference between compliance readiness and an independent audit, see Canonical Plus readiness pricing, and review the artifacts prepared for software and cloud teams."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">
@@ -40,6 +47,7 @@ const deliverables = [
           <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
             Start readiness assessment
           </a>
+          <a href={pricingHref} class="btn btn--secondary btn--large">View pricing</a>
           <a href={frameworksHref} class="btn btn--secondary btn--large">Choose a framework</a>
         </div>
       </div>
@@ -53,6 +61,50 @@ const deliverables = [
           <li>Prepare for an auditor, assessor, customer, or regulator</li>
         </ul>
       </aside>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="readiness-pricing-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Readiness pricing</span>
+        <h2 id="readiness-pricing-title">Three levels of readiness support</h2>
+        <p>
+          These are <strong>{catalog.source.publicationStatus}</strong> starting assumptions in
+          {catalog.source.currency}, current as of {catalog.source.asOf}. Final scope, price,
+          allowances, dependencies, term, and billing are controlled by the signed statement of work.
+        </p>
+      </header>
+
+      <div class="readiness-pricing-grid">
+        {catalog.tiers.map((tier, index) => (
+          <article class={`card readiness-pricing-card ${index === 1 ? 'readiness-pricing-card--featured' : ''}`}>
+            <span class="readiness-pricing-card__number">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{tier.name}</h3>
+            <p class="readiness-pricing-card__price">
+              <strong>{money.format(tier.monthlyUsd)}</strong>
+              <span>/ month starting assumption</span>
+            </p>
+            <p>{tier.summary}</p>
+            <p><strong>Best fit:</strong> {tier.idealFor}</p>
+            <ul class="check-list">
+              {tier.includes.map((item) => <li>{item}</li>)}
+            </ul>
+          </article>
+        ))}
+      </div>
+
+      <div class="action-row readiness-pricing-actions">
+        <a href={pricingHref} class="btn btn--secondary btn--large">Full pricing details</a>
+        <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          Scope a readiness engagement
+        </a>
+      </div>
+
+      <p class="boundary-note readiness-pricing-boundary">
+        Canonical Plus readiness packages do not promise an audit opinion, certification,
+        authorization, legal conclusion, or successful outcome from an independent reviewer.
+      </p>
     </div>
   </section>
 
@@ -177,3 +229,61 @@ const deliverables = [
     </div>
   </section>
 </BaseLayout>
+
+<style>
+  .readiness-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .readiness-pricing-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .readiness-pricing-card--featured {
+    border-color: var(--av-teal);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--av-teal) 35%, transparent), var(--shadow-md);
+  }
+
+  .readiness-pricing-card__number {
+    color: var(--av-teal);
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+
+  .readiness-pricing-card__price {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin: 0;
+  }
+
+  .readiness-pricing-card__price strong {
+    color: var(--av-text-primary);
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+  }
+
+  .readiness-pricing-card__price span {
+    color: var(--av-text-secondary);
+  }
+
+  .readiness-pricing-actions {
+    justify-content: center;
+    margin-top: var(--space-xl);
+  }
+
+  .readiness-pricing-boundary {
+    max-width: 64rem;
+    margin: var(--space-lg) auto 0;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .readiness-pricing-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
