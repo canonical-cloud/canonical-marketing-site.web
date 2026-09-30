@@ -114,7 +114,19 @@ test(
         "the response CSP must block executable inline script",
       );
 
-      // The landing page should not silently expand its network/CSP trust surface.
+      // Exercise the no-login estimator through the exact deployable nginx/CSP
+      // surface. This catches route-specific script/CSP regressions that the
+      // landing-page security probe cannot see.
+      response = await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
+      assert.ok(response);
+      assert.equal(response.status(), 200);
+      assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), 'ready');
+      assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+      await page.locator('[data-complete-public-quote]').click();
+      assert.equal(await page.locator('[data-quote-complete]').isVisible(), true);
+
+      // Neither the landing page nor the public quote flow may silently expand
+      // the production network/CSP trust surface.
       assert.deepEqual(externalRequests, []);
       assert.deepEqual(pageErrors, []);
     } catch (error) {

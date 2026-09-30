@@ -56,10 +56,13 @@ test("playwright: public quote completes locally without auth, persistence, or n
   assert.equal(await standards.first().evaluate((element) => element === document.activeElement), true);
   assert.equal(await completion.isHidden(), true);
 
+  // Re-enable only SOC 2. This deliberately narrows the earlier default
+  // SOC 2 + ISO 27001 scope, so the completed range is lower than the 3-week
+  // range asserted above before the standards were cleared.
   await standards.first().check();
   await page.locator('[data-complete-public-quote]').click();
   assert.equal(await completion.isVisible(), true);
-  assert.equal((await page.locator('[data-completed-range]').textContent())?.trim(), '$12,000–$15,000');
+  assert.equal((await page.locator('[data-completed-range]').textContent())?.trim(), '$11,500–$14,500');
   assert.match((await page.locator('[data-completed-summary]').textContent()) ?? '', /3 weeks · SOC 2/);
 
   await page.locator('input[name="quote_delivery_depth"][value="remediation"]').check();
