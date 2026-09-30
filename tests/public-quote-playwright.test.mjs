@@ -36,8 +36,10 @@ test("playwright: public quote completes locally without auth, persistence, or n
   const range = page.locator('[data-quote-range]');
   const slider = page.locator('[data-quote-speed-slider]');
   const completion = page.locator('[data-quote-complete]');
+  const completeButton = page.locator('[data-complete-public-quote]');
 
   assert.equal(await estimator.getAttribute('data-quote-runtime'), 'ready');
+  assert.equal(await completeButton.isEnabled(), true);
   assert.equal((await range.textContent())?.trim(), '$9,500–$12,000');
   assert.equal(await slider.getAttribute('aria-valuetext'), '5 weeks');
   assert.equal(await page.locator('a[data-quote-login]').first().getAttribute('href'), 'https://app.canonical.plus/u/quote');
@@ -50,7 +52,7 @@ test("playwright: public quote completes locally without auth, persistence, or n
   for (let index = 0; index < (await standards.count()); index += 1) {
     await standards.nth(index).uncheck();
   }
-  await page.locator('[data-complete-public-quote]').click();
+  await completeButton.click();
   assert.equal(await page.locator('[data-standard-error]').isVisible(), true);
   assert.equal(await page.locator('[data-standards-group]').getAttribute('aria-invalid'), 'true');
   assert.equal(await standards.first().evaluate((element) => element === document.activeElement), true);
@@ -60,7 +62,7 @@ test("playwright: public quote completes locally without auth, persistence, or n
   // SOC 2 + ISO 27001 scope, so the completed range is lower than the 3-week
   // range asserted above before the standards were cleared.
   await standards.first().check();
-  await page.locator('[data-complete-public-quote]').click();
+  await completeButton.click();
   assert.equal(await completion.isVisible(), true);
   assert.equal((await page.locator('[data-completed-range]').textContent())?.trim(), '$11,500–$14,500');
   assert.match((await page.locator('[data-completed-summary]').textContent()) ?? '', /3 weeks · SOC 2/);
@@ -86,4 +88,24 @@ test("playwright: public quote remains usable at mobile width without horizontal
   assert.ok(dimensions.scrollWidth <= dimensions.clientWidth + 1, JSON.stringify(dimensions));
   assert.equal(await page.locator('[data-complete-public-quote]').isVisible(), true);
   assert.equal(await page.locator('[data-quote-login]').first().isVisible(), true);
+});
+
+test("playwright: no-JavaScript fallback never creates a false completed quote", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+  const context = await browser.newContext({
+    javaScriptEnabled: false,
+    viewport: { height: 900, width: 1280 },
+  });
+  t.after(() => context.close());
+  const page = await context.newPage();
+
+  await page.goto(`${server.url}/quote/`, { waitUntil: "load" });
+  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+  assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), null);
+  assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
+
+  await page.locator('[data-complete-public-quote]').click({ force: true });
+  assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 });

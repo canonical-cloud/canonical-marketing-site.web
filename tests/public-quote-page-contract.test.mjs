@@ -201,8 +201,8 @@ test("runtime fails closed on invalid or incompatible configuration instead of s
   assert.match(runtime, /schemaVersion === EXPECTED_SCHEMA_VERSION/);
   assert.match(runtime, /const configurationValid =/);
   assert.match(runtime, /\^\[A-Z\]\{3\}\$/);
-  assert.match(runtime, /Number\.isFinite\(floor\)/);
-  assert.match(runtime, /uniqueIndexes\.size === speedOptions\.length/);
+  assert.match(runtime, /Number\.isSafeInteger\(floor\)/);
+  assert.match(runtime, /option\.index === index/);
   assert.match(runtime, /pricedInputs\.every\(pricedInputValid\)/);
   assert.match(runtime, /root\.dataset\.quoteRuntime = 'invalid'/);
   assert.match(runtime, /Estimate unavailable/);

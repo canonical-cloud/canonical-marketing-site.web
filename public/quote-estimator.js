@@ -27,6 +27,9 @@ if (root instanceof HTMLElement) {
   const completedRange = document.querySelector('[data-completed-range]');
   const completedSummary = document.querySelector('[data-completed-summary]');
 
+  root.dataset.quoteRuntime = 'booting';
+  if (completeButton instanceof HTMLButtonElement) completeButton.disabled = true;
+
   const speedNodes = [...root.querySelectorAll('[data-quote-speed-option]')];
   const speedOptions = speedNodes.map((node) => ({
     index: Number(node.dataset.index),
@@ -39,161 +42,198 @@ if (root instanceof HTMLElement) {
   const depthInputs = [...root.querySelectorAll('input[name="quote_delivery_depth"]')];
   const complexityInputs = [...root.querySelectorAll('input[name="quote_complexity"]')];
   const pricedInputs = [...standardInputs, ...depthInputs, ...complexityInputs];
+  const allControls = [speedSlider, ...pricedInputs].filter((input) => input instanceof HTMLInputElement);
 
-  const uniqueIndexes = new Set(speedOptions.map((option) => option.index));
   const uniqueValues = (inputs) => new Set(inputs.map((input) => input.value)).size === inputs.length;
   const pricedInputValid = (input) => {
     const amount = Number(input.dataset.amount);
-    return input.value.length > 0 && (input.dataset.label || '').length > 0 && Number.isFinite(amount) && amount >= 0;
+    return (
+      input instanceof HTMLInputElement &&
+      input.value.length > 0 &&
+      (input.dataset.label || '').length > 0 &&
+      Number.isSafeInteger(amount) &&
+      amount >= 0
+    );
   };
+  const exactlyOneChecked = (inputs) => inputs.filter((input) => input instanceof HTMLInputElement && input.checked).length === 1;
+  const speedValue = speedSlider instanceof HTMLInputElement ? Number(speedSlider.value) : Number.NaN;
+  const speedControlValid =
+    speedSlider instanceof HTMLInputElement &&
+    speedSlider.type === 'range' &&
+    Number(speedSlider.min) === 0 &&
+    Number(speedSlider.max) === speedOptions.length - 1 &&
+    Number(speedSlider.step) === 1 &&
+    Number.isInteger(speedValue) &&
+    speedOptions.some((option) => option.index === speedValue);
+  const requiredNodesPresent =
+    speedLabel instanceof HTMLElement &&
+    speedNote instanceof HTMLElement &&
+    rangeNode instanceof HTMLElement &&
+    summaryNode instanceof HTMLElement &&
+    meterNode instanceof HTMLElement &&
+    standardGroup instanceof HTMLElement &&
+    standardError instanceof HTMLElement &&
+    completeButton instanceof HTMLButtonElement &&
+    completedPanel instanceof HTMLElement &&
+    completedRange instanceof HTMLElement &&
+    completedSummary instanceof HTMLElement;
   const configurationValid =
     schemaVersion === EXPECTED_SCHEMA_VERSION &&
     /^[A-Z]{3}$/.test(currency) &&
-    Number.isFinite(floor) &&
+    Number.isSafeInteger(floor) &&
     floor >= 0 &&
-    Number.isFinite(ceiling) &&
+    Number.isSafeInteger(ceiling) &&
     ceiling > floor &&
-    Number.isFinite(midpointFloor) &&
+    Number.isSafeInteger(midpointFloor) &&
     midpointFloor >= floor &&
     midpointFloor <= ceiling &&
-    Number.isFinite(midpointCeiling) &&
+    Number.isSafeInteger(midpointCeiling) &&
     midpointCeiling >= midpointFloor &&
     midpointCeiling <= ceiling &&
-    Number.isFinite(roundTo) &&
+    Number.isSafeInteger(roundTo) &&
     roundTo > 0 &&
     Number.isFinite(lowerFactor) &&
     lowerFactor > 0 &&
     Number.isFinite(upperFactor) &&
     upperFactor >= lowerFactor &&
     speedOptions.length > 0 &&
-    uniqueIndexes.size === speedOptions.length &&
     speedOptions.every(
-      (option) =>
-        Number.isInteger(option.index) &&
-        option.index >= 0 &&
+      (option, index) =>
+        option.index === index &&
         Number.isInteger(option.weeks) &&
         option.weeks > 0 &&
         option.label.length > 0 &&
-        Number.isFinite(option.base) &&
+        Number.isSafeInteger(option.base) &&
         option.base >= 0,
     ) &&
+    speedControlValid &&
     standardInputs.length > 0 &&
     depthInputs.length > 0 &&
     complexityInputs.length > 0 &&
     uniqueValues(standardInputs) &&
     uniqueValues(depthInputs) &&
     uniqueValues(complexityInputs) &&
-    pricedInputs.every(pricedInputValid);
+    pricedInputs.every(pricedInputValid) &&
+    standardInputs.some((input) => input instanceof HTMLInputElement && input.checked) &&
+    exactlyOneChecked(depthInputs) &&
+    exactlyOneChecked(complexityInputs) &&
+    requiredNodesPresent;
 
   const failClosed = () => {
     root.dataset.quoteRuntime = 'invalid';
-    if (rangeNode) rangeNode.textContent = 'Estimate unavailable';
-    if (summaryNode) summaryNode.textContent = 'Quote configuration could not be validated. Please refresh or contact Canonical Plus.';
+    root.setAttribute('aria-disabled', 'true');
+    if (rangeNode instanceof HTMLElement) rangeNode.textContent = 'Estimate unavailable';
+    if (summaryNode instanceof HTMLElement) {
+      summaryNode.textContent = 'Quote configuration could not be validated. Please refresh or contact Canonical Plus.';
+    }
     if (meterNode instanceof HTMLElement) meterNode.style.width = '0%';
     if (completeButton instanceof HTMLButtonElement) completeButton.disabled = true;
+    for (const control of allControls) control.disabled = true;
+    if (completedPanel instanceof HTMLElement) completedPanel.hidden = true;
   };
 
   if (!configurationValid) {
     failClosed();
   } else {
-    root.dataset.quoteRuntime = 'ready';
+    let money;
+    try {
+      money = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency,
+        maximumFractionDigits: 0,
+      });
+      money.format(0);
+    } catch {
+      failClosed();
+    }
 
-    const money = new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency,
-      maximumFractionDigits: 0,
-    });
-    const roundMoney = (value) => Math.round(value / roundTo) * roundTo;
-    const checkedInputs = (name) => [...root.querySelectorAll(`input[name="${name}"]:checked`)];
-    const selectedRadio = (name) => root.querySelector(`input[name="${name}"]:checked`);
-    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-    const scrollBehavior = reducedMotion ? 'auto' : 'smooth';
+    if (money) {
+      root.dataset.quoteRuntime = 'ready';
+      root.removeAttribute('aria-disabled');
+      completeButton.disabled = false;
 
-    const selectedSpeed = () => {
-      const index = speedSlider instanceof HTMLInputElement ? Number(speedSlider.value) : speedOptions[0].index;
-      return speedOptions.find((option) => option.index === index) || speedOptions[0];
-    };
+      const roundMoney = (value) => Math.round(value / roundTo) * roundTo;
+      const checkedInputs = (name) => [...root.querySelectorAll(`input[name="${name}"]:checked`)];
+      const selectedRadio = (name) => root.querySelector(`input[name="${name}"]:checked`);
+      const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+      const scrollBehavior = reducedMotion ? 'auto' : 'smooth';
 
-    const calculate = () => {
-      const speed = selectedSpeed();
-      const standards = checkedInputs('quote_standard');
-      const depth = selectedRadio('quote_delivery_depth');
-      const complexity = selectedRadio('quote_complexity');
+      const selectedSpeed = () => {
+        const index = Number(speedSlider.value);
+        return speedOptions.find((option) => option.index === index) || speedOptions[0];
+      };
 
-      const standardAmount = standards.reduce((total, input) => total + Number(input.dataset.amount), 0);
-      const depthAmount = depth instanceof HTMLInputElement ? Number(depth.dataset.amount) : 0;
-      const complexityAmount = complexity instanceof HTMLInputElement ? Number(complexity.dataset.amount) : 0;
+      const calculate = () => {
+        const speed = selectedSpeed();
+        const standards = checkedInputs('quote_standard');
+        const depth = selectedRadio('quote_delivery_depth');
+        const complexity = selectedRadio('quote_complexity');
 
-      const rawMidpoint = speed.base + standardAmount + depthAmount + complexityAmount;
-      const midpoint = clamp(rawMidpoint, midpointFloor, midpointCeiling);
-      const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
-      const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
-      const standardLabels = standards.map((input) => input.dataset.label).filter(Boolean);
-      const depthLabel = depth instanceof HTMLInputElement ? depth.dataset.label : '';
-      const complexityLabel = complexity instanceof HTMLInputElement ? complexity.dataset.label : '';
-      const summary = `${speed.label} · ${standardLabels.join(' + ') || 'No standard selected'} · ${depthLabel} · ${complexityLabel}`;
+        const standardAmount = standards.reduce((total, input) => total + Number(input.dataset.amount), 0);
+        const depthAmount = depth instanceof HTMLInputElement ? Number(depth.dataset.amount) : 0;
+        const complexityAmount = complexity instanceof HTMLInputElement ? Number(complexity.dataset.amount) : 0;
 
-      return { speed, standards, lower, upper, midpoint, summary };
-    };
+        const rawMidpoint = speed.base + standardAmount + depthAmount + complexityAmount;
+        const midpoint = clamp(rawMidpoint, midpointFloor, midpointCeiling);
+        const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
+        const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
+        const standardLabels = standards.map((input) => input.dataset.label).filter(Boolean);
+        const depthLabel = depth instanceof HTMLInputElement ? depth.dataset.label : '';
+        const complexityLabel = complexity instanceof HTMLInputElement ? complexity.dataset.label : '';
+        const summary = `${speed.label} · ${standardLabels.join(' + ') || 'No standard selected'} · ${depthLabel} · ${complexityLabel}`;
 
-    const render = () => {
-      const quote = calculate();
+        return { speed, standards, lower, upper, midpoint, summary };
+      };
 
-      if (speedLabel) speedLabel.textContent = quote.speed.label;
-      if (speedNote) speedNote.textContent = quote.speed.note;
-      if (speedSlider instanceof HTMLInputElement) speedSlider.setAttribute('aria-valuetext', quote.speed.label);
-      if (rangeNode) rangeNode.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
-      if (summaryNode) summaryNode.textContent = quote.summary;
-      if (meterNode instanceof HTMLElement) {
+      const render = () => {
+        const quote = calculate();
+
+        speedLabel.textContent = quote.speed.label;
+        speedNote.textContent = quote.speed.note;
+        speedSlider.setAttribute('aria-valuetext', quote.speed.label);
+        rangeNode.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
+        summaryNode.textContent = quote.summary;
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
         meterNode.style.width = `${clamp(percentage, 4, 100)}%`;
-      }
-      if (quote.standards.length > 0) {
-        if (standardError instanceof HTMLElement) standardError.hidden = true;
-        if (standardGroup instanceof HTMLElement) standardGroup.removeAttribute('aria-invalid');
-      }
+        if (quote.standards.length > 0) {
+          standardError.hidden = true;
+          standardGroup.removeAttribute('aria-invalid');
+        }
 
-      return quote;
-    };
+        return quote;
+      };
 
-    const invalidateCompletedQuote = () => {
-      if (completedPanel instanceof HTMLElement && !completedPanel.hidden) {
-        completedPanel.hidden = true;
-      }
-    };
+      const invalidateCompletedQuote = () => {
+        if (!completedPanel.hidden) completedPanel.hidden = true;
+      };
 
-    const handleEstimatorChange = () => {
-      invalidateCompletedQuote();
-      render();
-    };
+      const handleEstimatorChange = () => {
+        invalidateCompletedQuote();
+        render();
+      };
 
-    root.addEventListener('input', handleEstimatorChange);
-    root.addEventListener('change', handleEstimatorChange);
+      root.addEventListener('input', handleEstimatorChange);
+      root.addEventListener('change', handleEstimatorChange);
 
-    if (completeButton instanceof HTMLButtonElement) {
       completeButton.addEventListener('click', () => {
         const quote = render();
         if (quote.standards.length === 0) {
-          if (standardGroup instanceof HTMLElement) standardGroup.setAttribute('aria-invalid', 'true');
-          if (standardError instanceof HTMLElement) {
-            standardError.hidden = false;
-            const firstStandard = root.querySelector('input[name="quote_standard"]');
-            if (firstStandard instanceof HTMLInputElement) firstStandard.focus({ preventScroll: true });
-            standardError.scrollIntoView({ behavior: scrollBehavior, block: 'center' });
-          }
+          standardGroup.setAttribute('aria-invalid', 'true');
+          standardError.hidden = false;
+          const firstStandard = root.querySelector('input[name="quote_standard"]');
+          if (firstStandard instanceof HTMLInputElement) firstStandard.focus({ preventScroll: true });
+          standardError.scrollIntoView({ behavior: scrollBehavior, block: 'center' });
           return;
         }
 
-        if (completedRange) completedRange.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
-        if (completedSummary) completedSummary.textContent = quote.summary;
-        if (completedPanel instanceof HTMLElement) {
-          completedPanel.hidden = false;
-          completedPanel.focus({ preventScroll: true });
-          completedPanel.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
-        }
+        completedRange.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
+        completedSummary.textContent = quote.summary;
+        completedPanel.hidden = false;
+        completedPanel.focus({ preventScroll: true });
+        completedPanel.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
       });
-    }
 
-    render();
+      render();
+    }
   }
 }
