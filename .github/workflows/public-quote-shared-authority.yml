@@ -1,0 +1,65 @@
+name: public quote shared authority
+
+on:
+  pull_request:
+    paths:
+      - 'src/data/quote-estimator.json'
+      - 'src/data/quote-estimator.contract.json'
+      - 'tests/public-quote-shared-authority.test.mjs'
+      - '.github/workflows/public-quote-shared-authority.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'src/data/quote-estimator.json'
+      - 'src/data/quote-estimator.contract.json'
+      - 'tests/public-quote-shared-authority.test.mjs'
+      - '.github/workflows/public-quote-shared-authority.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: public-quote-shared-authority-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parity:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out marketing candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+          show-progress: false
+
+      - name: Resolve reviewed authority pin
+        id: pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          revision="$(node -p "JSON.parse(require('fs').readFileSync('src/data/quote-estimator.contract.json','utf8')).authorityRevision")"
+          repository="$(node -p "JSON.parse(require('fs').readFileSync('src/data/quote-estimator.contract.json','utf8')).authorityRepository")"
+          test "$repository" = 'canonical-cloud/canonical-interfaces'
+          [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
+          printf 'revision=%s\n' "$revision" >> "$GITHUB_OUTPUT"
+
+      - name: Check out exact shared authority
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: canonical-cloud/canonical-interfaces
+          ref: ${{ steps.pin.outputs.revision }}
+          path: .authority/canonical-interfaces
+          persist-credentials: false
+          show-progress: false
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+
+      - name: Prove marketing pricing semantics match pinned shared contract
+        env:
+          CANONICAL_QUOTE_AUTHORITY_FIXTURE: ${{ github.workspace }}/.authority/canonical-interfaces/contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json
+        run: node --test tests/public-quote-shared-authority.test.mjs
