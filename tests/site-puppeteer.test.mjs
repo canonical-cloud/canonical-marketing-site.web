@@ -46,9 +46,14 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
     await page.$eval("#nav-sign-in", (element) => element.href),
     "https://app.canonical.plus/u/quote",
   );
+
+  // The primary quote CTA is intentionally public and same-origin; signing in
+  // remains a distinct action. This guards against accidentally reintroducing
+  // authentication as a prerequisite for building or completing an estimate.
+  const publicQuoteUrl = new URL('/quote/', server.url).href;
   assert.equal(
     await page.$eval("#nav-quote", (element) => element.href),
-    "https://app.canonical.plus/u/quote",
+    publicQuoteUrl,
   );
 
   const serviceCards = await page.$$eval("#services .services__card h3", (nodes) =>
