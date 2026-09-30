@@ -27,6 +27,9 @@ if (root instanceof HTMLElement) {
   const completedRange = document.querySelector('[data-completed-range]');
   const completedSummary = document.querySelector('[data-completed-summary]');
 
+  root.dataset.quoteRuntime = 'booting';
+  if (completeButton instanceof HTMLButtonElement) completeButton.disabled = true;
+
   const speedNodes = [...root.querySelectorAll('[data-quote-speed-option]')];
   const speedOptions = speedNodes.map((node) => ({
     index: Number(node.dataset.index),
@@ -97,6 +100,7 @@ if (root instanceof HTMLElement) {
     failClosed();
   } else {
     root.dataset.quoteRuntime = 'ready';
+    if (completeButton instanceof HTMLButtonElement) completeButton.disabled = false;
 
     const money = new Intl.NumberFormat('en-US', {
       style: 'currency',
