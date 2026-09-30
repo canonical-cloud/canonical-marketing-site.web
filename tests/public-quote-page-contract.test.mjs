@@ -117,6 +117,18 @@ test("quote estimator configuration is internally consistent and bounded", () =>
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* upperFactor\), lower, ceiling\)/);
 });
 
+test("Astro validates config at build time and derives the no-JS fallback from the same authority", () => {
+  assert.match(page, /const EXPECTED_ESTIMATOR_SCHEMA_VERSION = 1/);
+  assert.match(page, /throw new Error\('Invalid quote estimator configuration'\)/);
+  assert.match(page, /throw new Error\('Invalid quote estimator defaults'\)/);
+  assert.match(page, /const initialRange =/);
+  assert.match(page, /const initialSummary =/);
+  assert.match(page, /data-schema-version=\{estimator\.schemaVersion\}/);
+  assert.match(page, /data-quote-range>\{initialRange\}<\/strong>/);
+  assert.match(page, /data-quote-summary>\{initialSummary\}<\/p>/);
+  assert.doesNotMatch(page, /data-quote-range>\$[0-9]/);
+});
+
 test("every supported pricing combination stays bounded and ordered", () => {
   const standardTotals = nonEmptyStandardTotals();
   let combinationsChecked = 0;
@@ -142,7 +154,10 @@ test("every supported pricing combination stays bounded and ordered", () => {
     }
   }
 
-  assert.equal(combinationsChecked, 6885);
+  assert.equal(
+    combinationsChecked,
+    (2 ** estimator.standards.length - 1) * estimator.speeds.length * estimator.deliveryDepths.length * estimator.complexities.length,
+  );
 });
 
 test("faster delivery, deeper service, and greater complexity never reduce pricing", () => {
@@ -181,7 +196,9 @@ test("faster delivery, deeper service, and greater complexity never reduce prici
   }
 });
 
-test("runtime fails closed on invalid configuration instead of substituting pricing defaults", () => {
+test("runtime fails closed on invalid or incompatible configuration instead of substituting pricing defaults", () => {
+  assert.match(runtime, /const EXPECTED_SCHEMA_VERSION = 1/);
+  assert.match(runtime, /schemaVersion === EXPECTED_SCHEMA_VERSION/);
   assert.match(runtime, /const configurationValid =/);
   assert.match(runtime, /\^\[A-Z\]\{3\}\$/);
   assert.match(runtime, /Number\.isFinite\(floor\)/);
@@ -202,7 +219,7 @@ test("completed quote snapshots cannot silently become stale", () => {
 });
 
 test("quote controls expose validation and reduced-motion accessibility semantics", () => {
-  assert.match(page, /aria-valuetext=\{estimator\.speeds\[defaultSpeedIndex\]\.label\}/);
+  assert.match(page, /aria-valuetext=\{defaultSpeed\.label\}/);
   assert.match(page, /aria-describedby="quote-standard-note quote-standard-error"/);
   assert.match(page, /data-standard-error role="alert"/);
   assert.match(runtime, /setAttribute\('aria-valuetext', quote\.speed\.label\)/);
