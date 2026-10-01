@@ -76,6 +76,7 @@
 #nav-logo .nav__logo-icon {
   width: 27px;
   height: 27px;
+  flex: 0 0 auto;
   margin-left: 0.25rem;
 }
 
@@ -119,15 +120,40 @@
   }
 }
 
-@media (max-width: 480px) {
+/* Keep both marks visible on narrow desktop layouts without forcing the
+   navigation links to collide. The aria-label still exposes the full parent /
+   product relationship when the parent wordmark contracts to its mark. */
+@media (max-width: 960px) {
   #nav-logo {
     column-gap: 0.45rem;
   }
 
   #nav-logo::before {
+    content: '';
+    width: 38px;
     min-height: 38px;
-    padding-left: 38px;
-    background-size: 31px 31px;
-    font-size: 0.78rem;
+    padding-left: 0;
+    background-size: 36px 36px;
+  }
+
+  #nav-logo .nav__logo-text::before {
+    display: none;
+  }
+
+  #nav-logo .nav__logo-text {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #nav-logo::before {
+    width: 34px;
+    min-height: 34px;
+    background-size: 32px 32px;
+  }
+
+  #nav-logo .nav__logo-icon {
+    width: 23px;
+    height: 23px;
   }
 }
