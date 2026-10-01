@@ -1,9 +1,9 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "authorityRepository": "canonical-cloud/canonical-interfaces",
-  "authorityRevision": "6e5043cb118147660fe235945b72d00aa59d3e3e",
-  "authorityFixturePath": "contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json",
-  "authoritySchemaPath": "contracts/public-quote-estimator/v1/authored.schema.json",
-  "authorityTypeSpecPath": "contracts/public-quote-estimator/v1/main.tsp",
-  "contractId": "urn:canonical-cloud:public-quote-estimator:v1"
+  "authorityRevision": "30348cce0b7933cb54d8d5b04be324c99cd5dbb7",
+  "authorityFixturePath": "contracts/public-quote-estimator/v2/instances/PublicQuoteEstimatorConfig/valid/current.json",
+  "authoritySchemaPath": "contracts/public-quote-estimator/v2/authored.schema.json",
+  "authorityTypeSpecPath": "contracts/public-quote-estimator/v2/main.tsp",
+  "contractId": "urn:canonical-cloud:public-quote-estimator:v2"
 }
