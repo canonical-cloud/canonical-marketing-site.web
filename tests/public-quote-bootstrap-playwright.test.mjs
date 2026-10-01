@@ -29,7 +29,7 @@ test("playwright: quote cannot complete when JavaScript is unavailable", async (
 
   assert.equal(await estimator.getAttribute('data-quote-runtime'), null);
   assert.equal(await completion.isHidden(), true);
-  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$11,000–$13,500');
 
   await completeButton.click();
   assert.equal(await completion.isHidden(), true, 'static fallback must never create a completed quote');
@@ -66,5 +66,8 @@ test("playwright: malformed runtime config disables the entire estimator before 
   assert.equal(await page.locator('input[name="quote_standard"]').first().isDisabled(), true);
   assert.equal(await page.locator('input[name="quote_delivery_depth"]').first().isDisabled(), true);
   assert.equal(await page.locator('input[name="quote_complexity"]').first().isDisabled(), true);
+  assert.equal(await page.locator('input[name="quote_company_profile"]').first().isDisabled(), true);
+  assert.equal(await page.locator('select[name="quote_employee_band"]').isDisabled(), true);
+  assert.equal(await page.locator('select[name="quote_sector"]').isDisabled(), true);
   assert.equal(await completion.isHidden(), true);
 });
