@@ -15,32 +15,37 @@ test("static fallback and interactive estimator use one currency", () => {
   assert.equal(estimator.currency, tiers.source.currency);
 });
 
-test("public quote runtime admits completion only after validation", () => {
+test("public quote runtime validates configuration before becoming ready", () => {
   const booting = runtime.indexOf("root.dataset.quoteRuntime = 'booting'");
-  const initialDisable = runtime.indexOf("completeButton.disabled = true");
   const validity = runtime.indexOf("const configurationValid =");
+  const invalid = runtime.indexOf("root.dataset.quoteRuntime = 'invalid'");
   const ready = runtime.indexOf("root.dataset.quoteRuntime = 'ready'");
-  const enable = runtime.indexOf("completeButton.disabled = false");
-
   assert.ok(booting >= 0);
-  assert.ok(initialDisable > booting);
-  assert.ok(validity > initialDisable);
+  assert.ok(validity >= 0);
+  assert.ok(invalid >= 0);
   assert.ok(ready > validity);
-  assert.ok(enable > ready);
 });
 
-test("invalid public quote runtime disables all estimator controls", () => {
-  assert.match(runtime, /root\.setAttribute\('aria-disabled', 'true'\)/);
-  assert.match(runtime, /for \(const control of allControls\) control\.disabled = true/);
-  assert.match(runtime, /completedPanel instanceof HTMLElement\) completedPanel\.hidden = true/);
+test("runtime requires company profile and quote delivery controls", () => {
+  assert.match(runtime, /stageSelect/);
+  assert.match(runtime, /employeeInput/);
+  assert.match(runtime, /sectorSelect/);
+  assert.match(runtime, /emailInput/);
+  assert.match(runtime, /selectedEmployeeBand/);
+  assert.match(runtime, /company_profile:/);
+  assert.match(runtime, /kind: 'quote'/);
 });
 
-test("runtime requires complete DOM and default-selection shape before ready", () => {
-  assert.match(runtime, /const requiredNodesPresent =/);
-  assert.match(runtime, /option\.index === index/);
-  assert.match(runtime, /speedSlider\.type === 'range'/);
-  assert.match(runtime, /Number\(speedSlider\.max\) === speedOptions\.length - 1/);
-  assert.match(runtime, /standardInputs\.some\(\(input\) => input instanceof HTMLInputElement && input\.checked\)/);
-  assert.match(runtime, /exactlyOneChecked\(depthInputs\)/);
-  assert.match(runtime, /exactlyOneChecked\(complexityInputs\)/);
+test("runtime clamps employee count and monetary output", () => {
+  assert.match(runtime, /clamp\(Math\.round\(Number\(employeeInput\.value\) \|\| 1\), 1, 1000000\)/);
+  assert.match(runtime, /clamp\(rawMidpoint, midpointFloor, midpointCeiling\)/);
+  assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
+  assert.match(runtime, /clamp\(roundMoney\(midpoint \* upperFactor\), lower, ceiling\)/);
+});
+
+test("runtime submits only through the configured public intake endpoint", () => {
+  assert.match(runtime, /fetch\(intakeEndpoint/);
+  assert.match(runtime, /credentials: 'omit'/);
+  assert.match(runtime, /referrerPolicy: 'strict-origin-when-cross-origin'/);
+  assert.doesNotMatch(runtime, /service_role|SUPABASE_SERVICE|RESEND_API_KEY|NEON_DATABASE_URL/i);
 });
