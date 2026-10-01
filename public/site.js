@@ -1,4 +1,8 @@
-const QUOTE_PATH = '/quote/';
+const APP_SCHEME = 'https';
+const APP_HOST = 'app.canonical.plus';
+const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
+const APPLICATION_QUOTE_PATH = '/u/quote';
+const applicationQuoteUrl = new URL(APPLICATION_QUOTE_PATH, APP_ORIGIN);
 
 const configureBrandStyles = () => {
   if (document.querySelector('link[data-canonical-brand-styles]')) return;
@@ -53,12 +57,10 @@ const configureHeaderBranding = () => {
 configureHeaderBranding();
 
 const configureApplicationLinks = () => {
-  const quoteUrl = new URL(QUOTE_PATH, window.location.origin);
   for (const link of document.querySelectorAll('[data-application-link]')) {
     if (!(link instanceof HTMLAnchorElement)) continue;
-    link.href = quoteUrl.href;
-    link.removeAttribute('target');
-    link.removeAttribute('rel');
+    link.href = applicationQuoteUrl.href;
+    link.rel = 'noopener';
   }
 };
 
