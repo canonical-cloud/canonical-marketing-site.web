@@ -22,9 +22,22 @@ const clean = (value: unknown, max: number) =>
 const validEmail = (value: string) =>
   value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+const escapeHtml = (value: string) =>
+  value.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
+
 Deno.serve(async (request) => {
   const origin = request.headers.get('origin') || '';
-  if (request.method === 'OPTIONS') return json(204, {}, origin);
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
+        'access-control-allow-headers': 'authorization, apikey, content-type',
+        'access-control-allow-methods': 'POST, OPTIONS',
+        'vary': 'Origin',
+      },
+    });
+  }
   if (request.method !== 'POST') return json(405, { error: 'method_not_allowed' }, origin);
   if (!allowedOrigins.has(origin)) return json(403, { error: 'origin_not_allowed' }, origin);
 
@@ -81,11 +94,10 @@ Deno.serve(async (request) => {
       ['Employees', clean(scope.employeeBand, 80)],
       ['Sector', clean(scope.sector, 100)],
     ];
-    const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c] || c));
     subject = `Canonical Plus readiness quote for ${company}`;
     html = `<h1>Your Canonical Plus planning estimate</h1>
       <p><strong>$${lower.toLocaleString()}–$${upper.toLocaleString()} USD</strong></p>
-      <table>${rows.map(([k,v]) => `<tr><td><strong>${esc(k)}</strong></td><td>${esc(v)}</td></tr>`).join('')}</table>
+      <table>${rows.map(([k,v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')}</table>
       <p>This is a non-binding planning range. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.</p>
       <p>Payment plans may be available for qualifying engagements. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor or certification-body fees are itemized separately unless expressly included in writing.</p>
       <p>Questions? Reply to this email or contact hello@canonical.plus.</p>`;
@@ -101,7 +113,7 @@ Deno.serve(async (request) => {
     record.topic = topic;
     record.message = message;
     subject = `Canonical Plus inquiry: ${topic || 'general'} — ${company}`;
-    html = `<h1>New canonical.plus inquiry</h1><p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Company:</strong> ${company}</p><p><strong>Topic:</strong> ${topic}</p><p>${message.replace(/\n/g, '<br>')}</p>`;
+    html = `<h1>New canonical.plus inquiry</h1><p><strong>Name:</strong> ${escapeHtml(name)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p><p><strong>Company:</strong> ${escapeHtml(company)}</p><p><strong>Topic:</strong> ${escapeHtml(topic)}</p><p>${escapeHtml(message).replace(/\n/g, '<br>')}</p>`;
     recipients = ['hello@canonical.plus'];
   }
 
