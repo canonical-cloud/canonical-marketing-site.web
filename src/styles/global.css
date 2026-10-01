@@ -14,6 +14,13 @@
   --av-teal: #2dd4bf;
   --av-blue: #38bdf8;
 
+  /* Brand/editorial accent — dark magenta, tuned per theme for contrast */
+  --av-magenta: #d946ef;
+  --av-magenta-light: #e879f9;
+  --av-magenta-dark: #86198f;
+  --av-magenta-glow: rgba(192, 38, 211, 0.14);
+  --av-magenta-border: rgba(217, 70, 239, 0.34);
+
   /* Neutrals — Deep Navy */
   --av-black: #04100b;
   --av-bg: #0a0f1a;
@@ -100,6 +107,11 @@
   --av-emerald-glow: rgba(74, 222, 166, 0.13);
   --av-teal: #5eead4;
   --av-blue: #67c8f5;
+  --av-magenta: #e879f9;
+  --av-magenta-light: #f0abfc;
+  --av-magenta-dark: #a21caf;
+  --av-magenta-glow: rgba(217, 70, 239, 0.14);
+  --av-magenta-border: rgba(232, 121, 249, 0.38);
 
   --av-bg: #172033;
   --av-surface: #202c43;
@@ -145,6 +157,11 @@
   --av-emerald-glow: rgba(5, 150, 105, 0.1);
   --av-teal: #0f766e;
   --av-blue: #0369a1;
+  --av-magenta: #86198f;
+  --av-magenta-light: #a21caf;
+  --av-magenta-dark: #701a75;
+  --av-magenta-glow: rgba(134, 25, 143, 0.09);
+  --av-magenta-border: rgba(134, 25, 143, 0.24);
 
   --av-bg: #f3f7f5;
   --av-surface: #ffffff;
@@ -309,9 +326,9 @@ p {
   border: 1px solid var(--av-border-hover);
 }
 .btn--secondary:hover {
-  border-color: var(--av-emerald);
-  color: var(--av-emerald);
-  background: var(--av-emerald-glow);
+  border-color: var(--av-magenta);
+  color: var(--av-magenta);
+  background: var(--av-magenta-glow);
 }
 .btn--large {
   padding: 1rem 2.25rem;
@@ -327,8 +344,8 @@ p {
   transition: all var(--duration-normal) var(--ease-out);
 }
 .card:hover {
-  border-color: var(--av-border-active);
-  box-shadow: var(--shadow-glow);
+  border-color: var(--av-magenta-border);
+  box-shadow: 0 12px 38px var(--av-magenta-glow);
   transform: translateY(-4px);
 }
 
@@ -354,7 +371,7 @@ p {
     135deg,
     var(--av-emerald-light),
     var(--av-emerald),
-    var(--av-teal)
+    var(--av-magenta-light)
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -365,7 +382,7 @@ p {
 .divider {
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, var(--av-emerald), transparent);
+  background: linear-gradient(90deg, var(--av-magenta), var(--av-emerald), transparent);
   border-radius: 2px;
 }
 
@@ -448,7 +465,9 @@ p {
   background-size: 60px 60px;
 }
 .bg-radial {
-  background: radial-gradient(ellipse at 50% 0%, var(--av-radial-glow) 0%, transparent 60%);
+  background:
+    radial-gradient(circle at 86% 12%, var(--av-magenta-glow) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 0%, var(--av-radial-glow) 0%, transparent 60%);
 }
 .bg-noise {
   position: relative;
@@ -552,6 +571,6 @@ p {
 
 /* ── Selection ── */
 ::selection {
-  background: rgba(52, 211, 153, 0.3);
+  background: var(--av-magenta-border);
   color: var(--av-text-primary);
 }

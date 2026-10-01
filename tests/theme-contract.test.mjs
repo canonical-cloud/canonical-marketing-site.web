@@ -92,9 +92,21 @@ test('all three palettes define their own accessible color system', () => {
     '--av-nav-bg',
     '--av-footer-bg',
     '--av-theme-active-bg',
+    '--av-magenta',
+    '--av-magenta-glow',
+    '--av-magenta-border',
   ]) {
     assert.ok(globalCss.includes(token), `missing adaptive token: ${token}`);
   }
+});
+
+test('magenta is a decorative brand accent while functional readiness colors stay emerald', () => {
+  assert.match(globalCss, /\.btn--primary\s*\{[\s\S]*var\(--av-emerald\)/);
+  assert.match(globalCss, /\.btn--secondary:hover\s*\{[\s\S]*var\(--av-magenta\)/);
+  assert.match(globalCss, /\.gradient-text\s*\{[\s\S]*var\(--av-magenta-light\)/);
+  assert.match(layout, /\.nav__logo-compliance\s*\{[\s\S]*var\(--av-magenta\)/);
+  assert.match(layout, /\.nav__link::after\s*\{[\s\S]*var\(--av-magenta\)/);
+  assert.match(globalCss, /--av-success:/);
 });
 
 test('automatic theme resolves against browser-local time', () => {
