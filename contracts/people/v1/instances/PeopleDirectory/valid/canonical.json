@@ -15,10 +15,10 @@
       "initials": "JS"
     },
     {
-      "id": "jack-johnson",
-      "name": "Jack Johnson",
-      "role": "Browser, Mobile, Clientside",
-      "initials": "JJ"
+      "id": "georgiana-fabrecce",
+      "name": "Georgiana Fabrecce",
+      "role": "Team",
+      "initials": "GF"
     },
     {
       "id": "vikkie-pandey",
@@ -59,12 +59,6 @@
       "role": "Team",
       "initials": "RT",
       "photoUrl": "/team/rebecca-toni.jpeg"
-    },
-    {
-      "id": "georgiana-fabrecce",
-      "name": "Georgiana Fabrecce",
-      "role": "Team",
-      "initials": "GF"
     },
     {
       "id": "bryce-merrson",
