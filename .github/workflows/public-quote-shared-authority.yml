@@ -61,5 +61,5 @@ jobs:
 
       - name: Prove marketing pricing semantics match pinned shared contract
         env:
-          CANONICAL_QUOTE_AUTHORITY_FIXTURE: ${{ github.workspace }}/.authority/canonical-interfaces/contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json
+          CANONICAL_QUOTE_AUTHORITY_FIXTURE: ${{ github.workspace }}/.authority/canonical-interfaces/contracts/public-quote-estimator/v2/instances/PublicQuoteEstimatorConfig/valid/current.json
         run: node --test tests/public-quote-shared-authority.test.mjs
