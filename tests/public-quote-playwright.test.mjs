@@ -4,16 +4,12 @@ import { chromium } from "playwright";
 import { chromeExecutablePath, startSite } from "./site-browser-harness.mjs";
 
 const launchBrowser = async (t) => {
-  const browser = await chromium.launch({
-    executablePath: chromeExecutablePath(),
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  const browser = await chromium.launch({ executablePath: chromeExecutablePath(), headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] });
   t.after(() => browser.close());
   return browser;
 };
 
-test("playwright: public quote completes locally without auth, persistence, or network submission", async (t) => {
+test("playwright: public quote scopes company context locally before explicit email submission", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
@@ -25,9 +21,7 @@ test("playwright: public quote completes locally without auth, persistence, or n
   const interactionRequests = [];
   let interactionsStarted = false;
   page.on("pageerror", (error) => pageErrors.push(error.message));
-  page.on("request", (request) => {
-    if (interactionsStarted) interactionRequests.push(request.url());
-  });
+  page.on("request", (request) => { if (interactionsStarted) interactionRequests.push(request.url()); });
 
   await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
   interactionsStarted = true;
@@ -40,37 +34,40 @@ test("playwright: public quote completes locally without auth, persistence, or n
 
   assert.equal(await estimator.getAttribute('data-quote-runtime'), 'ready');
   assert.equal(await completeButton.isEnabled(), true);
-  assert.equal((await range.textContent())?.trim(), '$9,500–$12,000');
+  assert.equal((await range.textContent())?.trim(), '$11,000–$13,500');
   assert.equal(await slider.getAttribute('aria-valuetext'), '5 weeks');
-  assert.equal(await page.locator('a[data-quote-login]').first().getAttribute('href'), 'https://app.canonical.plus/u/quote');
+  assert.equal(await page.locator('#nav-sign-in').count(), 0);
+  assert.equal(await page.locator('select[name="quote_employee_band"]').inputValue(), '26_100');
+  assert.equal(await page.locator('input[name="quote_company_profile"]:checked').inputValue(), 'business');
 
   await slider.fill('2');
   assert.equal((await range.textContent())?.trim(), '$12,000–$15,000');
   assert.equal(await slider.getAttribute('aria-valuetext'), '3 weeks');
 
+  await page.locator('input[name="quote_company_profile"][value="startup"]').check();
+  await page.locator('select[name="quote_employee_band"]').selectOption('1_25');
+  await page.locator('select[name="quote_sector"]').selectOption('financial_services');
+  assert.match((await page.locator('[data-quote-summary]').textContent()) ?? '', /Startup · 1–25 employees · Financial services \/ Fintech/);
+
   const standards = page.locator('input[name="quote_standard"]');
-  for (let index = 0; index < (await standards.count()); index += 1) {
-    await standards.nth(index).uncheck();
-  }
+  for (let index = 0; index < (await standards.count()); index += 1) await standards.nth(index).uncheck();
   await completeButton.click();
   assert.equal(await page.locator('[data-standard-error]').isVisible(), true);
   assert.equal(await page.locator('[data-standards-group]').getAttribute('aria-invalid'), 'true');
   assert.equal(await standards.first().evaluate((element) => element === document.activeElement), true);
   assert.equal(await completion.isHidden(), true);
 
-  // Re-enable only SOC 2. This deliberately narrows the earlier default
-  // SOC 2 + ISO 27001 scope, so the completed range is lower than the 3-week
-  // range asserted above before the standards were cleared.
   await standards.first().check();
   await completeButton.click();
   assert.equal(await completion.isVisible(), true);
-  assert.equal((await page.locator('[data-completed-range]').textContent())?.trim(), '$11,500–$14,500');
   assert.match((await page.locator('[data-completed-summary]').textContent()) ?? '', /3 weeks · SOC 2/);
+  assert.equal(await page.locator('input[data-intake-sector]').inputValue(), 'financial_services');
+  assert.equal(await page.locator('input[data-intake-company-profile]').inputValue(), 'startup');
 
   await page.locator('input[name="quote_delivery_depth"][value="remediation"]').check();
   assert.equal(await completion.isHidden(), true, 'changing an input must invalidate the completed snapshot');
 
-  assert.deepEqual(interactionRequests, [], 'quote interactions must not submit or persist over the network');
+  assert.deepEqual(interactionRequests, [], 'scoping interactions must not submit until the user submits the email form');
   assert.deepEqual(pageErrors, []);
 });
 
@@ -81,28 +78,22 @@ test("playwright: public quote remains usable at mobile width without horizontal
   const page = await browser.newPage({ viewport: { height: 844, width: 390 } });
 
   await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
-  const dimensions = await page.evaluate(() => ({
-    clientWidth: document.documentElement.clientWidth,
-    scrollWidth: document.documentElement.scrollWidth,
-  }));
+  const dimensions = await page.evaluate(() => ({ clientWidth: document.documentElement.clientWidth, scrollWidth: document.documentElement.scrollWidth }));
   assert.ok(dimensions.scrollWidth <= dimensions.clientWidth + 1, JSON.stringify(dimensions));
   assert.equal(await page.locator('[data-complete-public-quote]').isVisible(), true);
-  assert.equal(await page.locator('[data-quote-login]').first().isVisible(), true);
+  assert.equal(await page.locator('a[href="mailto:hello@canonical.plus"]').first().isVisible(), true);
 });
 
 test("playwright: no-JavaScript fallback never creates a false completed quote", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
-  const context = await browser.newContext({
-    javaScriptEnabled: false,
-    viewport: { height: 900, width: 1280 },
-  });
+  const context = await browser.newContext({ javaScriptEnabled: false, viewport: { height: 900, width: 1280 } });
   t.after(() => context.close());
   const page = await context.newPage();
 
   await page.goto(`${server.url}/quote/`, { waitUntil: "load" });
-  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$11,000–$13,500');
   assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), null);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 
