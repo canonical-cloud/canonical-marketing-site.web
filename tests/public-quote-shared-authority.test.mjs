@@ -19,7 +19,7 @@ const governedProjection = (value) => {
 };
 
 test("public quote estimator authority pin is immutable and explicit", () => {
-  assert.equal(pin.schemaVersion, 1);
+  assert.equal(pin.schemaVersion, 2);
   assert.equal(pin.authorityRepository, "canonical-cloud/canonical-interfaces");
   assert.match(pin.authorityRevision, /^[0-9a-f]{40}$/);
   assert.equal(pin.contractId, "urn:canonical-cloud:public-quote-estimator:v2");
