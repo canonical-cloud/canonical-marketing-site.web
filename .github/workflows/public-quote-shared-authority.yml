@@ -41,9 +41,12 @@ jobs:
           set -euo pipefail
           revision="$(node -p "JSON.parse(require('fs').readFileSync('src/data/quote-estimator.contract.json','utf8')).authorityRevision")"
           repository="$(node -p "JSON.parse(require('fs').readFileSync('src/data/quote-estimator.contract.json','utf8')).authorityRepository")"
+          fixture="$(node -p "JSON.parse(require('fs').readFileSync('src/data/quote-estimator.contract.json','utf8')).authorityFixturePath")"
           test "$repository" = 'canonical-cloud/canonical-interfaces'
           [[ "$revision" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$fixture" == contracts/public-quote-estimator/*/instances/PublicQuoteEstimatorConfig/valid/current.json ]]
           printf 'revision=%s\n' "$revision" >> "$GITHUB_OUTPUT"
+          printf 'fixture=%s\n' "$fixture" >> "$GITHUB_OUTPUT"
 
       - name: Check out exact shared authority
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -61,5 +64,5 @@ jobs:
 
       - name: Prove marketing pricing semantics match pinned shared contract
         env:
-          CANONICAL_QUOTE_AUTHORITY_FIXTURE: ${{ github.workspace }}/.authority/canonical-interfaces/contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json
+          CANONICAL_QUOTE_AUTHORITY_FIXTURE: ${{ github.workspace }}/.authority/canonical-interfaces/${{ steps.pin.outputs.fixture }}
         run: node --test tests/public-quote-shared-authority.test.mjs
