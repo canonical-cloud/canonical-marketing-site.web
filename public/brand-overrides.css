@@ -6,6 +6,8 @@ html:root[data-theme='dark'] {
   --av-orange-dark: #c2410c;
   --av-orange-glow: rgba(249, 115, 22, 0.14);
   --av-orange-border: rgba(249, 115, 22, 0.36);
+
+  /* Compatibility aliases while existing components migrate off the old accent token names. */
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
   --av-magenta-dark: var(--av-orange-dark);
@@ -19,6 +21,7 @@ html:root[data-theme='medium'] {
   --av-orange-dark: #ea580c;
   --av-orange-glow: rgba(251, 146, 60, 0.15);
   --av-orange-border: rgba(251, 146, 60, 0.4);
+
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
   --av-magenta-dark: var(--av-orange-dark);
@@ -32,6 +35,7 @@ html:root[data-theme='light'] {
   --av-orange-dark: #9a3412;
   --av-orange-glow: rgba(194, 65, 12, 0.1);
   --av-orange-border: rgba(194, 65, 12, 0.28);
+
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
   --av-magenta-dark: var(--av-orange-dark);
@@ -39,9 +43,105 @@ html:root[data-theme='light'] {
   --av-magenta-border: var(--av-orange-border);
 }
 
-/* Make highlighted word boundaries explicit instead of relying on formatter/newline whitespace. */
+/* Reassert orange directly on every selector touched by the old magenta layer. */
+.nav__logo-compliance,
+.nav__product-brand-name {
+  color: var(--av-orange) !important;
+}
+
+.nav__link::after {
+  background: linear-gradient(90deg, var(--av-orange), var(--av-orange-light)) !important;
+}
+
+.btn--secondary:hover {
+  border-color: var(--av-orange) !important;
+  color: var(--av-orange) !important;
+  background: var(--av-orange-glow) !important;
+}
+
+.card:hover {
+  border-color: var(--av-orange-border) !important;
+  box-shadow: 0 12px 38px var(--av-orange-glow) !important;
+}
+
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--av-emerald-light),
+    var(--av-emerald),
+    var(--av-orange-light)
+  ) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.divider {
+  background: linear-gradient(90deg, var(--av-orange), var(--av-emerald), transparent) !important;
+}
+
+.bg-radial {
+  background:
+    radial-gradient(circle at 86% 12%, var(--av-orange-glow) 0%, transparent 30%),
+    radial-gradient(ellipse at 50% 0%, var(--av-radial-glow) 0%, transparent 60%) !important;
+}
+
+::selection {
+  background: var(--av-orange-border);
+  color: var(--av-text-primary);
+}
+
+/* Make highlighted hero-word boundaries visible even when Astro/HTML formatting collapses newline whitespace. */
 .page-hero__title > .gradient-text {
-  margin-inline-start: 0.14em;
+  margin-inline-start: 0.18em;
+}
+
+/*
+ * Server markup still contains the canonical.plus product mark. This fallback
+ * presents Canonical Cloud alongside it before the module script upgrades the
+ * header, so there is no single-brand flash or regression if that upgrade is delayed.
+ */
+#nav-logo:not([data-brand-lockup='true']) {
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+#nav-logo:not([data-brand-lockup='true'])::before {
+  content: 'CANONICAL CLOUD';
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding-left: 46px;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--av-border-hover);
+  background: url('./brand/canonical-cloud.svg') no-repeat left center / 38px 38px;
+  color: var(--av-text-primary);
+  font-size: 0.9rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+#nav-logo:not([data-brand-lockup='true']) > .nav__logo-icon {
+  width: 25px;
+  height: 25px;
+  flex: 0 0 25px;
+}
+
+#nav-logo:not([data-brand-lockup='true']) > .nav__logo-text {
+  color: var(--av-orange);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  line-height: 1.05;
+  text-transform: lowercase;
+  white-space: nowrap;
+}
+
+#nav-logo:not([data-brand-lockup='true']) > .nav__logo-text .nav__logo-aardvark,
+#nav-logo:not([data-brand-lockup='true']) > .nav__logo-text .nav__logo-compliance {
+  color: var(--av-orange) !important;
 }
 
 .nav__brand-lockup {
@@ -132,17 +232,47 @@ html:root[data-theme='light'] {
 }
 
 @media (max-width: 1040px) {
-  .nav__brand-lockup { gap: 0.55rem !important; }
-  .nav__parent-brand { gap: 0.4rem; padding-right: 0.55rem; }
-  .nav__parent-brand-name { font-size: 0.78rem; }
-  .nav__product-brand-name { font-size: 0.65rem !important; }
+  .nav__brand-lockup,
+  #nav-logo:not([data-brand-lockup='true']) {
+    gap: 0.55rem !important;
+  }
+
+  .nav__parent-brand {
+    gap: 0.4rem;
+    padding-right: 0.55rem;
+  }
+
+  .nav__parent-brand-name,
+  #nav-logo:not([data-brand-lockup='true'])::before {
+    font-size: 0.78rem;
+  }
+
+  .nav__product-brand-name,
+  #nav-logo:not([data-brand-lockup='true']) > .nav__logo-text {
+    font-size: 0.65rem !important;
+  }
 }
 
 @media (max-width: 900px) {
-  .nav__product-brand-name { display: none; }
+  .nav__product-brand-name,
+  #nav-logo:not([data-brand-lockup='true']) > .nav__logo-text {
+    display: none;
+  }
 }
 
 @media (max-width: 680px) {
-  .nav__parent-brand-name { display: none; }
-  .nav__parent-brand { padding-right: 0.5rem; }
+  .nav__parent-brand-name {
+    display: none;
+  }
+
+  .nav__parent-brand {
+    padding-right: 0.5rem;
+  }
+
+  #nav-logo:not([data-brand-lockup='true'])::before {
+    content: '';
+    width: 46px;
+    padding-left: 38px;
+    padding-right: 0.5rem;
+  }
 }
