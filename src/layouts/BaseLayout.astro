@@ -11,6 +11,7 @@ const {
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const homeHref = `${baseNoSlash}/`;
+const canonicalCloudHref = 'https://canonical-cloud.github.io/';
 const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
@@ -112,36 +113,43 @@ const siteScriptHref = `${baseNoSlash}/site.js`;
     <footer class="footer" id="site-footer">
       <div class="container">
         <div class="footer__boundary">
-          <strong>Readiness, not independent assurance.</strong>
+          <strong>Canonical supports readiness and pre-audit preparation.</strong>
           <span>
-            Canonical Plus helps scope frameworks, identify gaps, plan remediation, and prepare evidence.
+            Canonical Plus helps scope frameworks, identify gaps, plan remediation, and prepare evidence so independent review starts from a stronger position.
             Independent auditors, assessors, certification bodies, regulators, and legal counsel make formal determinations.
           </span>
         </div>
 
         <div class="footer__top">
           <div class="footer__brand">
-            <a href={homeHref} class="nav__logo" aria-label="Canonical Plus home">
-              <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-                <g class="brand-mark__primary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
-                  <path d="M8.55 25.36A21.5 21.5 0 0 1 22.36 11.55"/>
-                  <path d="M35.64 11.55A21.5 21.5 0 0 1 44.98 17.62"/>
-                </g>
-                <g class="brand-mark__secondary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
-                  <path d="M44.98 46.38A21.5 21.5 0 0 1 35.64 52.45"/>
-                  <path d="M22.36 52.45A21.5 21.5 0 0 1 8.55 38.64"/>
-                </g>
-                <g class="brand-mark__primary" fill="currentColor">
-                  <rect x="40.5" y="28.25" width="18" height="7.5" rx="2.5"/>
-                  <rect x="45.75" y="23" width="7.5" height="18" rx="2.5"/>
-                </g>
-              </svg>
-              <span class="nav__logo-text">
-                <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.PLUS</span>
-              </span>
-            </a>
+            <div class="footer__brand-lockups" aria-label="Canonical Cloud and Canonical Plus">
+              <a href={canonicalCloudHref} class="footer__brand-logo footer__brand-logo--cloud" aria-label="Canonical Cloud home">
+                <span class="canonical-cloud-mark" aria-hidden="true"></span>
+                <span class="canonical-cloud-wordmark">Canonical Cloud</span>
+              </a>
+              <span class="footer__brand-divider" aria-hidden="true"></span>
+              <a href={homeHref} class="nav__logo footer__brand-logo" aria-label="Canonical Plus home">
+                <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+                  <g class="brand-mark__primary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
+                    <path d="M8.55 25.36A21.5 21.5 0 0 1 22.36 11.55"/>
+                    <path d="M35.64 11.55A21.5 21.5 0 0 1 44.98 17.62"/>
+                  </g>
+                  <g class="brand-mark__secondary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
+                    <path d="M44.98 46.38A21.5 21.5 0 0 1 35.64 52.45"/>
+                    <path d="M22.36 52.45A21.5 21.5 0 0 1 8.55 38.64"/>
+                  </g>
+                  <g class="brand-mark__primary" fill="currentColor">
+                    <rect x="40.5" y="28.25" width="18" height="7.5" rx="2.5"/>
+                    <rect x="45.75" y="23" width="7.5" height="18" rx="2.5"/>
+                  </g>
+                </svg>
+                <span class="nav__logo-text">
+                  <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.PLUS</span>
+                </span>
+              </a>
+            </div>
             <p class="footer__tagline">
-              Compliance readiness and technical remediation planning for software and cloud teams.
+              Canonical Cloud provides the operating platform. Canonical Plus provides compliance readiness and technical remediation planning for software and cloud teams.
             </p>
           </div>
 
@@ -435,7 +443,49 @@ const siteScriptHref = `${baseNoSlash}/site.js`;
       }
 
       .footer__brand {
-        max-width: 320px;
+        max-width: 390px;
+      }
+
+      .footer__brand-lockups {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-md);
+      }
+
+      .footer__brand-logo {
+        min-height: 44px;
+        text-decoration: none;
+      }
+
+      .footer__brand-logo--cloud {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--av-text-primary);
+        font-weight: 800;
+      }
+
+      .canonical-cloud-mark {
+        width: 32px;
+        height: 32px;
+        flex: 0 0 auto;
+        border-radius: 0.65rem;
+        background: linear-gradient(145deg, #1d4ed8, #7dd3fc);
+        box-shadow:
+          inset 0 0 0 1px rgb(255 255 255 / 40%),
+          0 8px 22px rgb(29 78 216 / 22%);
+      }
+
+      .canonical-cloud-wordmark {
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+      }
+
+      .footer__brand-divider {
+        width: 1px;
+        height: 32px;
+        background: var(--av-border-hover);
       }
 
       .footer__tagline {
