@@ -44,13 +44,8 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   );
   assert.equal(await page.$("#nav-sign-in"), null);
 
-  // The primary quote CTA is intentionally public and same-origin. Authentication
-  // is not presented until a supported sign-in experience exists.
   const publicQuoteUrl = new URL('/quote/', server.url).href;
-  assert.equal(
-    await page.$eval("#nav-quote", (element) => element.href),
-    publicQuoteUrl,
-  );
+  assert.equal(await page.$eval("#nav-quote", (element) => element.href), publicQuoteUrl);
 
   const serviceCards = await page.$$eval("#services .services__card h3", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
@@ -62,11 +57,9 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
     "Independent-review handoff",
   ]);
 
-  assert.equal(
-    await page.$eval('a[href="mailto:hello@canonical.plus"]', (element) => Boolean(element)),
-    true,
-  );
-  assert.match(await pageText(page), /Readiness, not independent assurance/);
+  assert.equal(await page.$eval('a[href="mailto:hello@canonical.plus"]', (element) => Boolean(element)), true);
+  assert.match(await pageText(page), /Canonical supports readiness and pre-audit preparation/);
+  assert.match(await pageText(page), /hello@canonical\.plus/);
   assert.match(await pageText(page), /canonical\.plus\. All rights reserved/);
 
   assert.deepEqual(pageErrors, []);
