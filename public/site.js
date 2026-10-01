@@ -121,7 +121,8 @@ if (themeController) {
     const { theme, themePreference } = document.documentElement.dataset;
     for (const button of themeButtons) {
       if (!(button instanceof HTMLButtonElement)) continue;
-      button.setAttribute('aria-pressed', String(button.dataset.themeChoice === themePreference));
+      const selected = button.dataset.themeChoice === themePreference;
+      button.setAttribute('aria-pressed', String(selected));
     }
     const status = themePreference === 'auto'
       ? `Auto · ${theme} from local time`
