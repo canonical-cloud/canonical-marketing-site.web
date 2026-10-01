@@ -17,14 +17,14 @@ const workflow = await read('../.github/workflows/people-contract.yml');
 const roster = [
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
-  ['Jack Johnson', 'Browser, Mobile, Clientside'],
+  ['Georgiana Fabrecce', 'Team'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
   ['Tom Mensch', 'Software & Legal'],
   ['Rebecca Toni', 'Team'],
-  ['Georgiana Fabrecce', 'Team'],
+  ['Bryce Merrson', 'Technical Support'],
 ];
 
 test('people directory has exactly ten named roles in the requested order', () => {
@@ -33,6 +33,7 @@ test('people directory has exactly ten named roles in the requested order', () =
   assert.equal(directory.people.length, 10);
   assert.equal(new Set(directory.people.map(({ id }) => id)).size, 10, 'person ids must be unique');
   assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 10, 'initials must be unique');
+  assert.equal(directory.people.some(({ name }) => name === 'Jack Johnson'), false);
 });
 
 test('homepage and people page share the validated directory', () => {
@@ -40,7 +41,7 @@ test('homepage and people page share the validated directory', () => {
   assert.match(grid, /const people = directory\.people/);
   assert.match(grid, /people\.map\(\(person\)/);
   assert.match(grid, /data-person-id=\{person\.id\}/);
-  assert.match(source, /Ten people, one readiness platform/);
+  assert.match(source, /Ten people, one readiness product/);
   for (const page of [source, home]) assert.match(page, /<PeopleGrid\s*\/>/);
 });
 
@@ -52,23 +53,25 @@ test('desktop layout has four columns with tablet and mobile layouts', () => {
   assert.match(grid, /data-person-card/);
 });
 
-test('four verified Benefactor headshots are used and unresolved identities stay neutral', () => {
+test('local team portraits include Rebecca and Bryce while unresolved identities stay neutral', () => {
   const photos = directory.people.filter(({ photoUrl }) => photoUrl).map(({ photoUrl }) => photoUrl);
   assert.deepEqual(photos, [
     '/team/alex-mills.jpg',
     '/team/vinayak-pandey.png',
     '/team/elijah-gizzarelli.jpeg',
     '/team/marcus-gerlach.jpg',
+    '/team/rebecca-toni.jpeg',
+    '/team/bryce-merrson.jpeg',
   ]);
 
-  for (const name of ['John Siliciano', 'Jack Johnson', 'Eugene Li', 'Tom Mensch', 'Rebecca Toni', 'Georgiana Fabrecce']) {
+  for (const name of ['John Siliciano', 'Georgiana Fabrecce', 'Eugene Li', 'Tom Mensch']) {
     assert.equal(directory.people.find((person) => person.name === name)?.photoUrl, undefined);
   }
   assert.match(grid, /person-card__fallback/);
   assert.doesNotMatch(JSON.stringify(directory), /linkedin\.com|avatars\.githubusercontent\.com/i);
 });
 
-test('Benefactor portraits are served locally and remain base-aware', async () => {
+test('team portraits are served locally, base-aware, grayscale by default, and color on hover', async () => {
   for (const person of directory.people) {
     if (person.photoUrl) {
       assert.match(person.photoUrl, /^\/team\/[a-z-]+\.(?:jpe?g|png)$/);
@@ -78,6 +81,8 @@ test('Benefactor portraits are served locally and remain base-aware', async () =
   }
   assert.match(grid, /import\.meta\.env\.BASE_URL/);
   assert.match(grid, /src=\{`\$\{baseNoSlash\}\$\{person\.photoUrl\}`\}/);
+  assert.match(grid, /filter:\s*grayscale\(1\)/);
+  assert.match(grid, /\.person-card:hover \.person-card__photo[\s\S]*grayscale\(0\)/);
   assert.match(nginx, /img-src 'self' data: https:\/\/benefactor\.cc;/);
 });
 
