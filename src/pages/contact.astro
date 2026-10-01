@@ -4,90 +4,140 @@ import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
-const pricingHref = `${baseNoSlash}/pricing/`;
-const trainingHref = `${baseNoSlash}/training/`;
-const securityHref = `${baseNoSlash}/security/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
+const contactScriptHref = `${baseNoSlash}/contact-intake.js`;
 ---
 
 <BaseLayout
-  title="Contact"
-  description="Contact Canonical Plus about compliance readiness, security engineering, training, pricing, and assessment scoping."
+  title="Contact Canonical Plus"
+  description="Contact Canonical Plus about compliance readiness, pre-audit preparation, evidence automation, remediation, and independent-review coordination."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">
       <div class="page-hero__copy">
-        <span class="badge">Contact Canonical Plus</span>
-        <p class="page-hero__eyebrow">One public contact address</p>
-        <h1 class="page-hero__title hero__title">
-          Start with the problem,
-          <span class="gradient-text">not a sales form.</span>
-        </h1>
+        <span class="badge">Talk to Canonical Plus</span>
+        <p class="page-hero__eyebrow">Readiness · remediation · pre-audit preparation</p>
+        <h1 class="page-hero__title hero__title">Bring us the scope.<br /><span class="gradient-text">We’ll help turn it into a plan.</span></h1>
         <p class="page-hero__subtitle">
-          Tell us what you are trying to prepare for, where the hard technical gaps are, and what
-          timeline or independent review you are working toward. We can use that context to scope the
-          right next step.
+          Tell us what you are preparing for, what is already in place, and where the friction is.
+          We can help scope readiness, automate evidence work, prioritize remediation, and prepare the handoff to an independent reviewer.
         </p>
         <div class="page-hero__actions">
-          <a class="btn btn--primary btn--large" href="mailto:hello@canonical.plus">Email hello@canonical.plus</a>
-          <a class="btn btn--secondary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--primary btn--large" href="mailto:hello@canonical.plus">hello@canonical.plus</a>
+          <a class="btn btn--secondary btn--large" href={quoteHref}>Build a quote first</a>
         </div>
       </div>
-      <aside class="page-hero__panel" aria-label="Useful context for an introduction">
-        <h2>Useful context to include</h2>
-        <ul class="check-list">
-          <li>Frameworks, customer requirements, or review type</li>
-          <li>Cloud, application, and deployment footprint</li>
-          <li>Known security or evidence gaps</li>
-          <li>Target timeline and decision points</li>
+      <aside class="page-hero__panel">
+        <h2>Useful context to send</h2>
+        <ul>
+          <li>Frameworks or customer requirements driving the work</li>
+          <li>Target dates and any audit, certification, or procurement milestone</li>
+          <li>Clouds, applications, identity systems, repositories, and vendors in scope</li>
+          <li>Current gaps, evidence bottlenecks, or remediation work already identified</li>
         </ul>
+        <p><strong>hello@canonical.plus</strong> is monitored for new scope and commercial questions.</p>
       </aside>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="paths-title">
-    <div class="container">
-      <header class="section-header section-header--center">
-        <span class="badge">Self-serve paths</span>
-        <h2 id="paths-title">Explore before you contact us.</h2>
-        <p>Use the public pages to understand scope, service depth, and the readiness boundary first.</p>
-      </header>
-      <div class="contact-grid">
-        <a class="card contact-card" href={pricingHref}>
-          <h3>Pricing</h3>
-          <p>Review the three proposed readiness tiers and their starting assumptions.</p>
-        </a>
-        <a class="card contact-card" href={trainingHref}>
-          <h3>Training</h3>
-          <p>Walk through the readiness model and evidence concepts without an account.</p>
-        </a>
-        <a class="card contact-card" href={securityHref}>
-          <h3>Security</h3>
-          <p>See how security requirements translate into accountable engineering and evidence work.</p>
-        </a>
+  <section class="section" aria-labelledby="contact-form-title">
+    <div class="container contact-grid">
+      <div>
+        <div class="section-header">
+          <span class="badge">Contact form</span>
+          <h2 id="contact-form-title">Tell us what you need</h2>
+          <p>Your message is routed through our Supabase intake service to <strong>hello@canonical.plus</strong>. We use it to respond to this request, not to enroll you in a marketing list.</p>
+        </div>
+
+        <form class="contact-form card" data-contact-intake-form novalidate>
+          <div class="contact-form__grid">
+            <label>
+              <span>Name</span>
+              <input type="text" name="displayName" autocomplete="name" minlength="2" maxlength="120" required />
+            </label>
+            <label>
+              <span>Work email</span>
+              <input type="email" name="email" autocomplete="email" maxlength="320" required />
+            </label>
+            <label>
+              <span>Organization</span>
+              <input type="text" name="organizationName" autocomplete="organization" minlength="2" maxlength="200" required />
+            </label>
+            <label>
+              <span>What can we help with?</span>
+              <select name="topic" required>
+                <option value="">Choose a topic</option>
+                <option value="readiness">Readiness assessment / pre-audit</option>
+                <option value="remediation">Technical remediation</option>
+                <option value="evidence-automation">Evidence automation / integrations</option>
+                <option value="managed-readiness">Managed readiness program</option>
+                <option value="audit-coordination">Independent-audit coordination</option>
+                <option value="pricing">Pricing, payment plan, or package discount</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            <span>Message</span>
+            <textarea
+              name="message"
+              rows="8"
+              minlength="20"
+              maxlength="5000"
+              placeholder="Target framework(s), timing, environment, current state, blockers, and the outcome you need."
+              required
+            ></textarea>
+          </label>
+
+          <label class="contact-honeypot" aria-hidden="true">
+            <span>Website</span>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+
+          <div class="contact-form__actions">
+            <button class="btn btn--primary btn--large" type="submit" data-contact-submit>Send to hello@canonical.plus</button>
+            <a class="btn btn--secondary btn--large" href="mailto:hello@canonical.plus">Use email instead</a>
+          </div>
+          <p class="contact-form__status" data-contact-status role="status" aria-live="polite"></p>
+        </form>
+        <noscript>
+          <p>JavaScript is required for the web form. Email <a href="mailto:hello@canonical.plus">hello@canonical.plus</a> directly instead.</p>
+        </noscript>
       </div>
+
+      <aside class="contact-side card">
+        <span class="badge">Commercial flexibility</span>
+        <h2>Scope first, then make the commercial model fit</h2>
+        <p>For larger readiness programs, we can discuss milestone payment schedules and package discounts. Itemized fees, deliverables, target dates, service levels, dependencies, and any discount are captured in the signed Order or Statement of Work.</p>
+        <p>Where a formal audit or certification is required, the qualified independent provider remains responsible for that engagement and its fees unless a signed agreement expressly itemizes an approved pass-through arrangement.</p>
+        <a class="btn btn--secondary" href={quoteHref}>Build a planning estimate</a>
+      </aside>
     </div>
   </section>
+
+  <script type="module" src={contactScriptHref}></script>
 </BaseLayout>
 
 <style>
-  .contact-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-lg);
-  }
-
-  .contact-card {
-    display: block;
-  }
-
-  .contact-card:hover {
-    border-color: var(--av-teal);
-  }
-
-  @media (max-width: 900px) {
-    .contact-grid {
-      grid-template-columns: 1fr;
-    }
+  .contact-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(280px, .65fr); gap: var(--space-xl); align-items: start; }
+  .contact-form { display: grid; gap: 1rem; padding: clamp(1.25rem, 3vw, 2rem); }
+  .contact-form__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .contact-form label { display: grid; gap: .5rem; color: var(--av-text-primary); font-weight: 700; }
+  .contact-form input, .contact-form select, .contact-form textarea { width: 100%; padding: .75rem .85rem; border: 1px solid var(--av-border); border-radius: var(--radius-md); background: var(--av-surface-raised, var(--av-surface)); color: var(--av-text-primary); font: inherit; }
+  .contact-form input, .contact-form select { min-height: 3rem; }
+  .contact-form textarea { resize: vertical; min-height: 10rem; }
+  .contact-form input:focus-visible, .contact-form select:focus-visible, .contact-form textarea:focus-visible { outline: 2px solid var(--av-accent); outline-offset: 2px; }
+  .contact-form__actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+  .contact-form__status { min-height: 1.5rem; margin: 0; color: var(--av-text-secondary); }
+  .contact-form__status[data-state="success"] { color: var(--av-accent); font-weight: 750; }
+  .contact-form__status[data-state="error"] { color: #ef7b72; font-weight: 750; }
+  .contact-honeypot { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; white-space: nowrap !important; }
+  .contact-side { position: sticky; top: 6rem; display: grid; gap: 1rem; padding: clamp(1.25rem, 3vw, 2rem); }
+  .contact-side h2, .contact-side p { margin: 0; }
+  .contact-side p { color: var(--av-text-secondary); line-height: 1.6; }
+  @media (max-width: 850px) {
+    .contact-grid, .contact-form__grid { grid-template-columns: 1fr; }
+    .contact-side { position: static; }
   }
 </style>
