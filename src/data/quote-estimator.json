@@ -47,12 +47,12 @@
   ],
   "sectors": [
     { "id": "technology", "label": "Technology / SaaS", "amountUsd": 0 },
-    { "id": "professional-services", "label": "Professional services", "amountUsd": 250 },
-    { "id": "financial-services", "label": "Financial services / fintech", "amountUsd": 1500 },
-    { "id": "healthcare", "label": "Healthcare / life sciences", "amountUsd": 1500 },
-    { "id": "retail", "label": "Retail / ecommerce", "amountUsd": 500 },
-    { "id": "public-sector", "label": "Public sector / defense", "amountUsd": 1750 },
-    { "id": "other", "label": "Other", "amountUsd": 500 }
+    { "id": "professional-services", "label": "Professional services", "amountUsd": 0 },
+    { "id": "financial-services", "label": "Financial services / fintech", "amountUsd": 0 },
+    { "id": "healthcare", "label": "Healthcare / life sciences", "amountUsd": 0 },
+    { "id": "retail", "label": "Retail / ecommerce", "amountUsd": 0 },
+    { "id": "public-sector", "label": "Public sector / defense", "amountUsd": 0 },
+    { "id": "other", "label": "Other", "amountUsd": 0 }
   ],
   "defaults": {
     "speedWeeks": 5,
