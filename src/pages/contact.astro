@@ -7,36 +7,41 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const pricingHref = `${baseNoSlash}/pricing/`;
 const trainingHref = `${baseNoSlash}/training/`;
 const securityHref = `${baseNoSlash}/security/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
+const contactScriptHref = `${baseNoSlash}/contact-intake.js`;
+const intakeEndpoint = import.meta.env.PUBLIC_CANONICAL_INTAKE_URL ?? '';
 ---
 
 <BaseLayout
   title="Contact"
-  description="Contact Canonical Plus about compliance readiness, security engineering, training, pricing, and assessment scoping."
+  description="Contact Canonical Plus about compliance readiness, pre-audit preparation, security remediation, pricing, and assessment scoping."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">
       <div class="page-hero__copy">
         <span class="badge">Contact Canonical Plus</span>
-        <p class="page-hero__eyebrow">One public contact address</p>
+        <p class="page-hero__eyebrow">Readiness, pre-audit preparation, and technical remediation</p>
         <h1 class="page-hero__title hero__title">
-          Start with the problem,
-          <span class="gradient-text">not a sales form.</span>
+          Tell us what you need to
+          <span class="gradient-text">get ready for.</span>
         </h1>
         <p class="page-hero__subtitle">
-          Tell us what you are trying to prepare for, where the hard technical gaps are, and what
-          timeline or independent review you are working toward. We can use that context to scope the
-          right next step.
+          Share your target framework, customer requirement, timeline, or technical blocker. We will use that context to recommend a practical next step and scope the work clearly.
         </p>
+        <div class="contact-email-callout">
+          <span>Direct email</span>
+          <a href="mailto:hello@canonical.plus">hello@canonical.plus</a>
+        </div>
         <div class="page-hero__actions">
-          <a class="btn btn--primary btn--large" href="mailto:hello@canonical.plus">Email hello@canonical.plus</a>
-          <a class="btn btn--secondary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--primary btn--large" href="#contact-form">Send a message</a>
+          <a class="btn btn--secondary btn--large" href={quoteHref}>Build a quote</a>
         </div>
       </div>
       <aside class="page-hero__panel" aria-label="Useful context for an introduction">
         <h2>Useful context to include</h2>
         <ul class="check-list">
           <li>Frameworks, customer requirements, or review type</li>
+          <li>Company size and business sector</li>
           <li>Cloud, application, and deployment footprint</li>
           <li>Known security or evidence gaps</li>
           <li>Target timeline and decision points</li>
@@ -45,21 +50,74 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
     </div>
   </section>
 
+  <section class="section" id="contact-form" aria-labelledby="contact-form-title">
+    <div class="container contact-form-layout">
+      <div>
+        <span class="badge">Talk to the team</span>
+        <h2 id="contact-form-title">Send Canonical Plus a message.</h2>
+        <p class="contact-intro">The form routes to the Canonical Plus intake service and emails the team at <strong>hello@canonical.plus</strong>. We only ask for enough context to respond and scope the conversation.</p>
+        <div class="contact-trust-points">
+          <p><strong>Clear scope.</strong> We separate readiness work, remediation, recurring support, and independent-audit costs when they are relevant.</p>
+          <p><strong>Commercial flexibility.</strong> Payment plans and bundled discounts can be discussed for qualified engagements.</p>
+          <p><strong>Independent review.</strong> When formal assurance is needed, the independent auditor or certification body remains responsible for its own opinion or certification.</p>
+        </div>
+      </div>
+
+      <form class="card contact-form" data-contact-form data-intake-endpoint={intakeEndpoint} novalidate>
+        <label class="contact-field">
+          <span>Name</span>
+          <input type="text" name="name" maxlength="120" autocomplete="name" required />
+        </label>
+        <label class="contact-field">
+          <span>Work email</span>
+          <input type="email" name="email" maxlength="320" autocomplete="email" required />
+        </label>
+        <label class="contact-field">
+          <span>Company</span>
+          <input type="text" name="company" maxlength="200" autocomplete="organization" />
+        </label>
+        <label class="contact-field">
+          <span>What can we help with?</span>
+          <select name="topic" required>
+            <option value="">Choose a topic</option>
+            <option value="readiness">Readiness assessment / pre-audit preparation</option>
+            <option value="remediation">Technical remediation</option>
+            <option value="continuous-readiness">Continuous readiness</option>
+            <option value="pricing">Pricing, payment plan, or discount</option>
+            <option value="audit-coordination">Independent-audit coordination</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="contact-field contact-field--wide">
+          <span>Message</span>
+          <textarea name="message" rows="7" maxlength="4000" required placeholder="Frameworks, timeline, systems in scope, current blockers, or anything else that would help us understand the engagement."></textarea>
+        </label>
+        <label class="contact-honeypot" aria-hidden="true" tabindex="-1">
+          <span>Website</span>
+          <input type="text" name="website" autocomplete="off" tabindex="-1" />
+        </label>
+        <button class="btn btn--primary btn--large" type="submit">Send message</button>
+        <p class="contact-status" data-contact-status role="status"></p>
+        <p class="contact-fallback">Prefer email? Write directly to <a href="mailto:hello@canonical.plus">hello@canonical.plus</a>.</p>
+      </form>
+    </div>
+  </section>
+
   <section class="section" aria-labelledby="paths-title">
     <div class="container">
       <header class="section-header section-header--center">
-        <span class="badge">Self-serve paths</span>
-        <h2 id="paths-title">Explore before you contact us.</h2>
-        <p>Use the public pages to understand scope, service depth, and the readiness boundary first.</p>
+        <span class="badge">Explore the scope</span>
+        <h2 id="paths-title">See how the engagement can fit together.</h2>
+        <p>Review pricing, training, and security-remediation context before or after you contact us.</p>
       </header>
       <div class="contact-grid">
         <a class="card contact-card" href={pricingHref}>
           <h3>Pricing</h3>
-          <p>Review the three proposed readiness tiers and their starting assumptions.</p>
+          <p>Review readiness tiers, starting assumptions, and the path to a tailored quote.</p>
         </a>
         <a class="card contact-card" href={trainingHref}>
           <h3>Training</h3>
-          <p>Walk through the readiness model and evidence concepts without an account.</p>
+          <p>Understand the readiness model, evidence expectations, and team responsibilities.</p>
         </a>
         <a class="card contact-card" href={securityHref}>
           <h3>Security</h3>
@@ -68,26 +126,39 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
       </div>
     </div>
   </section>
+
+  <script type="module" src={contactScriptHref}></script>
 </BaseLayout>
 
 <style>
-  .contact-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-lg);
-  }
-
-  .contact-card {
-    display: block;
-  }
-
-  .contact-card:hover {
-    border-color: var(--av-teal);
-  }
-
+  .contact-email-callout { display: inline-grid; gap: .2rem; margin: var(--space-md) 0; padding: .9rem 1.1rem; border: 1px solid var(--av-border); border-radius: var(--radius-md); background: var(--av-surface); }
+  .contact-email-callout span { color: var(--av-text-secondary); font-size: .78rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+  .contact-email-callout a { color: var(--av-accent); font-size: clamp(1.1rem, 2.5vw, 1.45rem); font-weight: 800; }
+  .contact-form-layout { display: grid; grid-template-columns: minmax(0, .8fr) minmax(340px, 1.2fr); gap: var(--space-xl); align-items: start; }
+  .contact-intro { color: var(--av-text-secondary); line-height: 1.65; }
+  .contact-trust-points { display: grid; gap: .8rem; margin-top: var(--space-lg); }
+  .contact-trust-points p { margin: 0; color: var(--av-text-secondary); line-height: 1.55; }
+  .contact-trust-points strong { color: var(--av-text-primary); }
+  .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding: clamp(1.25rem, 3vw, 2rem); }
+  .contact-field { display: grid; gap: .45rem; color: var(--av-text-secondary); font-size: .9rem; font-weight: 650; }
+  .contact-field--wide, .contact-form > button, .contact-status, .contact-fallback { grid-column: 1 / -1; }
+  .contact-field input, .contact-field select, .contact-field textarea { width: 100%; padding: .75rem .8rem; border: 1px solid var(--av-border); border-radius: var(--radius-md); background: var(--av-surface-raised, var(--av-surface)); color: var(--av-text-primary); font: inherit; }
+  .contact-field input, .contact-field select { min-height: 46px; }
+  .contact-field textarea { resize: vertical; min-height: 150px; }
+  .contact-field input:focus, .contact-field select:focus, .contact-field textarea:focus { outline: 2px solid var(--av-accent); outline-offset: 2px; }
+  .contact-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+  .contact-status { min-height: 1.4em; margin: 0; color: var(--av-text-secondary); }
+  .contact-status[data-state="success"] { color: var(--av-accent); }
+  .contact-status[data-state="error"] { color: #ef7b72; }
+  .contact-fallback { margin: 0; color: var(--av-text-secondary); font-size: .9rem; }
+  .contact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); }
+  .contact-card { display: block; }
+  .contact-card:hover { border-color: var(--av-accent); }
   @media (max-width: 900px) {
-    .contact-grid {
-      grid-template-columns: 1fr;
-    }
+    .contact-form-layout, .contact-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 620px) {
+    .contact-form { grid-template-columns: 1fr; }
+    .contact-field--wide, .contact-form > button, .contact-status, .contact-fallback { grid-column: auto; }
   }
 </style>
