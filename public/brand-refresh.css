@@ -1,0 +1,133 @@
+/* Canonical Cloud / Canonical Plus brand refresh.
+   Orange supersedes the previous magenta editorial accent. The --av-magenta*
+   names below are temporary compatibility shims for existing selectors so the
+   site can migrate without a risky all-at-once selector rewrite. */
+
+:root,
+:root[data-theme='dark'] {
+  --av-orange: #f97316;
+  --av-orange-light: #fb923c;
+  --av-orange-dark: #c2410c;
+  --av-orange-glow: rgba(249, 115, 22, 0.15);
+  --av-orange-border: rgba(251, 146, 60, 0.36);
+
+  --av-magenta: var(--av-orange);
+  --av-magenta-light: var(--av-orange-light);
+  --av-magenta-dark: var(--av-orange-dark);
+  --av-magenta-glow: var(--av-orange-glow);
+  --av-magenta-border: var(--av-orange-border);
+}
+
+:root[data-theme='medium'] {
+  --av-orange: #fb923c;
+  --av-orange-light: #fdba74;
+  --av-orange-dark: #ea580c;
+  --av-orange-glow: rgba(251, 146, 60, 0.16);
+  --av-orange-border: rgba(253, 186, 116, 0.4);
+
+  --av-magenta: var(--av-orange);
+  --av-magenta-light: var(--av-orange-light);
+  --av-magenta-dark: var(--av-orange-dark);
+  --av-magenta-glow: var(--av-orange-glow);
+  --av-magenta-border: var(--av-orange-border);
+}
+
+:root[data-theme='light'] {
+  --av-orange: #c2410c;
+  --av-orange-light: #ea580c;
+  --av-orange-dark: #9a3412;
+  --av-orange-glow: rgba(194, 65, 12, 0.1);
+  --av-orange-border: rgba(194, 65, 12, 0.26);
+
+  --av-magenta: var(--av-orange);
+  --av-magenta-light: var(--av-orange-light);
+  --av-magenta-dark: var(--av-orange-dark);
+  --av-magenta-glow: var(--av-orange-glow);
+  --av-magenta-border: var(--av-orange-border);
+}
+
+/* The parent company is the primary brand. The existing inline mark and
+   CANONICAL.PLUS wordmark remain the product identity. */
+#nav-logo {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  align-items: center;
+  column-gap: 0.6rem;
+}
+
+#nav-logo::before {
+  content: 'CANONICAL CLOUD';
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  padding-left: 48px;
+  background-image: url('./brand/canonical-cloud-logo.png');
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 40px 40px;
+  color: var(--av-text-primary);
+  font-size: 1rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+#nav-logo .nav__logo-icon {
+  width: 27px;
+  height: 27px;
+  margin-left: 0.25rem;
+}
+
+#nav-logo .nav__logo-text {
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  line-height: 1.05;
+  white-space: nowrap;
+}
+
+#nav-logo .nav__logo-text::before {
+  content: 'PRODUCT';
+  display: block;
+  margin-bottom: 0.18rem;
+  color: var(--av-text-muted);
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+#nav-logo .nav__logo-compliance {
+  color: var(--av-orange);
+}
+
+#nav-logo:hover .nav__logo-compliance {
+  color: var(--av-orange-light);
+}
+
+@media (max-width: 1040px) {
+  #nav-logo::before {
+    padding-left: 42px;
+    background-size: 34px 34px;
+    font-size: 0.88rem;
+    letter-spacing: 0.06em;
+  }
+
+  #nav-logo .nav__logo-icon {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  #nav-logo {
+    column-gap: 0.45rem;
+  }
+
+  #nav-logo::before {
+    min-height: 38px;
+    padding-left: 38px;
+    background-size: 31px 31px;
+    font-size: 0.78rem;
+  }
+}
