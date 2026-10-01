@@ -10,18 +10,17 @@ const readinessHref = `${baseNoSlash}/readiness/`;
 
 <BaseLayout
   title="People"
-  description="Meet the people working across engineering, security, infrastructure, business, and legal at Canonical Plus."
+  description="Meet the people behind Canonical Plus, the compliance-readiness product from Canonical Cloud."
 >
   <section class="people-hero section--hero bg-grid bg-radial">
     <div class="container people-hero__content">
       <span class="badge animate-fade-in-up">People</span>
       <p class="people-hero__eyebrow animate-fade-in-up stagger-1">Cross-functional by design</p>
       <h1 class="people-hero__title animate-fade-in-up stagger-2">
-        The people behind <span class="gradient-text">Canonical Plus</span>
+        The people behind{' '}<span class="gradient-text">Canonical Plus</span>
       </h1>
       <p class="people-hero__subtitle animate-fade-in-up stagger-2">
-        A small team spanning infrastructure, security, client experiences, go-to-market,
-        operations, accounting, and legal.
+        Canonical Plus is a Canonical Cloud product supported by a small cross-functional team.
       </p>
     </div>
   </section>
@@ -30,7 +29,7 @@ const readinessHref = `${baseNoSlash}/readiness/`;
     <div class="container">
       <header class="section-header section-header--center">
         <span class="badge">Team</span>
-        <h2 id="people-grid-title">Ten people, one readiness platform</h2>
+        <h2 id="people-grid-title">Eleven people, one readiness product</h2>
       </header>
 
       <PeopleGrid />
@@ -43,14 +42,8 @@ const readinessHref = `${baseNoSlash}/readiness/`;
   </section>
 
   <style>
-    .people-hero {
-      text-align: center;
-    }
-
-    .people-hero__content {
-      max-width: 840px;
-    }
-
+    .people-hero { text-align: center; }
+    .people-hero__content { max-width: 840px; }
     .people-hero__eyebrow {
       margin-top: var(--space-lg);
       color: var(--av-teal);
@@ -59,13 +52,11 @@ const readinessHref = `${baseNoSlash}/readiness/`;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
-
     .people-hero__title {
       margin-top: var(--space-md);
       font-size: clamp(2.5rem, 6vw, 4.8rem);
       line-height: 1.02;
     }
-
     .people-hero__subtitle {
       max-width: 700px;
       margin: var(--space-lg) auto 0;
@@ -73,11 +64,7 @@ const readinessHref = `${baseNoSlash}/readiness/`;
       font-size: clamp(1rem, 2vw, 1.2rem);
       line-height: 1.7;
     }
-
-    .people-section {
-      padding-top: var(--space-2xl);
-    }
-
+    .people-section { padding-top: var(--space-2xl); }
     .people-cta {
       display: flex;
       align-items: center;
@@ -89,19 +76,14 @@ const readinessHref = `${baseNoSlash}/readiness/`;
       border-radius: var(--radius-lg);
       background: var(--av-emerald-glow);
     }
-
     .people-cta p {
       max-width: 42rem;
       color: var(--av-text-secondary);
       font-size: 1rem;
       line-height: 1.6;
     }
-
     @media (max-width: 900px) {
-      .people-cta {
-        align-items: flex-start;
-        flex-direction: column;
-      }
+      .people-cta { align-items: flex-start; flex-direction: column; }
     }
   </style>
 </BaseLayout>
