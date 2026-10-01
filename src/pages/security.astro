@@ -7,7 +7,7 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const pricingHref = `${baseNoSlash}/pricing/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
 ---
 
 <BaseLayout
@@ -25,8 +25,8 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
         </h1>
         <p class="page-hero__subtitle">
           Canonical Plus helps teams scope controls, map technical ownership, identify gaps,
-          implement remediation, and organize evidence for an independent reviewer. We do not
-          replace your auditor, assessor, regulator, certification body, or legal counsel.
+          implement remediation, and organize evidence for an independent reviewer. When formal
+          assurance begins, your selected qualified auditor, assessor, regulator, certification body, or counsel owns that determination.
         </p>
         <div class="page-hero__actions">
           <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
