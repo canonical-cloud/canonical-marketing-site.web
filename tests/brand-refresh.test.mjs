@@ -21,6 +21,9 @@ test('orange replaces the former magenta presentation across all adaptive themes
 
   assert.match(brandCss, /--av-magenta:\s*var\(--av-orange\)/);
   assert.match(brandCss, /--av-magenta-light:\s*var\(--av-orange-light\)/);
+  assert.match(brandCss, /\.nav__link::after[\s\S]*var\(--av-orange\)/);
+  assert.match(brandCss, /\.btn--secondary:hover[\s\S]*var\(--av-orange\)/);
+  assert.match(brandCss, /\.gradient-text[\s\S]*var\(--av-orange-light\)/);
   assert.doesNotMatch(brandCss, /#(?:d946ef|e879f9|86198f|f0abfc|a21caf|701a75)/i);
 });
 
@@ -36,11 +39,13 @@ test('header lockup presents Canonical Cloud as parent and canonical.plus as pro
   assert.match(siteScript, /parentName\.textContent = 'CANONICAL CLOUD'/);
   assert.match(siteScript, /canonical-cloud\.svg/);
   assert.match(siteScript, /canonical\.plus product/);
+  assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*CANONICAL CLOUD/);
+  assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*canonical-cloud\.svg/);
   assert.match(brandCss, /\.nav__parent-brand-name[\s\S]*font-size:\s*0\.9rem/);
   assert.match(brandCss, /\.nav__product-brand-name[\s\S]*font-size:\s*0\.72rem/);
   assert.match(cloudLogo, /Canonical Cloud layered C/);
 });
 
 test('headline accent spacing is explicit at the inline boundary', () => {
-  assert.match(brandCss, /\.page-hero__title > \.gradient-text\s*\{[\s\S]*margin-inline-start:\s*0\.14em/);
+  assert.match(brandCss, /\.page-hero__title > \.gradient-text\s*\{[\s\S]*margin-inline-start:\s*0\.18em/);
 });
