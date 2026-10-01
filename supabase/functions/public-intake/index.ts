@@ -90,7 +90,7 @@ Deno.serve(async (request) => {
       ['Frameworks', standards.join(', ')],
       ['Service depth', clean(scope.serviceDepth, 80)],
       ['Complexity', clean(scope.complexity, 80)],
-      ['Organization', clean(scope.organizationType, 80)],
+      ['Company stage', clean(scope.companyStage, 80)],
       ['Employees', clean(scope.employeeBand, 80)],
       ['Sector', clean(scope.sector, 100)],
     ];
