@@ -23,6 +23,8 @@ if (root instanceof HTMLElement) {
   const standardGroup = root.querySelector('[data-standards-group]');
   const standardError = root.querySelector('[data-standard-error]');
   const completeButton = root.querySelector('[data-complete-public-quote]');
+  const employeeBand = root.querySelector('[data-quote-employee-band]');
+  const sectorSelect = root.querySelector('[data-quote-sector]');
   const completedPanel = document.querySelector('[data-quote-complete]');
   const completedRange = document.querySelector('[data-completed-range]');
   const completedSummary = document.querySelector('[data-completed-summary]');
@@ -41,19 +43,14 @@ if (root instanceof HTMLElement) {
   const standardInputs = [...root.querySelectorAll('input[name="quote_standard"]')];
   const depthInputs = [...root.querySelectorAll('input[name="quote_delivery_depth"]')];
   const complexityInputs = [...root.querySelectorAll('input[name="quote_complexity"]')];
-  const pricedInputs = [...standardInputs, ...depthInputs, ...complexityInputs];
-  const allControls = [speedSlider, ...pricedInputs].filter((input) => input instanceof HTMLInputElement);
+  const companyProfileInputs = [...root.querySelectorAll('input[name="quote_company_profile"]')];
+  const pricedInputs = [...standardInputs, ...depthInputs, ...complexityInputs, ...companyProfileInputs];
+  const allControls = [speedSlider, ...pricedInputs, employeeBand, sectorSelect].filter(Boolean);
 
   const uniqueValues = (inputs) => new Set(inputs.map((input) => input.value)).size === inputs.length;
   const pricedInputValid = (input) => {
     const amount = Number(input.dataset.amount);
-    return (
-      input instanceof HTMLInputElement &&
-      input.value.length > 0 &&
-      (input.dataset.label || '').length > 0 &&
-      Number.isSafeInteger(amount) &&
-      amount >= 0
-    );
+    return input instanceof HTMLInputElement && input.value.length > 0 && (input.dataset.label || '').length > 0 && Number.isSafeInteger(amount) && amount >= 0;
   };
   const exactlyOneChecked = (inputs) => inputs.filter((input) => input instanceof HTMLInputElement && input.checked).length === 1;
   const speedValue = speedSlider instanceof HTMLInputElement ? Number(speedSlider.value) : Number.NaN;
@@ -65,6 +62,15 @@ if (root instanceof HTMLElement) {
     Number(speedSlider.step) === 1 &&
     Number.isInteger(speedValue) &&
     speedOptions.some((option) => option.index === speedValue);
+  const selectValid = (select, priced = false) => {
+    if (!(select instanceof HTMLSelectElement) || select.options.length === 0) return false;
+    return [...select.options].every((option) => {
+      if (!option.value || !(option.dataset.label || '').length) return false;
+      if (!priced) return true;
+      const amount = Number(option.dataset.amount);
+      return Number.isSafeInteger(amount) && amount >= 0;
+    });
+  };
   const requiredNodesPresent =
     speedLabel instanceof HTMLElement &&
     speedNote instanceof HTMLElement &&
@@ -74,58 +80,35 @@ if (root instanceof HTMLElement) {
     standardGroup instanceof HTMLElement &&
     standardError instanceof HTMLElement &&
     completeButton instanceof HTMLButtonElement &&
+    employeeBand instanceof HTMLSelectElement &&
+    sectorSelect instanceof HTMLSelectElement &&
     completedPanel instanceof HTMLElement &&
     completedRange instanceof HTMLElement &&
     completedSummary instanceof HTMLElement;
   const configurationValid =
     schemaVersion === EXPECTED_SCHEMA_VERSION &&
     /^[A-Z]{3}$/.test(currency) &&
-    Number.isSafeInteger(floor) &&
-    floor >= 0 &&
-    Number.isSafeInteger(ceiling) &&
-    ceiling > floor &&
-    Number.isSafeInteger(midpointFloor) &&
-    midpointFloor >= floor &&
-    midpointFloor <= ceiling &&
-    Number.isSafeInteger(midpointCeiling) &&
-    midpointCeiling >= midpointFloor &&
-    midpointCeiling <= ceiling &&
-    Number.isSafeInteger(roundTo) &&
-    roundTo > 0 &&
-    Number.isFinite(lowerFactor) &&
-    lowerFactor > 0 &&
-    Number.isFinite(upperFactor) &&
-    upperFactor >= lowerFactor &&
-    speedOptions.length > 0 &&
-    speedOptions.every(
-      (option, index) =>
-        option.index === index &&
-        Number.isInteger(option.weeks) &&
-        option.weeks > 0 &&
-        option.label.length > 0 &&
-        Number.isSafeInteger(option.base) &&
-        option.base >= 0,
-    ) &&
+    Number.isSafeInteger(floor) && floor >= 0 &&
+    Number.isSafeInteger(ceiling) && ceiling > floor &&
+    Number.isSafeInteger(midpointFloor) && midpointFloor >= floor && midpointFloor <= ceiling &&
+    Number.isSafeInteger(midpointCeiling) && midpointCeiling >= midpointFloor && midpointCeiling <= ceiling &&
+    Number.isSafeInteger(roundTo) && roundTo > 0 &&
+    Number.isFinite(lowerFactor) && lowerFactor > 0 &&
+    Number.isFinite(upperFactor) && upperFactor >= lowerFactor &&
+    speedOptions.length > 0 && speedOptions.every((option, index) => option.index === index && Number.isInteger(option.weeks) && option.weeks > 0 && option.label.length > 0 && Number.isSafeInteger(option.base) && option.base >= 0) &&
     speedControlValid &&
-    standardInputs.length > 0 &&
-    depthInputs.length > 0 &&
-    complexityInputs.length > 0 &&
-    uniqueValues(standardInputs) &&
-    uniqueValues(depthInputs) &&
-    uniqueValues(complexityInputs) &&
+    standardInputs.length > 0 && depthInputs.length > 0 && complexityInputs.length > 0 && companyProfileInputs.length > 0 &&
+    uniqueValues(standardInputs) && uniqueValues(depthInputs) && uniqueValues(complexityInputs) && uniqueValues(companyProfileInputs) &&
     pricedInputs.every(pricedInputValid) &&
     standardInputs.some((input) => input instanceof HTMLInputElement && input.checked) &&
-    exactlyOneChecked(depthInputs) &&
-    exactlyOneChecked(complexityInputs) &&
-    requiredNodesPresent;
+    exactlyOneChecked(depthInputs) && exactlyOneChecked(complexityInputs) && exactlyOneChecked(companyProfileInputs) &&
+    selectValid(employeeBand, true) && selectValid(sectorSelect, false) && requiredNodesPresent;
 
   const failClosed = () => {
     root.dataset.quoteRuntime = 'invalid';
     root.setAttribute('aria-disabled', 'true');
     if (rangeNode instanceof HTMLElement) rangeNode.textContent = 'Estimate unavailable';
-    if (summaryNode instanceof HTMLElement) {
-      summaryNode.textContent = 'Quote configuration could not be validated. Please refresh or contact Canonical Plus.';
-    }
+    if (summaryNode instanceof HTMLElement) summaryNode.textContent = 'Quote configuration could not be validated. Please refresh or contact hello@canonical.plus.';
     if (meterNode instanceof HTMLElement) meterNode.style.width = '0%';
     if (completeButton instanceof HTMLButtonElement) completeButton.disabled = true;
     for (const control of allControls) control.disabled = true;
@@ -137,11 +120,7 @@ if (root instanceof HTMLElement) {
   } else {
     let money;
     try {
-      money = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency,
-        maximumFractionDigits: 0,
-      });
+      money = new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 });
       money.format(0);
     } catch {
       failClosed();
@@ -157,6 +136,7 @@ if (root instanceof HTMLElement) {
       const selectedRadio = (name) => root.querySelector(`input[name="${name}"]:checked`);
       const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
       const scrollBehavior = reducedMotion ? 'auto' : 'smooth';
+      const selectedOption = (select) => select.options[select.selectedIndex];
 
       const selectedSpeed = () => {
         const index = Number(speedSlider.value);
@@ -168,26 +148,51 @@ if (root instanceof HTMLElement) {
         const standards = checkedInputs('quote_standard');
         const depth = selectedRadio('quote_delivery_depth');
         const complexity = selectedRadio('quote_complexity');
+        const companyProfile = selectedRadio('quote_company_profile');
+        const employeeOption = selectedOption(employeeBand);
+        const sectorOption = selectedOption(sectorSelect);
 
         const standardAmount = standards.reduce((total, input) => total + Number(input.dataset.amount), 0);
         const depthAmount = depth instanceof HTMLInputElement ? Number(depth.dataset.amount) : 0;
         const complexityAmount = complexity instanceof HTMLInputElement ? Number(complexity.dataset.amount) : 0;
+        const companyAmount = companyProfile instanceof HTMLInputElement ? Number(companyProfile.dataset.amount) : 0;
+        const employeeAmount = Number(employeeOption?.dataset.amount || 0);
 
-        const rawMidpoint = speed.base + standardAmount + depthAmount + complexityAmount;
+        const rawMidpoint = speed.base + standardAmount + depthAmount + complexityAmount + companyAmount + employeeAmount;
         const midpoint = clamp(rawMidpoint, midpointFloor, midpointCeiling);
         const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
         const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
         const standardLabels = standards.map((input) => input.dataset.label).filter(Boolean);
         const depthLabel = depth instanceof HTMLInputElement ? depth.dataset.label : '';
         const complexityLabel = complexity instanceof HTMLInputElement ? complexity.dataset.label : '';
-        const summary = `${speed.label} · ${standardLabels.join(' + ') || 'No standard selected'} · ${depthLabel} · ${complexityLabel}`;
+        const companyLabel = companyProfile instanceof HTMLInputElement ? companyProfile.dataset.label : '';
+        const employeeLabel = employeeOption?.dataset.label || '';
+        const sectorLabel = sectorOption?.dataset.label || '';
+        const summary = `${speed.label} · ${standardLabels.join(' + ') || 'No standard selected'} · ${depthLabel} · ${complexityLabel} · ${companyLabel} · ${employeeLabel} · ${sectorLabel}`;
 
-        return { speed, standards, lower, upper, midpoint, summary };
+        return {
+          speed,
+          standards,
+          lower,
+          upper,
+          midpoint,
+          summary,
+          companyProfile: companyProfile?.value || '',
+          employeeBand: employeeBand.value,
+          sector: sectorSelect.value,
+        };
+      };
+
+      const syncIntake = (quote) => {
+        for (const node of document.querySelectorAll('[data-intake-estimate-range]')) node.value = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
+        for (const node of document.querySelectorAll('[data-intake-estimate-summary]')) node.value = quote.summary;
+        for (const node of document.querySelectorAll('[data-intake-company-profile]')) node.value = quote.companyProfile;
+        for (const node of document.querySelectorAll('[data-intake-employee-band]')) node.value = quote.employeeBand;
+        for (const node of document.querySelectorAll('[data-intake-sector]')) node.value = quote.sector;
       };
 
       const render = () => {
         const quote = calculate();
-
         speedLabel.textContent = quote.speed.label;
         speedNote.textContent = quote.speed.note;
         speedSlider.setAttribute('aria-valuetext', quote.speed.label);
@@ -195,23 +200,18 @@ if (root instanceof HTMLElement) {
         summaryNode.textContent = quote.summary;
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
         meterNode.style.width = `${clamp(percentage, 4, 100)}%`;
+        syncIntake(quote);
         if (quote.standards.length > 0) {
           standardError.hidden = true;
           standardGroup.removeAttribute('aria-invalid');
         }
-
         return quote;
       };
 
       const invalidateCompletedQuote = () => {
         if (!completedPanel.hidden) completedPanel.hidden = true;
       };
-
-      const handleEstimatorChange = () => {
-        invalidateCompletedQuote();
-        render();
-      };
-
+      const handleEstimatorChange = () => { invalidateCompletedQuote(); render(); };
       root.addEventListener('input', handleEstimatorChange);
       root.addEventListener('change', handleEstimatorChange);
 
@@ -225,9 +225,9 @@ if (root instanceof HTMLElement) {
           standardError.scrollIntoView({ behavior: scrollBehavior, block: 'center' });
           return;
         }
-
         completedRange.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
         completedSummary.textContent = quote.summary;
+        syncIntake(quote);
         completedPanel.hidden = false;
         completedPanel.focus({ preventScroll: true });
         completedPanel.scrollIntoView({ behavior: scrollBehavior, block: 'start' });
