@@ -3,7 +3,6 @@ const APP_HOST = 'app.canonical.plus';
 const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
 const QUOTE_PATH = '/u/quote';
 const quoteUrl = new URL(QUOTE_PATH, APP_ORIGIN);
-const signInUrl = new URL(QUOTE_PATH, APP_ORIGIN);
 
 const configureBrandStyles = () => {
   if (document.querySelector('link[data-canonical-brand-styles]')) {
@@ -70,8 +69,7 @@ const configureApplicationLinks = () => {
       continue;
     }
 
-    const kind = link.dataset.applicationLink;
-    link.href = kind === 'sign-in' ? signInUrl.href : quoteUrl.href;
+    link.href = quoteUrl.href;
     link.rel = 'noopener';
   }
 };
@@ -80,9 +78,9 @@ configureApplicationLinks();
 
 const configurePeopleNavigation = () => {
   const readinessLink = document.getElementById('nav-services');
-  const signInLink = document.getElementById('nav-sign-in');
+  const quoteLink = document.getElementById('nav-quote');
 
-  if (!(readinessLink instanceof HTMLAnchorElement) || !(signInLink instanceof HTMLAnchorElement)) {
+  if (!(readinessLink instanceof HTMLAnchorElement) || !(quoteLink instanceof HTMLAnchorElement)) {
     return;
   }
 
@@ -95,7 +93,7 @@ const configurePeopleNavigation = () => {
   peopleLink.className = 'nav__link';
   peopleLink.textContent = 'People';
   peopleLink.href = new URL('../people/', readinessLink.href).href;
-  signInLink.before(peopleLink);
+  quoteLink.before(peopleLink);
 };
 
 configurePeopleNavigation();

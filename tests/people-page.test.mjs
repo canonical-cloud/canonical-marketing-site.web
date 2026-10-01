@@ -17,7 +17,7 @@ const workflow = await read('../.github/workflows/people-contract.yml');
 const roster = [
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
-  ['Jack Johnson', 'Browser, Mobile, Clientside'],
+  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
@@ -66,7 +66,7 @@ test('local team headshots are used and unresolved identities stay neutral', () 
     '/team/nouman-siddiqui.jpg',
   ]);
 
-  for (const name of ['John Siliciano', 'Jack Johnson', 'Eugene Li', 'Tom Mensch', 'Georgiana Fabrecce']) {
+  for (const name of ['John Siliciano', 'Jeremy Reynolds', 'Eugene Li', 'Tom Mensch', 'Georgiana Fabrecce']) {
     assert.equal(directory.people.find((person) => person.name === name)?.photoUrl, undefined);
   }
   assert.match(grid, /person-card__fallback/);
@@ -88,11 +88,12 @@ test('team portraits are served locally and remain base-aware', async () => {
   assert.match(nginx, /img-src 'self' data: https:\/\/benefactor\.cc;/);
 });
 
-test('people navigation is base-aware and inserted before account actions', () => {
+test('people navigation is base-aware and inserted before the quote action', () => {
   assert.match(siteScript, /id = 'nav-people'/);
   assert.match(siteScript, /textContent = 'People'/);
   assert.match(siteScript, /new URL\('\.\.\/people\/', readinessLink\.href\)/);
-  assert.match(siteScript, /signInLink\.before\(peopleLink\)/);
+  assert.match(siteScript, /quoteLink\.before\(peopleLink\)/);
+  assert.doesNotMatch(siteScript, /nav-sign-in|signInLink/);
 });
 
 test('failed remote portraits fall back without inline handlers', () => {

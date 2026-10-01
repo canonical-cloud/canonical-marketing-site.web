@@ -37,19 +37,15 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "People", "Sign in"]);
+  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "People"]);
   assert.equal(
     await page.$eval("#nav-people", (element) => new URL(element.href).pathname),
     "/people/",
   );
-  assert.equal(
-    await page.$eval("#nav-sign-in", (element) => element.href),
-    "https://app.canonical.plus/u/quote",
-  );
+  assert.equal(await page.$("#nav-sign-in"), null);
 
-  // The primary quote CTA is intentionally public and same-origin; signing in
-  // remains a distinct action. This guards against accidentally reintroducing
-  // authentication as a prerequisite for building or completing an estimate.
+  // The primary quote CTA is intentionally public and same-origin. Authentication
+  // is not presented until a supported sign-in experience exists.
   const publicQuoteUrl = new URL('/quote/', server.url).href;
   assert.equal(
     await page.$eval("#nav-quote", (element) => element.href),

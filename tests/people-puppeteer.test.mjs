@@ -6,7 +6,7 @@ import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 const expectedPeople = [
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
-  ['Jack Johnson', 'Browser, Mobile, Clientside'],
+  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
@@ -81,7 +81,7 @@ test('puppeteer: people page renders twelve cards with responsive 4-to-2-to-1 co
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'JR', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
   assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 12);
