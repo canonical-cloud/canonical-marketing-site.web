@@ -20,7 +20,7 @@ const url = new URL(target);
 const sha40 = /^[0-9a-f]{40}$/;
 
 if (url.protocol !== 'https:' || url.host !== 'app.canonical.plus' || url.pathname !== '/u/quote' || url.search || url.hash) {
-  throw new Error('canonical CTA target must be exact credential-free https://app.canonical.plus/u/quote');
+  throw new Error('canonical authenticated application CTA target must be exact credential-free https://app.canonical.plus/u/quote');
 }
 
 // canonical-docs is private, while this repository is public. A pull-request
@@ -37,7 +37,7 @@ if (
   !Array.isArray(docsAuthority.admittedTargets) ||
   !docsAuthority.admittedTargets.includes(target)
 ) {
-  throw new Error('pinned product information architecture does not admit the canonical CTA target');
+  throw new Error('pinned product information architecture does not admit the canonical application CTA target');
 }
 
 if (webAuthority.repository !== 'canonical-cloud/canonical-web-server.rs' || !sha40.test(webAuthority.revision)) {
@@ -46,12 +46,26 @@ if (webAuthority.repository !== 'canonical-cloud/canonical-web-server.rs' || !sh
 if (!webRoutes.includes('.route("/u/quote", get(quote::page).post(quote::submit))')) {
   throw new Error('customer web server does not implement GET+POST /u/quote');
 }
-for (const [name, source] of Object.entries({ marketingIndex, siteScript, readme })) {
-  if (!source.includes('/u/quote')) throw new Error(`${name} does not reference /u/quote`);
+
+for (const [name, source] of Object.entries({ siteScript, readme })) {
+  if (!source.includes('/u/quote')) throw new Error(`${name} does not reference authenticated /u/quote`);
   if (source.includes('/u/readiness')) throw new Error(`${name} still contains obsolete /u/readiness`);
   if (/(?:access_token|refresh_token|id_token|return_to|[?&](?:token|tenant|subject|session)=)/i.test(source)) {
     throw new Error(`${name} contains credential/identity material in application-link source`);
   }
 }
 
-process.stdout.write(`application-route-authority: admitted ${target}\n`);
+// The public marketing estimator is intentionally separate from the authenticated
+// customer application. Visitors can build a lead/readiness estimate on canonical.plus
+// without being sent into the signed-in application route.
+if (!marketingIndex.includes('/quote/')) {
+  throw new Error('marketingIndex does not reference the public /quote/ estimator');
+}
+if (marketingIndex.includes('/u/readiness')) {
+  throw new Error('marketingIndex still contains obsolete /u/readiness');
+}
+if (/(?:access_token|refresh_token|id_token|return_to|[?&](?:token|tenant|subject|session)=)/i.test(marketingIndex)) {
+  throw new Error('marketingIndex contains credential/identity material in public quote source');
+}
+
+process.stdout.write(`application-route-authority: authenticated ${target}; public estimator /quote/\n`);
