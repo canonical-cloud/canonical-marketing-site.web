@@ -5,89 +5,84 @@ import '../styles/marketing-pages.css';
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const pricingHref = `${baseNoSlash}/pricing/`;
-const trainingHref = `${baseNoSlash}/training/`;
-const securityHref = `${baseNoSlash}/security/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
+const contactScriptHref = `${baseNoSlash}/contact-form.js`;
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
+const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 ---
 
 <BaseLayout
-  title="Contact"
-  description="Contact Canonical Plus about compliance readiness, security engineering, training, pricing, and assessment scoping."
+  title="Contact Canonical Plus"
+  description="Contact Canonical Plus about compliance readiness, remediation, pricing, payment plans, and pre-audit preparation."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">
       <div class="page-hero__copy">
         <span class="badge">Contact Canonical Plus</span>
-        <p class="page-hero__eyebrow">One public contact address</p>
+        <p class="page-hero__eyebrow">hello@canonical.plus</p>
         <h1 class="page-hero__title hero__title">
-          Start with the problem,
-          <span class="gradient-text">not a sales form.</span>
+          Talk through your readiness plan.
+          <span class="gradient-text">We’ll help scope the next step.</span>
         </h1>
         <p class="page-hero__subtitle">
-          Tell us what you are trying to prepare for, where the hard technical gaps are, and what
-          timeline or independent review you are working toward. We can use that context to scope the
-          right next step.
+          Tell us what framework, customer requirement, deadline, or technical gap you are working through.
+          We can help scope readiness, remediation, evidence preparation, and independent-audit coordination.
         </p>
         <div class="page-hero__actions">
-          <a class="btn btn--primary btn--large" href="mailto:hello@canonical.plus">Email hello@canonical.plus</a>
-          <a class="btn btn--secondary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--primary btn--large" href="mailto:hello@canonical.plus">hello@canonical.plus</a>
+          <a class="btn btn--secondary btn--large" href={quoteHref}>Build a quote</a>
         </div>
       </div>
-      <aside class="page-hero__panel" aria-label="Useful context for an introduction">
-        <h2>Useful context to include</h2>
+      <aside class="page-hero__panel">
+        <h2>Useful context</h2>
         <ul class="check-list">
-          <li>Frameworks, customer requirements, or review type</li>
-          <li>Cloud, application, and deployment footprint</li>
-          <li>Known security or evidence gaps</li>
-          <li>Target timeline and decision points</li>
+          <li>Frameworks or customer requirements</li>
+          <li>Cloud and application footprint</li>
+          <li>Known control, evidence, or remediation gaps</li>
+          <li>Target date and any independent review already scheduled</li>
         </ul>
       </aside>
     </div>
   </section>
 
-  <section class="section" aria-labelledby="paths-title">
-    <div class="container">
-      <header class="section-header section-header--center">
-        <span class="badge">Self-serve paths</span>
-        <h2 id="paths-title">Explore before you contact us.</h2>
-        <p>Use the public pages to understand scope, service depth, and the readiness boundary first.</p>
-      </header>
-      <div class="contact-grid">
-        <a class="card contact-card" href={pricingHref}>
-          <h3>Pricing</h3>
-          <p>Review the three proposed readiness tiers and their starting assumptions.</p>
-        </a>
-        <a class="card contact-card" href={trainingHref}>
-          <h3>Training</h3>
-          <p>Walk through the readiness model and evidence concepts without an account.</p>
-        </a>
-        <a class="card contact-card" href={securityHref}>
-          <h3>Security</h3>
-          <p>See how security requirements translate into accountable engineering and evidence work.</p>
-        </a>
+  <section class="section" aria-labelledby="contact-form-title">
+    <div class="container contact-layout">
+      <div>
+        <span class="badge">Send a message</span>
+        <h2 id="contact-form-title">Contact our readiness team</h2>
+        <p>Messages are delivered to <strong>hello@canonical.plus</strong>. Do not submit credentials, secrets, regulated records, or audit evidence through this public form.</p>
       </div>
+      <form class="card contact-form" data-contact-form data-supabase-url={supabaseUrl} data-supabase-key={supabaseKey}>
+        <label>Name<input name="name" type="text" autocomplete="name" minlength="2" maxlength="120" required /></label>
+        <label>Work email<input name="email" type="email" autocomplete="email" maxlength="320" required /></label>
+        <label>Company<input name="company" type="text" autocomplete="organization" minlength="2" maxlength="160" required /></label>
+        <label>What can we help with?
+          <select name="topic" required>
+            <option value="readiness">Readiness / pre-audit</option>
+            <option value="remediation">Technical remediation</option>
+            <option value="pricing">Pricing / payment plans</option>
+            <option value="audit-coordination">Independent audit coordination</option>
+            <option value="other">Other</option>
+          </select>
+        </label>
+        <label class="contact-form__wide">Message<textarea name="message" minlength="20" maxlength="4000" rows="7" required></textarea></label>
+        <div class="contact-form__wide action-row">
+          <button class="btn btn--primary btn--large" type="submit">Send to hello@canonical.plus</button>
+          <a class="btn btn--secondary btn--large" href={pricingHref}>View pricing</a>
+        </div>
+        <p class="contact-form__wide" data-contact-status role="status"></p>
+      </form>
     </div>
   </section>
+
+  <script type="module" src={contactScriptHref}></script>
 </BaseLayout>
 
 <style>
-  .contact-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-lg);
-  }
-
-  .contact-card {
-    display: block;
-  }
-
-  .contact-card:hover {
-    border-color: var(--av-teal);
-  }
-
-  @media (max-width: 900px) {
-    .contact-grid {
-      grid-template-columns: 1fr;
-    }
-  }
+  .contact-layout{display:grid;grid-template-columns:minmax(0,.7fr) minmax(0,1.3fr);gap:var(--space-xl);align-items:start}
+  .contact-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md)}
+  .contact-form label{display:grid;gap:.45rem;color:var(--av-text-secondary);font-weight:700}
+  .contact-form input,.contact-form select,.contact-form textarea{width:100%;padding:.8rem;border:1px solid var(--av-border);border-radius:var(--radius-md);background:var(--av-surface);color:var(--av-text-primary)}
+  .contact-form__wide{grid-column:1/-1}
+  @media(max-width:900px){.contact-layout,.contact-form{grid-template-columns:1fr}.contact-form__wide{grid-column:auto}}
 </style>
