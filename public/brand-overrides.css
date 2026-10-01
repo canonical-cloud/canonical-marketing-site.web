@@ -116,6 +116,30 @@ html:root[data-theme='light'] {
   text-transform: uppercase;
 }
 
+.footer__prominent-contact {
+  display: inline-flex;
+  margin-top: 0.8rem;
+  padding: 0.48rem 0.7rem;
+  border: 1px solid var(--av-orange-border);
+  border-radius: var(--radius-full);
+  background: var(--av-orange-glow);
+  color: var(--av-orange-light);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.footer__prominent-contact:hover,
+.footer__prominent-contact:focus-visible {
+  border-color: var(--av-orange);
+  background: color-mix(in srgb, var(--av-orange-glow) 78%, var(--av-surface-hover));
+  color: var(--av-text-primary);
+}
+
 @media (max-width: 1040px) {
   .nav__brand-lockup {
     gap: 0.55rem !important;
