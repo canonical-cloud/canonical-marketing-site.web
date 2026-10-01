@@ -18,21 +18,19 @@ const governedProjection = (value) => {
   return value;
 };
 
-test("public quote estimator authority pin is immutable and explicit", () => {
-  assert.equal(pin.schemaVersion, 1);
+test("public quote estimator authority pin is immutable and explicitly versioned", () => {
+  assert.equal(pin.schemaVersion, local.schemaVersion);
+  assert.equal(pin.schemaVersion, 2);
   assert.equal(pin.authorityRepository, "canonical-cloud/canonical-interfaces");
   assert.match(pin.authorityRevision, /^[0-9a-f]{40}$/);
-  assert.equal(pin.contractId, "urn:canonical-cloud:public-quote-estimator:v1");
-  assert.equal(
-    pin.authorityFixturePath,
-    "contracts/public-quote-estimator/v1/instances/PublicQuoteEstimatorConfig/valid/current.json",
-  );
-  assert.equal(pin.authoritySchemaPath, "contracts/public-quote-estimator/v1/authored.schema.json");
-  assert.equal(pin.authorityTypeSpecPath, "contracts/public-quote-estimator/v1/main.tsp");
+  assert.equal(pin.contractId, "urn:canonical-cloud:public-quote-estimator:v2");
+  assert.equal(pin.authorityFixturePath, "contracts/public-quote-estimator/v2/instances/PublicQuoteEstimatorConfig/valid/current.json");
+  assert.equal(pin.authoritySchemaPath, "contracts/public-quote-estimator/v2/authored.schema.json");
+  assert.equal(pin.authorityTypeSpecPath, "contracts/public-quote-estimator/v2/main.tsp");
 });
 
-test("local estimator explanatory notes remain non-empty presentation copy", () => {
-  for (const item of [...local.speeds, ...local.deliveryDepths, ...local.complexities]) {
+test("local explanatory notes remain non-empty presentation copy", () => {
+  for (const item of [...local.speeds, ...local.deliveryDepths, ...local.complexities, ...local.companyStages]) {
     assert.equal(typeof item.note, "string");
     assert.ok(item.note.trim().length > 0);
   }
@@ -42,9 +40,7 @@ test(
   "marketing estimator governed projection matches pinned canonical authority",
   { skip: !process.env.CANONICAL_QUOTE_AUTHORITY_FIXTURE },
   async () => {
-    const authority = JSON.parse(
-      await readFile(process.env.CANONICAL_QUOTE_AUTHORITY_FIXTURE, "utf8"),
-    );
+    const authority = JSON.parse(await readFile(process.env.CANONICAL_QUOTE_AUTHORITY_FIXTURE, "utf8"));
     assert.deepEqual(governedProjection(local), governedProjection(authority));
   },
 );
