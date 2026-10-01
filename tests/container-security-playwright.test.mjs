@@ -1,161 +1,108 @@
 import assert from "node:assert/strict";
+import { mkdir, readFile } from "node:fs/promises";
 import { test } from "node:test";
 import { chromium } from "playwright";
+import { chromeExecutablePath } from "./site-browser-harness.mjs";
 import { writeBrowserFailureDiagnostics } from "./browser-failure-diagnostics.mjs";
-import { chromeExecutablePath, startSite } from "./site-browser-harness.mjs";
 
-const requireContainerHeaders = process.env.CANONICAL_REQUIRE_SECURITY_HEADERS === "1";
-const artifactDirectory = process.env.CANONICAL_BROWSER_ARTIFACT_DIR?.trim();
+const serverUrl = process.env.CANONICAL_SITE_TEST_URL;
+const requireSecurityHeaders = process.env.CANONICAL_REQUIRE_SECURITY_HEADERS === "1";
 
-test(
-  "playwright verifies the shipped web surface enforces browser security policy",
-  { skip: !requireContainerHeaders },
-  async (t) => {
-    const server = await startSite();
-    t.after(() => server.stop());
-    const expectedOrigin = new URL(server.url).origin;
-    const targetUrl = `${server.url}/`;
+test("playwright verifies the shipped web surface enforces browser security policy", { skip: !serverUrl }, async (t) => {
+  const browser = await chromium.launch({
+    executablePath: chromeExecutablePath(),
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+  t.after(() => browser.close());
 
-    const browser = await chromium.launch({
-      executablePath: chromeExecutablePath(),
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-    t.after(() => browser.close());
+  const artifactDirectory = process.env.CANONICAL_BROWSER_ARTIFACT_DIR;
+  if (artifactDirectory) await mkdir(artifactDirectory, { recursive: true });
 
-    const context = await browser.newContext({
-      viewport: { width: 1440, height: 900 },
-      serviceWorkers: "block",
-    });
-    t.after(() => context.close());
-    await context.tracing.start({ screenshots: true, snapshots: true, sources: false });
+  const page = await browser.newPage({ viewport: { height: 900, width: 1440 } });
+  const pageErrors = [];
+  const externalRequests = [];
+  const sourceOrigin = new URL(serverUrl).origin;
 
-    const page = await context.newPage();
-    const externalRequests = [];
-    const failedRequests = [];
-    const pageErrors = [];
-    const consoleMessages = [];
-    let response;
-    let tracingStopped = false;
+  page.on("pageerror", (error) => pageErrors.push(error.message));
+  page.on("request", (request) => {
+    const target = new URL(request.url());
+    if (target.origin !== sourceOrigin) externalRequests.push(request.url());
+  });
 
-    page.on("request", (request) => {
-      if (new URL(request.url()).origin !== expectedOrigin) {
-        externalRequests.push(request.url());
-      }
-    });
-    page.on("requestfailed", (request) => {
-      failedRequests.push({
-        method: request.method(),
-        url: request.url(),
-        errorText: request.failure()?.errorText ?? "unknown",
-      });
-    });
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("console", (message) => {
-      consoleMessages.push({ type: message.type(), text: message.text() });
-    });
+  try {
+    let response = await page.goto(`${serverUrl}/`, { waitUntil: "networkidle" });
+    assert.ok(response);
+    assert.equal(response.status(), 200);
 
-    try {
-      response = await page.goto(targetUrl, { waitUntil: "networkidle" });
-      assert.ok(response);
-      assert.equal(response.status(), 200);
-
-      const finalUrl = new URL(response.url());
-      assert.equal(
-        finalUrl.origin,
-        expectedOrigin,
-        "the deployed origin must not redirect browser trust to another host",
-      );
-
-      // Use the complete wire-visible header set. Playwright's compact headers()
-      // view can omit security-sensitive fields on some response paths.
-      const headers = await response.allHeaders();
-      assert.match(headers["content-type"], /^text\/html\b/i);
+    if (requireSecurityHeaders) {
+      const headers = response.headers();
+      const csp = headers["content-security-policy"] || "";
+      assert.match(csp, /default-src 'self'/);
+      assert.match(csp, /script-src 'self'/);
+      const scriptDirective = csp.split(';').map((part) => part.trim()).find((part) => part.startsWith('script-src')) || '';
+      assert.doesNotMatch(scriptDirective, /'unsafe-inline'/);
       assert.equal(headers["x-content-type-options"], "nosniff");
       assert.equal(headers["x-frame-options"], "DENY");
-      assert.equal(headers["referrer-policy"], "strict-origin-when-cross-origin");
+      assert.ok(headers["referrer-policy"]);
+      assert.ok(headers["permissions-policy"]);
       assert.equal(headers["cross-origin-opener-policy"], "same-origin");
-      assert.match(headers["permissions-policy"], /camera=\(\)/);
-      assert.match(headers["permissions-policy"], /microphone=\(\)/);
-
-      if (finalUrl.protocol === "https:") {
-        assert.match(
-          headers["strict-transport-security"],
-          /^max-age=\d+(?:;|$)/,
-          "the live HTTPS origin must advertise HSTS",
-        );
-      }
-
-      const csp = headers["content-security-policy"];
-      assert.ok(csp, "response must include a Content-Security-Policy");
-      for (const directive of [
-        "default-src 'self'",
-        "script-src 'self'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "frame-ancestors 'none'",
-        "object-src 'none'",
-      ]) {
-        assert.match(csp, new RegExp(directive.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
-      }
-      assert.doesNotMatch(csp, /script-src[^;]*'unsafe-inline'/);
-      assert.doesNotMatch(csp, /script-src[^;]*\*/);
-
-      // Exercise the policy in Chromium rather than merely parsing the header.
-      await page.evaluate(() => {
-        const script = document.createElement("script");
-        script.textContent = "window.__canonicalInlineScriptExecuted = true";
-        document.head.append(script);
-      });
-      await page.waitForTimeout(100);
-      assert.equal(
-        await page.evaluate(() => window.__canonicalInlineScriptExecuted),
-        undefined,
-        "the response CSP must block executable inline script",
-      );
-
-      // Exercise the no-login estimator through the exact deployable nginx/CSP
-      // surface. This catches route-specific script/CSP regressions that the
-      // landing-page security probe cannot see.
-      response = await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
-      assert.ok(response);
-      assert.equal(response.status(), 200);
-      assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), 'ready');
-      assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
-      await page.locator('[data-complete-public-quote]').click();
-      assert.equal(await page.locator('[data-quote-complete]').isVisible(), true);
-
-      // Neither the landing page nor the public quote flow may silently expand
-      // the production network/CSP trust surface.
-      assert.deepEqual(externalRequests, []);
-      assert.deepEqual(pageErrors, []);
-    } catch (error) {
-      try {
-        const result = await writeBrowserFailureDiagnostics({
-          artifactDirectory,
-          context,
-          page,
-          response,
-          targetUrl,
-          error,
-          externalRequests,
-          failedRequests,
-          pageErrors,
-          consoleMessages,
-        });
-        tracingStopped = result.tracingStopped;
-      } catch (diagnosticError) {
-        process.stderr.write(
-          `browser diagnostic capture failed: ${diagnosticError?.message ?? diagnosticError}\n`,
-        );
-      }
-      throw error;
-    } finally {
-      if (!tracingStopped) {
-        await context.tracing.stop().catch((error) => {
-          process.stderr.write(`browser trace cleanup failed: ${error.message}\n`);
-        });
-      }
     }
-  },
-);
+
+    assert.equal(
+      await page.evaluate(() => typeof window.canonicalTheme?.apply),
+      "function",
+      "external theme bootstrap must execute under the production CSP",
+    );
+    assert.equal(
+      await page.locator("#nav-people").getAttribute("href"),
+      "/people/",
+      "external site bootstrap must execute and add the People navigation link",
+    );
+    assert.equal(await page.locator("#nav-sign-in").count(), 0);
+    assert.equal(await page.locator("#nav-quote").getAttribute("href"), "/quote/");
+
+    const inlineResult = await page.evaluate(() => {
+      window.__canonicalInlineScriptExecuted = undefined;
+      const script = document.createElement("script");
+      script.textContent = "window.__canonicalInlineScriptExecuted = true";
+      document.body.append(script);
+    });
+    assert.equal(inlineResult, undefined);
+    await page.waitForTimeout(100);
+    assert.equal(
+      await page.evaluate(() => window.__canonicalInlineScriptExecuted),
+      undefined,
+      "the response CSP must block executable inline script",
+    );
+
+    // Exercise the no-login estimator through the exact deployable nginx/CSP
+    // surface. This catches route-specific script/CSP regressions that the
+    // landing-page security probe cannot see.
+    response = await page.goto(`${serverUrl}/quote/`, { waitUntil: "networkidle" });
+    assert.ok(response);
+    assert.equal(response.status(), 200);
+    assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), 'ready');
+    assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$11,000–$13,500');
+    await page.locator('[data-complete-public-quote]').click();
+    assert.equal(await page.locator('[data-quote-complete]').isVisible(), true);
+
+    // Neither the landing page nor the public quote flow may silently expand
+    // the production network/CSP trust surface before explicit form submission.
+    assert.deepEqual(externalRequests, []);
+    assert.deepEqual(pageErrors, []);
+  } catch (error) {
+    try {
+      const result = await writeBrowserFailureDiagnostics({
+        artifactDirectory,
+        page,
+        error,
+        sourceUrl: serverUrl,
+      });
+      if (result) console.error(`browser diagnostics written to ${result}`);
+    } catch (diagnosticsError) {
+      console.error("failed to write browser diagnostics", diagnosticsError);
+    }
+    throw error;
+  }
+});

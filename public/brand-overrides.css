@@ -6,6 +6,7 @@ html:root[data-theme='dark'] {
   --av-orange-dark: #c2410c;
   --av-orange-glow: rgba(249, 115, 22, 0.14);
   --av-orange-border: rgba(249, 115, 22, 0.36);
+  --av-accent: var(--av-orange);
 
   /* Compatibility aliases while existing components migrate off the old accent token names. */
   --av-magenta: var(--av-orange);
@@ -21,6 +22,7 @@ html:root[data-theme='medium'] {
   --av-orange-dark: #ea580c;
   --av-orange-glow: rgba(251, 146, 60, 0.15);
   --av-orange-border: rgba(251, 146, 60, 0.4);
+  --av-accent: var(--av-orange);
 
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
@@ -35,6 +37,7 @@ html:root[data-theme='light'] {
   --av-orange-dark: #9a3412;
   --av-orange-glow: rgba(194, 65, 12, 0.1);
   --av-orange-border: rgba(194, 65, 12, 0.28);
+  --av-accent: var(--av-orange);
 
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
@@ -114,6 +117,30 @@ html:root[data-theme='light'] {
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.footer__prominent-contact {
+  display: inline-flex;
+  margin-top: 0.8rem;
+  padding: 0.48rem 0.7rem;
+  border: 1px solid var(--av-orange-border);
+  border-radius: var(--radius-full);
+  background: var(--av-orange-glow);
+  color: var(--av-orange-light);
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.footer__prominent-contact:hover,
+.footer__prominent-contact:focus-visible {
+  border-color: var(--av-orange);
+  background: color-mix(in srgb, var(--av-orange-glow) 78%, var(--av-surface-hover));
+  color: var(--av-text-primary);
 }
 
 @media (max-width: 1040px) {

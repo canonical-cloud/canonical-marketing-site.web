@@ -38,84 +38,92 @@ if (
   throw new Error('Invalid quote estimator configuration');
 }
 
+const companyProfiles = [
+  { id: 'startup', label: 'Startup', amountUsd: 0, note: 'Focused teams proving an initial readiness program.' },
+  { id: 'business', label: 'Business', amountUsd: 750, note: 'Growing organizations with more owners, systems, and evidence sources.' },
+  { id: 'enterprise', label: 'Enterprise', amountUsd: 2000, note: 'Broader stakeholder, system, and coordination scope.' },
+];
+const employeeBands = [
+  { id: '1_25', label: '1–25 employees', amountUsd: 0 },
+  { id: '26_100', label: '26–100 employees', amountUsd: 500 },
+  { id: '101_500', label: '101–500 employees', amountUsd: 1250 },
+  { id: '501_2000', label: '501–2,000 employees', amountUsd: 2500 },
+  { id: '2001_plus', label: '2,001+ employees', amountUsd: 4000 },
+];
+const sectors = [
+  ['software_saas', 'Software / SaaS'],
+  ['financial_services', 'Financial services / Fintech'],
+  ['healthcare', 'Healthcare / Life sciences'],
+  ['ecommerce_retail', 'E-commerce / Retail'],
+  ['professional_services', 'Professional services'],
+  ['manufacturing_logistics', 'Manufacturing / Logistics'],
+  ['public_education', 'Public sector / Education'],
+  ['other', 'Other'],
+];
+
 const defaultSpeedIndex = estimator.speeds.findIndex((speed) => speed.weeks === estimator.defaults.speedWeeks);
 const defaultSpeed = estimator.speeds[defaultSpeedIndex];
 const defaultStandardIds = new Set(estimator.defaults.standardIds);
 const defaultStandards = estimator.standards.filter((standard) => defaultStandardIds.has(standard.id));
 const defaultDepth = estimator.deliveryDepths.find((depth) => depth.id === estimator.defaults.deliveryDepthId);
 const defaultComplexity = estimator.complexities.find((complexity) => complexity.id === estimator.defaults.complexityId);
+const defaultCompanyProfile = companyProfiles[1];
+const defaultEmployeeBand = employeeBands[1];
 
-if (
-  defaultSpeedIndex < 0 ||
-  !defaultSpeed ||
-  defaultStandardIds.size === 0 ||
-  defaultStandards.length !== defaultStandardIds.size ||
-  !defaultDepth ||
-  !defaultComplexity
-) {
+if (!defaultSpeed || defaultSpeedIndex < 0 || defaultStandards.length !== defaultStandardIds.size || !defaultDepth || !defaultComplexity) {
   throw new Error('Invalid quote estimator defaults');
 }
 
-const money = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: catalog.source.currency,
-  maximumFractionDigits: 0,
-});
+const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: catalog.source.currency, maximumFractionDigits: 0 });
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number) => Math.round(value / estimator.roundToUsd) * estimator.roundToUsd;
 const defaultStandardAmount = defaultStandards.reduce((total, standard) => total + standard.amountUsd, 0);
 const defaultMidpoint = clamp(
-  defaultSpeed.baseUsd + defaultStandardAmount + defaultDepth.amountUsd + defaultComplexity.amountUsd,
+  defaultSpeed.baseUsd + defaultStandardAmount + defaultDepth.amountUsd + defaultComplexity.amountUsd + defaultCompanyProfile.amountUsd + defaultEmployeeBand.amountUsd,
   estimator.midpointFloorUsd,
   estimator.midpointCeilingUsd,
 );
-const defaultLower = clamp(
-  roundMoney(defaultMidpoint * estimator.lowerFactor),
-  estimator.estimateFloorUsd,
-  estimator.estimateCeilingUsd,
-);
-const defaultUpper = clamp(
-  roundMoney(defaultMidpoint * estimator.upperFactor),
-  defaultLower,
-  estimator.estimateCeilingUsd,
-);
+const defaultLower = clamp(roundMoney(defaultMidpoint * estimator.lowerFactor), estimator.estimateFloorUsd, estimator.estimateCeilingUsd);
+const defaultUpper = clamp(roundMoney(defaultMidpoint * estimator.upperFactor), defaultLower, estimator.estimateCeilingUsd);
 const initialRange = `${money.format(defaultLower)}–${money.format(defaultUpper)}`;
-const initialSummary = `${defaultSpeed.label} · ${defaultStandards.map((standard) => standard.label).join(' + ')} · ${defaultDepth.label} · ${defaultComplexity.label}`;
+const initialSummary = `${defaultSpeed.label} · ${defaultStandards.map((standard) => standard.label).join(' + ')} · ${defaultDepth.label} · ${defaultComplexity.label} · ${defaultCompanyProfile.label} · ${defaultEmployeeBand.label}`;
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const quoteEstimatorScriptHref = `${baseNoSlash}/quote-estimator.js`;
+const intakeScriptHref = `${baseNoSlash}/intake-form.js`;
 const contactHref = `${baseNoSlash}/contact/`;
-const appQuoteUrl = 'https://app.canonical.plus/u/quote';
+const intakeEndpoint = import.meta.env.PUBLIC_CANONICAL_INTAKE_URL || '';
 ---
 
 <BaseLayout
   title="Compliance readiness quote"
-  description="Build a public Canonical Plus readiness estimate without creating an account, then optionally sign in for the separate authenticated quote workflow."
+  description="Scope a Canonical Plus readiness or pre-audit engagement and receive a planning estimate by email."
 >
   <section class="page-hero section--hero bg-grid bg-radial">
     <div class="container page-hero__grid">
       <div class="page-hero__copy">
-        <span class="badge">Public readiness quote</span>
-        <p class="page-hero__eyebrow">No account required · estimate in page memory</p>
-        <h1 class="page-hero__title hero__title">Price the readiness work.<br /><span class="gradient-text">Then decide how to continue.</span></h1>
+        <span class="badge">Readiness & pre-audit scoping</span>
+        <p class="page-hero__eyebrow">Fast planning range · no account required</p>
+        <h1 class="page-hero__title hero__title">Scope the work.<br /><span class="gradient-text">Get a useful planning range.</span></h1>
         <p class="page-hero__subtitle">
-          Adjust delivery speed, compliance standards, service depth, and environment complexity to get a live project range.
-          The estimator works without signing in and never transmits or persists these selections. Signing in starts the separate account quote workflow; this browser estimate is not automatically transferred.
+          Canonical Plus supports readiness assessments, pre-audit preparation, evidence organization, and technical remediation.
+          Adjust the factors below, then email the estimate to yourself and our team so we can turn it into a reviewed scope.
         </p>
         <div class="page-hero__actions">
-          <a class="btn btn--primary btn--large" href="#quote-estimator">Complete quote without login</a>
-          <a class="btn btn--secondary btn--large" href={appQuoteUrl} data-quote-login>Sign in</a>
+          <a class="btn btn--primary btn--large" href="#quote-estimator">Build my estimate</a>
+          <a class="btn btn--secondary btn--large" href="mailto:hello@canonical.plus">hello@canonical.plus</a>
         </div>
+        <p class="commercial-note">Milestone payment plans are available. Multi-framework and full-scope readiness engagements may qualify for bundled-scope discounts.</p>
       </div>
-      <aside class="page-hero__panel">
+      <aside class="page-hero__panel" aria-label="What drives the readiness estimate">
         <h2>What drives the estimate</h2>
         <ul>
-          <li>Delivery speed: 9 weeks, 5 weeks, or an intensive 3-week window</li>
-          <li>Standards such as SOC 2, ISO 27001, NIST, GDPR, HIPAA, PCI DSS, FedRAMP, and CIS Controls</li>
-          <li>Service depth: advisory, managed readiness, or hands-on remediation</li>
-          <li>Environment complexity: focused, growing, or complex / regulated</li>
+          <li>Target timeline and frameworks</li>
+          <li>Service depth and environment complexity</li>
+          <li>Company stage and employee scale</li>
+          <li>Business sector, used to improve scoping rather than apply an automatic industry surcharge</li>
         </ul>
-        <p>The result is a planning range, not a binding offer. A reviewed statement of work controls final scope and price.</p>
+        <p>The range is planning guidance. A reviewed statement of work controls final scope, deliverables, milestones, and price.</p>
       </aside>
     </div>
   </section>
@@ -124,8 +132,8 @@ const appQuoteUrl = 'https://app.canonical.plus/u/quote';
     <div class="container">
       <div class="section-header">
         <span class="badge">Instant estimator</span>
-        <h2 id="quote-estimator-title">Build your project quote</h2>
-        <p>Nothing here requires authentication. Selections stay in browser memory for this page session and are not sent to Canonical Plus.</p>
+        <h2 id="quote-estimator-title">Build your readiness quote</h2>
+        <p>Start with the public estimate, then send it to your inbox. We use the submitted details only when you choose to email the quote.</p>
       </div>
 
       <div
@@ -142,101 +150,52 @@ const appQuoteUrl = 'https://app.canonical.plus/u/quote';
         data-upper-factor={estimator.upperFactor}
       >
         <div class="quote-estimator__controls">
-          <fieldset class="quote-control-card">
-            <legend>1. Delivery speed</legend>
-            <div class="quote-slider__heading">
-              <span>More planning room</span>
-              <strong data-speed-label>{defaultSpeed.label}</strong>
-              <span>Faster delivery</span>
-            </div>
-            <input
-              class="quote-slider"
-              id="quote-speed"
-              type="range"
-              min="0"
-              max={estimator.speeds.length - 1}
-              step="1"
-              value={defaultSpeedIndex}
-              aria-label="Delivery speed"
-              aria-valuetext={defaultSpeed.label}
-              data-quote-speed-slider
-            />
-            <div class="quote-slider__ticks" aria-hidden="true">
-              {estimator.speeds.map((speed) => <span>{speed.label}</span>)}
-            </div>
+          <section class="quote-control-card" aria-labelledby="quote-speed-title">
+            <h3 class="quote-control-card__title" id="quote-speed-title">1. Delivery speed</h3>
+            <div class="quote-slider__heading"><span>More planning room</span><strong data-speed-label>{defaultSpeed.label}</strong><span>Faster delivery</span></div>
+            <input class="quote-slider" id="quote-speed" type="range" min="0" max={estimator.speeds.length - 1} step="1" value={defaultSpeedIndex} aria-label="Delivery speed" aria-valuetext={defaultSpeed.label} data-quote-speed-slider />
+            <div class="quote-slider__ticks" aria-hidden="true">{estimator.speeds.map((speed) => <span>{speed.label}</span>)}</div>
             <p class="quote-control-note" data-speed-note>{defaultSpeed.note}</p>
-            <div hidden aria-hidden="true">
-              {estimator.speeds.map((speed, index) => (
-                <span
-                  data-quote-speed-option
-                  data-index={index}
-                  data-weeks={speed.weeks}
-                  data-label={speed.label}
-                  data-base={speed.baseUsd}
-                  data-note={speed.note}
-                ></span>
-              ))}
-            </div>
-          </fieldset>
+            <div hidden aria-hidden="true">{estimator.speeds.map((speed, index) => <span data-quote-speed-option data-index={index} data-weeks={speed.weeks} data-label={speed.label} data-base={speed.baseUsd} data-note={speed.note}></span>)}</div>
+          </section>
 
           <fieldset class="quote-control-card" aria-describedby="quote-standard-note quote-standard-error">
-            <legend>2. Standards to meet</legend>
-            <p class="quote-control-note" id="quote-standard-note">Choose at least one. Overlapping control work is intentionally priced below a simple per-framework sum.</p>
+            <legend class="sr-only">Standards to meet</legend>
+            <h3 class="quote-control-card__title">2. Standards to meet</h3>
+            <p class="quote-control-note" id="quote-standard-note">Choose at least one. Shared control work is accounted for so overlapping frameworks are not treated as completely separate projects.</p>
             <div class="quote-checkbox-grid" data-standards-group>
-              {estimator.standards.map((standard) => (
-                <label class="quote-check">
-                  <input
-                    type="checkbox"
-                    name="quote_standard"
-                    value={standard.id}
-                    data-label={standard.label}
-                    data-amount={standard.amountUsd}
-                    checked={defaultStandardIds.has(standard.id)}
-                  />
-                  <span>{standard.label}</span>
-                </label>
-              ))}
+              {estimator.standards.map((standard) => <label class="quote-check"><input type="checkbox" name="quote_standard" value={standard.id} data-label={standard.label} data-amount={standard.amountUsd} checked={defaultStandardIds.has(standard.id)} /><span>{standard.label}</span></label>)}
             </div>
             <p class="quote-validation" id="quote-standard-error" data-standard-error role="alert" hidden>Please select at least one standard.</p>
           </fieldset>
 
           <fieldset class="quote-control-card">
-            <legend>3. Service depth</legend>
-            <div class="quote-radio-list">
-              {estimator.deliveryDepths.map((depth) => (
-                <label class="quote-radio">
-                  <input
-                    type="radio"
-                    name="quote_delivery_depth"
-                    value={depth.id}
-                    data-label={depth.label}
-                    data-amount={depth.amountUsd}
-                    checked={depth.id === defaultDepth.id}
-                  />
-                  <span><strong>{depth.label}</strong><small>{depth.note}</small></span>
-                </label>
-              ))}
-            </div>
+            <legend class="sr-only">Service depth</legend>
+            <h3 class="quote-control-card__title">3. Service depth</h3>
+            <div class="quote-radio-list">{estimator.deliveryDepths.map((depth) => <label class="quote-radio"><input type="radio" name="quote_delivery_depth" value={depth.id} data-label={depth.label} data-amount={depth.amountUsd} checked={depth.id === defaultDepth.id} /><span><strong>{depth.label}</strong><small>{depth.note}</small></span></label>)}</div>
           </fieldset>
 
           <fieldset class="quote-control-card">
-            <legend>4. Environment complexity</legend>
-            <div class="quote-radio-list">
-              {estimator.complexities.map((complexity) => (
-                <label class="quote-radio">
-                  <input
-                    type="radio"
-                    name="quote_complexity"
-                    value={complexity.id}
-                    data-label={complexity.label}
-                    data-amount={complexity.amountUsd}
-                    checked={complexity.id === defaultComplexity.id}
-                  />
-                  <span><strong>{complexity.label}</strong><small>{complexity.note}</small></span>
-                </label>
-              ))}
-            </div>
+            <legend class="sr-only">Environment complexity</legend>
+            <h3 class="quote-control-card__title">4. Environment complexity</h3>
+            <div class="quote-radio-list">{estimator.complexities.map((complexity) => <label class="quote-radio"><input type="radio" name="quote_complexity" value={complexity.id} data-label={complexity.label} data-amount={complexity.amountUsd} checked={complexity.id === defaultComplexity.id} /><span><strong>{complexity.label}</strong><small>{complexity.note}</small></span></label>)}</div>
           </fieldset>
+
+          <fieldset class="quote-control-card">
+            <legend class="sr-only">Company profile</legend>
+            <h3 class="quote-control-card__title">5. Company profile</h3>
+            <p class="quote-control-note">Company stage affects the amount of coordination and program structure typically required.</p>
+            <div class="quote-radio-list">{companyProfiles.map((profile) => <label class="quote-radio"><input type="radio" name="quote_company_profile" value={profile.id} data-label={profile.label} data-amount={profile.amountUsd} checked={profile.id === defaultCompanyProfile.id} /><span><strong>{profile.label}</strong><small>{profile.note}</small></span></label>)}</div>
+          </fieldset>
+
+          <section class="quote-control-card" aria-labelledby="company-context-title">
+            <h3 class="quote-control-card__title" id="company-context-title">6. Team size & sector</h3>
+            <div class="quote-select-grid">
+              <label class="quote-select"><span>Employees</span><select name="quote_employee_band" data-quote-employee-band>{employeeBands.map((band) => <option value={band.id} data-label={band.label} data-amount={band.amountUsd} selected={band.id === defaultEmployeeBand.id}>{band.label}</option>)}</select></label>
+              <label class="quote-select"><span>Business sector</span><select name="quote_sector" data-quote-sector>{sectors.map(([id, label]) => <option value={id} data-label={label}>{label}</option>)}</select></label>
+            </div>
+            <p class="quote-control-note">Employee scale contributes to the estimate. Sector helps us scope likely evidence and regulatory context but does not automatically increase the price.</p>
+          </section>
         </div>
 
         <aside class="quote-estimator__result" aria-live="polite" aria-atomic="true">
@@ -244,99 +203,100 @@ const appQuoteUrl = 'https://app.canonical.plus/u/quote';
           <p class="quote-estimator__price"><strong data-quote-range>{initialRange}</strong></p>
           <p class="quote-estimator__summary" data-quote-summary>{initialSummary}</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
-          <p class="quote-estimator__boundary">Typical public estimator range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Final pricing depends on validated scope.</p>
-          <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Complete quote without login</button>
-          <a class="btn btn--secondary" href={appQuoteUrl} data-quote-login>Sign in</a>
-          <p class="quote-estimator__privacy">No account is required to calculate or complete this estimate. The local estimate stays in page memory and is not sent to Canonical Plus. Signing in starts a separate account quote workflow.</p>
+          <p class="quote-estimator__boundary">Public planning range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Broader enterprise scopes can exceed the public estimator and are reviewed before a proposal is issued.</p>
+          <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Review & email my quote</button>
+          <a class="btn btn--secondary" href="mailto:hello@canonical.plus">Questions? hello@canonical.plus</a>
+          <p class="quote-estimator__privacy">Calculation stays in the page until you choose to submit the email form below.</p>
         </aside>
       </div>
 
       <section class="quote-complete" data-quote-complete hidden tabindex="-1" aria-labelledby="quote-complete-title">
-        <span class="badge">Quote completed locally</span>
-        <h2 id="quote-complete-title">Your planning estimate is ready</h2>
+        <span class="badge">Planning estimate ready</span>
+        <h2 id="quote-complete-title">Email this quote to yourself</h2>
         <p class="quote-complete__range" data-completed-range></p>
         <p data-completed-summary></p>
-        <p>This completion does not create an account, send data to Canonical Plus, or bind either party. Changing any input invalidates this completed snapshot so you cannot accidentally rely on a stale range.</p>
-        <div class="page-hero__actions">
-          <a class="btn btn--primary" href={appQuoteUrl} data-quote-login>Sign in for account quote</a>
-          <a class="btn btn--secondary" href={contactHref}>Talk to us without an account</a>
-        </div>
+        <p>We will send the estimate details to the address you provide and copy <strong>hello@canonical.plus</strong>, so both sides have the same scoping snapshot.</p>
+
+        <form class="intake-form" data-intake-form data-intake-kind="quote" data-intake-endpoint={intakeEndpoint}>
+          <div class="intake-form__grid">
+            <label><span>Your name</span><input name="contact_name" type="text" autocomplete="name" maxlength="120" required /></label>
+            <label><span>Work email</span><input name="contact_email" type="email" autocomplete="email" maxlength="254" required /></label>
+            <label><span>Organization</span><input name="organization_name" type="text" autocomplete="organization" maxlength="160" required /></label>
+            <label><span>Target date <small>(optional)</small></span><input name="target_date" type="date" /></label>
+          </div>
+          <label class="intake-form__wide"><span>Anything we should know? <small>(optional)</small></span><textarea name="notes" rows="4" maxlength="2000" placeholder="Customer requirement, audit window, known gaps, or special constraints"></textarea></label>
+          <input type="text" name="company_website" tabindex="-1" autocomplete="off" class="intake-form__honeypot" aria-hidden="true" />
+          <input type="hidden" name="estimate_range" data-intake-estimate-range />
+          <input type="hidden" name="estimate_summary" data-intake-estimate-summary />
+          <input type="hidden" name="company_profile" data-intake-company-profile />
+          <input type="hidden" name="employee_band" data-intake-employee-band />
+          <input type="hidden" name="sector" data-intake-sector />
+          <div class="intake-form__actions"><button class="btn btn--primary btn--large" type="submit">Email my quote</button><a class="btn btn--secondary" href={contactHref}>Talk to us first</a></div>
+          <p class="intake-form__status" data-intake-status role="status" aria-live="polite"></p>
+          <p class="intake-form__privacy">Submitting sends these scoping details to Canonical Plus for quote follow-up. Do not include passwords, secrets, payment-card data, or protected health information.</p>
+        </form>
       </section>
+    </div>
+  </section>
+
+  <section class="section section--subtle">
+    <div class="container commercial-grid">
+      <article class="card"><span class="badge">Flexible commercial terms</span><h2>Payment plans for larger engagements</h2><p>Eligible projects can use milestone-based payment schedules tied to agreed deliverables and dates. The statement of work itemizes fees, payment timing, assumptions, and change-control rules.</p></article>
+      <article class="card"><span class="badge">Bundled scope</span><h2>Discounts where work genuinely overlaps</h2><p>Multi-framework and full-scope readiness work may qualify for discounts when controls, evidence, and remediation can be reused. Discounts are written into the proposal rather than implied by the estimator.</p></article>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <div class="section-header">
-        <span class="badge">Ongoing service tiers</span>
-        <h2>Three published starting points</h2>
-        <p>These are recurring readiness service tiers. They are separate from the one-time project estimate above.</p>
-      </div>
-      <div class="quote-tier-grid" aria-label="Canonical readiness service levels">
-        {catalog.tiers.map((tier) => (
-          <article class="card quote-tier-card">
-            <div>
-              <p class="quote-tier-card__eyebrow">{tier.name}</p>
-              <p class="quote-tier-card__price"><strong>{money.format(tier.monthlyUsd)}</strong> <span>/ month</span></p>
-              <p>{tier.summary}</p>
-            </div>
-            <ul>{tier.includes.map((item) => <li>{item}</li>)}</ul>
-            <a class="btn btn--secondary" href={appQuoteUrl} data-quote-login>Sign in to continue</a>
-          </article>
-        ))}
-      </div>
-      <p class="quote-disclaimer">The public estimator and tier cards do not create an audit opinion, certification, authorization, legal conclusion, or promise of an independent review outcome.</p>
+      <div class="section-header"><span class="badge">Ongoing service tiers</span><h2>Three published starting points</h2><p>Recurring readiness support can follow the initial project when you want ongoing evidence, control, and remediation operations.</p></div>
+      <div class="quote-tier-grid" aria-label="Canonical readiness service levels">{catalog.tiers.map((tier) => <article class="card quote-tier-card"><div><p class="quote-tier-card__eyebrow">{tier.name}</p><p class="quote-tier-card__price"><strong>{money.format(tier.monthlyUsd)}</strong> <span>/ month</span></p><p>{tier.summary}</p></div><ul>{tier.includes.map((item) => <li>{item}</li>)}</ul><a class="btn btn--secondary" href={contactHref}>Discuss this tier</a></article>)}</div>
+      <p class="quote-disclaimer">Canonical Plus prepares teams, controls, evidence, and remediation for review. Formal audit, certification, or authorization decisions remain with the qualified independent evaluator responsible for that engagement.</p>
     </div>
   </section>
 
   <script type="module" src={quoteEstimatorScriptHref}></script>
+  <script type="module" src={intakeScriptHref}></script>
 </BaseLayout>
 
 <style>
-  .quote-estimator { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, .75fr); gap: var(--space-xl); align-items: start; }
+  .commercial-note { max-width: 48rem; color: var(--av-text-secondary); font-size: .92rem; line-height: 1.55; }
+  .quote-estimator { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr); gap: var(--space-xl); align-items: start; }
   .quote-estimator__controls { display: grid; gap: var(--space-lg); }
-  .quote-control-card { margin: 0; padding: clamp(1.15rem, 2vw, 1.6rem); border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); }
-  .quote-control-card legend { padding: 0 .35rem; font-size: 1.05rem; font-weight: 800; }
-  .quote-control-note { color: var(--av-text-secondary); line-height: 1.55; }
+  .quote-control-card { margin: 0; padding: clamp(1.25rem, 2vw, 1.7rem); border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); min-width: 0; }
+  .quote-control-card__title { margin: 0 0 .9rem; color: var(--av-text-primary); font-size: 1.08rem; font-weight: 850; line-height: 1.25; }
+  .quote-control-card > .sr-only:first-child + .quote-control-card__title { margin-top: 0; }
+  .quote-control-note { margin: 0 0 .9rem; color: var(--av-text-secondary); line-height: 1.55; }
   .quote-slider { width: 100%; accent-color: var(--av-accent); }
   .quote-slider__heading, .quote-slider__ticks { display: grid; grid-template-columns: 1fr auto 1fr; gap: .75rem; align-items: center; }
   .quote-slider__heading { margin-bottom: .8rem; color: var(--av-text-secondary); font-size: .88rem; }
   .quote-slider__heading strong { color: var(--av-text-primary); font-size: 1.05rem; }
   .quote-slider__heading span:last-child { text-align: right; }
   .quote-slider__ticks { grid-template-columns: repeat(3, 1fr); margin-top: .35rem; color: var(--av-text-secondary); font-size: .8rem; }
-  .quote-slider__ticks span:nth-child(2) { text-align: center; }
-  .quote-slider__ticks span:last-child { text-align: right; }
+  .quote-slider__ticks span:nth-child(2) { text-align: center; } .quote-slider__ticks span:last-child { text-align: right; }
   .quote-checkbox-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
   .quote-check, .quote-radio { display: flex; gap: .7rem; align-items: flex-start; padding: .8rem; border: 1px solid var(--av-border); border-radius: var(--radius-md); cursor: pointer; }
+  .quote-check:has(input:checked), .quote-radio:has(input:checked) { border-color: var(--av-border-active); background: var(--av-orange-glow); }
   .quote-check input, .quote-radio input { margin-top: .18rem; accent-color: var(--av-accent); }
-  .quote-radio-list { display: grid; gap: .65rem; }
-  .quote-radio span { display: grid; gap: .2rem; }
-  .quote-radio small { color: var(--av-text-secondary); line-height: 1.45; }
+  .quote-radio-list { display: grid; gap: .65rem; } .quote-radio span { display: grid; gap: .2rem; } .quote-radio small { color: var(--av-text-secondary); line-height: 1.45; }
+  .quote-select-grid, .intake-form__grid, .commercial-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg); }
+  .quote-select, .intake-form label { display: grid; gap: .4rem; color: var(--av-text-secondary); font-weight: 700; }
+  .quote-select select, .intake-form input, .intake-form textarea { width: 100%; border: 1px solid var(--av-border); border-radius: var(--radius-sm); background: var(--av-surface-hover); color: var(--av-text-primary); padding: .78rem .85rem; font: inherit; }
+  .quote-select select:focus-visible, .intake-form input:focus-visible, .intake-form textarea:focus-visible { outline: 2px solid var(--av-accent); outline-offset: 2px; }
   .quote-validation { color: #ef7b72; font-weight: 700; }
   .quote-estimator__result { position: sticky; top: 6rem; display: grid; gap: 1rem; padding: clamp(1.35rem, 3vw, 2rem); border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); box-shadow: var(--shadow-lg); }
   .quote-estimator__eyebrow { margin: 0; color: var(--av-accent); font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
-  .quote-estimator__price { margin: 0; }
+  .quote-estimator__price, .quote-estimator__summary, .quote-estimator__boundary, .quote-estimator__privacy { margin: 0; }
   .quote-estimator__price strong { font-size: clamp(2rem, 5vw, 3.65rem); letter-spacing: -.04em; }
-  .quote-estimator__summary, .quote-estimator__boundary, .quote-estimator__privacy { margin: 0; color: var(--av-text-secondary); line-height: 1.55; }
-  .quote-estimator__meter { height: .65rem; overflow: hidden; border-radius: 999px; background: var(--av-border); }
-  .quote-estimator__meter span { display: block; height: 100%; width: 50%; border-radius: inherit; background: var(--av-accent); transition: width .2s ease; }
-  .quote-complete { margin-top: var(--space-xl); padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); }
+  .quote-estimator__summary, .quote-estimator__boundary, .quote-estimator__privacy { color: var(--av-text-secondary); line-height: 1.55; }
+  .quote-estimator__meter { height: .65rem; overflow: hidden; border-radius: 999px; background: var(--av-border); } .quote-estimator__meter span { display: block; height: 100%; width: 50%; border-radius: inherit; background: var(--av-accent); transition: width .2s ease; }
+  .quote-complete { margin-top: var(--space-xl); padding: clamp(1.5rem, 4vw, 2.5rem); border: 1px solid var(--av-border-active); border-radius: var(--radius-lg); background: var(--av-surface); }
   .quote-complete__range { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 850; letter-spacing: -.04em; }
-  .quote-tier-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); align-items: stretch; }
-  .quote-tier-card { display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-lg); }
-  .quote-tier-card__eyebrow { margin: 0; color: var(--av-accent); font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
-  .quote-tier-card__price { margin: .5rem 0 1rem; }
-  .quote-tier-card__price strong { font-size: clamp(2rem, 4vw, 3rem); }
-  .quote-tier-card__price span, .quote-tier-card p, .quote-tier-card li, .quote-disclaimer { color: var(--av-text-secondary); }
-  .quote-tier-card ul { display: grid; gap: .65rem; padding-left: 1.2rem; }
-  .quote-disclaimer { margin-top: var(--space-xl); line-height: 1.6; }
-  @media (max-width: 900px) {
-    .quote-estimator, .quote-tier-grid { grid-template-columns: 1fr; }
-    .quote-estimator__result { position: static; }
-  }
-  @media (max-width: 620px) {
-    .quote-checkbox-grid { grid-template-columns: 1fr; }
-    .quote-slider__heading span { display: none; }
-    .quote-slider__heading { grid-template-columns: 1fr; }
-  }
+  .intake-form { display: grid; gap: var(--space-lg); margin-top: var(--space-xl); max-width: 920px; }
+  .intake-form__wide, .intake-form__actions { grid-column: 1 / -1; } .intake-form__actions { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
+  .intake-form__status { min-height: 1.5em; margin: 0; color: var(--av-text-secondary); font-weight: 700; } .intake-form__status[data-state='success'] { color: var(--av-teal); } .intake-form__status[data-state='error'] { color: #ef7b72; }
+  .intake-form__privacy { margin: 0; color: var(--av-text-muted); font-size: .85rem; line-height: 1.5; } .intake-form__honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; opacity: 0 !important; }
+  .quote-tier-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); align-items: stretch; } .quote-tier-card { display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-lg); }
+  .quote-tier-card__eyebrow { margin: 0; color: var(--av-accent); font-weight: 750; letter-spacing: .04em; text-transform: uppercase; } .quote-tier-card__price { margin: .5rem 0 1rem; } .quote-tier-card__price strong { font-size: clamp(2rem, 4vw, 3rem); } .quote-tier-card__price span, .quote-tier-card p, .quote-tier-card li, .quote-disclaimer, .commercial-grid p { color: var(--av-text-secondary); } .quote-tier-card ul { display: grid; gap: .65rem; padding-left: 1.2rem; } .quote-disclaimer { margin-top: var(--space-xl); line-height: 1.6; }
+  @media (max-width: 900px) { .quote-estimator, .quote-tier-grid, .commercial-grid { grid-template-columns: 1fr; } .quote-estimator__result { position: static; } }
+  @media (max-width: 620px) { .quote-checkbox-grid, .quote-select-grid, .intake-form__grid { grid-template-columns: 1fr; } .quote-slider__heading span { display: none; } .quote-slider__heading { grid-template-columns: 1fr; } }
 </style>

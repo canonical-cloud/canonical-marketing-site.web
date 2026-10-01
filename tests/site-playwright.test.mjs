@@ -27,31 +27,21 @@ test("playwright renders the readiness-first canonical.plus landing page", async
 
   const hero = page.getByRole("heading", { level: 1 });
   await hero.waitFor({ state: "visible" });
-  assert.match(
-    (await hero.innerText()).replace(/\s+/g, " ").trim(),
-    /Know what stands between you and\s*audit-ready/,
-  );
+  assert.match((await hero.innerText()).replace(/\s+/g, " ").trim(), /Know what stands between you and\s*audit-ready/);
 
   await page.locator(".nav__logo-text").filter({ hasText: "CANONICAL" }).first().waitFor({ state: "visible" });
   for (const label of ["Readiness", "Process", "Frameworks", "Compare"]) {
     await page.locator(".nav__link", { hasText: label }).first().waitFor({ state: "visible" });
   }
 
-  for (const service of [
-    "Readiness assessment",
-    "Technical remediation roadmap",
-    "Evidence operations",
-    "Independent-review handoff",
-  ]) {
+  for (const service of ["Readiness assessment", "Technical remediation roadmap", "Evidence operations", "Independent-review handoff"]) {
     await page.getByRole("heading", { name: service, exact: true }).waitFor({ state: "visible" });
   }
 
-  assert.equal(
-    await page.locator("#hero-cta-primary").getAttribute("href"),
-    "https://app.canonical.plus/u/quote",
-  );
+  assert.equal(await page.locator("#hero-cta-primary").getAttribute("href"), "https://app.canonical.plus/u/quote");
   await page.locator('a[href="mailto:hello@canonical.plus"]').first().waitFor({ state: "visible" });
-  await page.locator("footer").getByText(/Readiness, not independent assurance/).waitFor({ state: "visible" });
+  await page.locator("footer").getByText(/Canonical supports readiness and pre-audit preparation/).waitFor({ state: "visible" });
+  await page.locator("footer").getByText(/hello@canonical\.plus/).first().waitFor({ state: "visible" });
   await page.locator("footer").getByText(/canonical\.plus\. All rights reserved/).waitFor({ state: "visible" });
 
   assert.deepEqual(pageErrors, []);
@@ -64,38 +54,22 @@ test("playwright exercises every header and footer theme control", async (t) => 
 
   const page = await browser.newPage({ viewport: { height: 900, width: 1440 } });
   await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
-
   assert.equal(await page.evaluate(() => typeof window.canonicalTheme?.apply), "function");
 
   for (const theme of ["light", "medium", "dark"]) {
     const header = page.locator(`[data-theme-switcher].theme-switcher--header [data-theme-choice="${theme}"]`);
     await header.click();
-    assert.deepEqual(
-      await page.evaluate(() => ({
-        preference: document.documentElement.dataset.themePreference,
-        theme: document.documentElement.dataset.theme,
-      })),
-      { preference: theme, theme },
-    );
+    assert.deepEqual(await page.evaluate(() => ({ preference: document.documentElement.dataset.themePreference, theme: document.documentElement.dataset.theme })), { preference: theme, theme });
     assert.equal(await header.getAttribute("aria-pressed"), "true");
-    assert.equal(
-      await page.locator(`footer [data-theme-choice="${theme}"]`).getAttribute("aria-pressed"),
-      "true",
-    );
+    assert.equal(await page.locator(`footer [data-theme-choice="${theme}"]`).getAttribute("aria-pressed"), "true");
     await page.locator("[data-theme-status]").getByText(new RegExp(`^${theme} · manual$`, "i")).waitFor();
   }
 
   await page.locator('footer [data-theme-choice="auto"]').click();
-  const automatic = await page.evaluate(() => ({
-    preference: document.documentElement.dataset.themePreference,
-    theme: document.documentElement.dataset.theme,
-  }));
+  const automatic = await page.evaluate(() => ({ preference: document.documentElement.dataset.themePreference, theme: document.documentElement.dataset.theme }));
   assert.equal(automatic.preference, "auto");
   assert.ok(["light", "medium", "dark"].includes(automatic.theme));
-  assert.equal(
-    await page.locator('[data-theme-switcher].theme-switcher--header [data-theme-choice="auto"]').getAttribute("aria-pressed"),
-    "true",
-  );
+  assert.equal(await page.locator('[data-theme-switcher].theme-switcher--header [data-theme-choice="auto"]').getAttribute("aria-pressed"), "true");
   await page.locator("[data-theme-status]").getByText(new RegExp(`^Auto · ${automatic.theme} from local time$`)).waitFor();
 });
 
@@ -104,16 +78,11 @@ test("playwright keeps mobile navigation operable by keyboard and touch", async 
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
 
-  const page = await browser.newPage({
-    hasTouch: true,
-    isMobile: true,
-    viewport: { height: 844, width: 390 },
-  });
+  const page = await browser.newPage({ hasTouch: true, isMobile: true, viewport: { height: 844, width: 390 } });
   const pageErrors = [];
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
-
   const toggle = page.locator("#nav-toggle");
   const links = page.locator("#nav-links");
   await toggle.waitFor({ state: "visible" });
@@ -148,9 +117,7 @@ test("playwright keeps mobile navigation operable by keyboard and touch", async 
   await toggle.click();
   assert.equal(await toggle.getAttribute("aria-expanded"), "true");
   await page.setViewportSize({ height: 900, width: 1024 });
-  await page.waitForFunction(
-    () => document.getElementById("nav-toggle")?.getAttribute("aria-expanded") === "false",
-  );
+  await page.waitForFunction(() => document.getElementById("nav-toggle")?.getAttribute("aria-expanded") === "false");
   for (const label of ["Readiness", "Process", "Frameworks", "Compare"]) {
     await page.locator(".nav__link", { hasText: label }).first().waitFor({ state: "visible" });
   }
