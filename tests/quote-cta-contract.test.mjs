@@ -14,13 +14,14 @@ test("marketing navigation makes the public no-login quote the primary CTA", () 
   assert.doesNotMatch(layout, /id="nav-quote"[^>]*data-application-link/);
 });
 
-test("sign in remains a separate optional application action", () => {
-  assert.match(layout, /const applicationHref = 'https:\/\/app\.canonical\.plus\/u\/readiness';/);
-  assert.match(layout, /href=\{applicationHref\}[^>]*id="nav-sign-in"[^>]*data-application-link="sign-in"[^>]*>Sign in<\/a>/);
-  assert.match(layout, /href=\{applicationHref\}[^>]*data-application-link="sign-in"[^>]*>Sign in<\/a>/);
+test("sign in stays absent until authentication is supported", () => {
+  assert.doesNotMatch(layout, /const applicationHref\s*=/);
+  assert.doesNotMatch(layout, /id="nav-sign-in"/);
+  assert.doesNotMatch(layout, /data-application-link="sign-in"/);
+  assert.doesNotMatch(layout, />Sign in<\/a>/);
 });
 
-test("footer exposes the public quote path and auth links never carry tokens", () => {
+test("footer exposes the public quote path and carries no auth-token material", () => {
   assert.match(layout, /href=\{publicQuoteHref\}[^>]*>Build a quote<\/a>/);
   assert.doesNotMatch(layout, /app\.canonical\.plus\/[^'"\s]*\?[^'"\s]*(?:token|jwt|access_token)=/i);
 });
