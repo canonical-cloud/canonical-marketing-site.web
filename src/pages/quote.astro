@@ -20,7 +20,7 @@ if (
   !pricedItemsAreValid(estimator.standards) ||
   !pricedItemsAreValid(estimator.deliveryDepths) ||
   !pricedItemsAreValid(estimator.complexities) ||
-  !pricedItemsAreValid(estimator.organizationTypes) ||
+  !estimator.companyStages?.length ||
   !pricedItemsAreValid(estimator.employeeBands) ||
   !pricedItemsAreValid(estimator.sectors)
 ) throw new Error('Invalid quote estimator configuration');
@@ -126,13 +126,13 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
             <h3 id="quote-org-title">5. Organization profile</h3>
             <div class="quote-profile-grid">
               <label>Company stage
-                <select name="quote_organization_type">
-                  {estimator.organizationTypes.map((item) => <option value={item.id} data-label={item.label} data-amount={item.amountUsd} selected={item.id === estimator.defaults.organizationTypeId}>{item.label}</option>)}
+                <select name="quote_company_stage">
+                  {estimator.companyStages.map((item) => <option value={item.id} data-label={item.label} data-multiplier={item.multiplier} selected={item.id === estimator.defaults.companyStageId}>{item.label}</option>)}
                 </select>
               </label>
               <label>Employees
                 <select name="quote_employee_band">
-                  {estimator.employeeBands.map((item) => <option value={item.id} data-label={item.label} data-amount={item.amountUsd} selected={item.id === estimator.defaults.employeeBandId}>{item.label}</option>)}
+                  {estimator.employeeBands.map((item) => <option value={item.id} data-label={item.label} data-amount={item.amountUsd} selected={estimator.defaults.employeeCount >= item.min && estimator.defaults.employeeCount <= item.max}>{item.label}</option>)}
                 </select>
               </label>
               <label>Business sector
@@ -159,8 +159,8 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
 
         <aside class="quote-estimator__result" aria-live="polite">
           <p class="quote-estimator__eyebrow">Estimated project range</p>
-          <p class="quote-estimator__price"><strong data-quote-range>{money.format(9000)}–{money.format(11500)}</strong></p>
-          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment</p>
+          <p class="quote-estimator__price"><strong data-quote-range>{money.format(10000)}–{money.format(12500)}</strong></p>
+          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
           <p class="quote-estimator__boundary">Typical estimator range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Final pricing depends on validated scope.</p>
           <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Email my quote</button>
