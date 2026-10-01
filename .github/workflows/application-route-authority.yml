@@ -32,7 +32,7 @@ jobs:
         with:
           persist-credentials: false
           path: marketing
-      - name: Read exact authority revisions
+      - name: Read exact public route revision
         id: authority
         working-directory: marketing
         shell: bash
@@ -40,16 +40,8 @@ jobs:
           set -euo pipefail
           node - <<'NODE' >> "$GITHUB_OUTPUT"
           const lock = require('./contracts/application-route-sources.json');
-          console.log(`docs_rev=${lock.sources.productInformationArchitecture.revision}`);
           console.log(`web_rev=${lock.sources.customerWebRoute.revision}`);
           NODE
-      - name: Check out product information architecture
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: canonical-cloud/canonical-docs
-          ref: ${{ steps.authority.outputs.docs_rev }}
-          persist-credentials: false
-          path: canonical-docs
       - name: Check out customer web route implementation
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -57,9 +49,9 @@ jobs:
           ref: ${{ steps.authority.outputs.web_rev }}
           persist-credentials: false
           path: canonical-web-server.rs
-      - name: Compare CTA against both authorities
+      - name: Compare CTA against pinned product authority and public route implementation
         working-directory: marketing
-        run: node scripts/check-application-route-authority.mjs ../canonical-docs ../canonical-web-server.rs
+        run: node scripts/check-application-route-authority.mjs ../canonical-web-server.rs
       - name: Keep checkout immutable
         working-directory: marketing
         run: git diff --exit-code
