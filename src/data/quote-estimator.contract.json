@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "authorityRepository": "canonical-cloud/canonical-interfaces",
-  "authorityRevision": "9de5bfe53474e6ba69e0be24cb2eeb3f6a3e6ac4",
+  "authorityRevision": "502f1405153fa0380f7d03ab72549521ac7d1a8a",
   "authorityFixturePath": "contracts/public-quote-estimator/v2/instances/PublicQuoteEstimatorConfig/valid/current.json",
   "authoritySchemaPath": "contracts/public-quote-estimator/v2/authored.schema.json",
   "authorityTypeSpecPath": "contracts/public-quote-estimator/v2/main.tsp",
