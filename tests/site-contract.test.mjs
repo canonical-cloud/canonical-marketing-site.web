@@ -118,6 +118,15 @@ test("nav exposes the readiness-first information architecture", () => {
   }
 });
 
+test("footer presents Canonical Cloud and Canonical Plus as distinct brand lockups", () => {
+  assert.match(layout, /const canonicalCloudHref = 'https:\/\/canonical-cloud\.github\.io\/'/);
+  assert.match(layout, /aria-label="Canonical Cloud home"/);
+  assert.match(layout, /class="canonical-cloud-mark"/);
+  assert.match(layout, /Canonical Cloud provides the operating platform/);
+  assert.match(layout, /aria-label="Canonical Plus home"/);
+  assert.match(layout, />CANONICAL<\/span><span class="nav__logo-compliance">\.PLUS<\/span>/);
+});
+
 test("skip navigation and named landmarks exist before JavaScript runs", () => {
   assert.match(layout, /<a class="skip-link" href="#main-content">Skip to main content<\/a>/);
   assert.match(layout, /<nav class="nav" id="main-nav" aria-label="Primary navigation">/);
