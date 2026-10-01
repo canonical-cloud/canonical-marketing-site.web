@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\\\/+$/, '');\nconst quoteHref = `${baseNoSlash}/quote/`;
 
 const approaches = [
   {
@@ -62,12 +62,12 @@ const sources = [
         <span class="badge animate-fade-in-up">Compare approaches</span>
         <p class="page-hero__eyebrow animate-fade-in-up stagger-1">Choose for the job you actually have</p>
         <h1 class="page-hero__title animate-fade-in-up stagger-2">
-          Readiness support is not a substitute for
-          <span class="gradient-text">automation or independent assurance</span>
+          Canonical supports readiness, remediation, and
+          <span class="gradient-text">pre-audit preparation</span>
         </h1>
         <p class="page-hero__subtitle animate-fade-in-up stagger-2">
-          The best operating model may combine all three: readiness and remediation support,
-          a continuous compliance platform, and a qualified independent reviewer.
+          Build the operating model around the work you actually need: scoped readiness, evidence automation,
+          remediation, auditor collaboration, and a qualified independent reviewer when formal assurance begins.
           Canonical Plus should be selected for its current strengths—not for capabilities it has not yet proven.
         </p>
         <div class="page-hero__actions animate-fade-in-up stagger-3">
