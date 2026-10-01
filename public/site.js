@@ -1,3 +1,25 @@
+const configureBrandRefresh = () => {
+  if (!document.querySelector('link[data-brand-refresh]')) {
+    const stylesheet = document.createElement('link');
+    stylesheet.rel = 'stylesheet';
+    stylesheet.href = new URL('./brand-refresh.css', import.meta.url).href;
+    stylesheet.dataset.brandRefresh = 'true';
+    document.head.append(stylesheet);
+  }
+
+  const navLogo = document.getElementById('nav-logo');
+  if (navLogo instanceof HTMLAnchorElement) {
+    navLogo.setAttribute('aria-label', 'Canonical Cloud — Canonical Plus product home');
+  }
+
+  const footerTagline = document.querySelector('.footer__tagline');
+  if (footerTagline instanceof HTMLParagraphElement) {
+    footerTagline.textContent = 'Canonical Plus is the compliance-readiness product from Canonical Cloud, focused on technical remediation planning for software and cloud teams.';
+  }
+};
+
+configureBrandRefresh();
+
 const APP_SCHEME = 'https';
 const APP_HOST = 'app.canonical.plus';
 const APP_ORIGIN = [APP_SCHEME, APP_HOST].join('://');
