@@ -11,6 +11,9 @@ const paths = [
   "../src/pages/compare.astro",
   "../src/pages/prices.astro",
   "../src/pages/training.astro",
+  "../src/pages/quote.astro",
+  "../src/pages/contact.astro",
+  "../src/pages/pricing.astro",
 ];
 
 const corpus = (
@@ -35,9 +38,9 @@ test("public copy never presents readiness as an independent audit or certificat
     assert.doesNotMatch(corpus, prohibited);
   }
 
-  assert.match(corpus, /Readiness, not independent assurance/);
-  assert.match(corpus, /do not issue audit opinions,\s+certifications,\s+or regulatory approvals/i);
-  assert.match(corpus, /Independent auditors, assessors, certification bodies, regulators, and legal counsel/);
+  assert.match(corpus, /Canonical supports readiness and pre-audit preparation/);
+  assert.match(corpus, /qualified provider responsible for any formal audit, certification, or regulatory decision/i);
+  assert.match(corpus, /Qualified auditors, assessors, certification bodies, regulators, and legal counsel/);
 });
 
 test("public comparison acknowledges current product limits", () => {

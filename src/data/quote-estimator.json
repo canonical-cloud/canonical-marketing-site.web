@@ -1,10 +1,11 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
+  "pricingRevision": "2026-10-01-v2",
   "currency": "USD",
   "estimateFloorUsd": 5000,
-  "estimateCeilingUsd": 15000,
+  "estimateCeilingUsd": 30000,
   "midpointFloorUsd": 5500,
-  "midpointCeilingUsd": 13500,
+  "midpointCeilingUsd": 27000,
   "roundToUsd": 500,
   "lowerFactor": 0.9,
   "upperFactor": 1.12,
@@ -33,10 +34,35 @@
     { "id": "growing", "label": "Growing environment", "amountUsd": 1000, "note": "Several systems, teams, vendors, or cloud accounts in scope." },
     { "id": "complex", "label": "Complex / regulated", "amountUsd": 2000, "note": "Multi-cloud, sensitive data, substantial remediation, or broad evidence collection." }
   ],
+  "organizationTypes": [
+    { "id": "startup", "label": "Startup", "amountUsd": 0, "note": "Early-stage or lean operating team with a concentrated decision path." },
+    { "id": "business", "label": "Business", "amountUsd": 1000, "note": "Established operating teams with multiple control owners and business functions." },
+    { "id": "enterprise", "label": "Enterprise", "amountUsd": 2500, "note": "Larger organizations with broader stakeholder, governance, and approval paths." }
+  ],
+  "employeeBands": [
+    { "id": "employees-1-25", "label": "1–25 employees", "minEmployees": 1, "maxEmployees": 25, "amountUsd": 0 },
+    { "id": "employees-26-100", "label": "26–100 employees", "minEmployees": 26, "maxEmployees": 100, "amountUsd": 750 },
+    { "id": "employees-101-500", "label": "101–500 employees", "minEmployees": 101, "maxEmployees": 500, "amountUsd": 1750 },
+    { "id": "employees-501-2000", "label": "501–2,000 employees", "minEmployees": 501, "maxEmployees": 2000, "amountUsd": 3000 },
+    { "id": "employees-2001-plus", "label": "2,001+ employees", "minEmployees": 2001, "maxEmployees": null, "amountUsd": 4500 }
+  ],
+  "sectors": [
+    { "id": "software-saas", "label": "Software / SaaS", "amountUsd": 0 },
+    { "id": "professional-services", "label": "Professional services", "amountUsd": 250 },
+    { "id": "retail-ecommerce", "label": "Retail / e-commerce", "amountUsd": 500 },
+    { "id": "manufacturing", "label": "Manufacturing / industrial", "amountUsd": 750 },
+    { "id": "financial-services", "label": "Financial services / fintech", "amountUsd": 1500 },
+    { "id": "healthcare", "label": "Healthcare / health tech", "amountUsd": 1500 },
+    { "id": "public-sector-defense", "label": "Public sector / defense", "amountUsd": 2250 },
+    { "id": "other", "label": "Other", "amountUsd": 500 }
+  ],
   "defaults": {
     "speedWeeks": 5,
     "standardIds": ["soc2", "iso27001"],
     "deliveryDepthId": "managed",
-    "complexityId": "growing"
+    "complexityId": "growing",
+    "organizationTypeId": "business",
+    "employeeCount": 50,
+    "sectorId": "software-saas"
   }
 }
