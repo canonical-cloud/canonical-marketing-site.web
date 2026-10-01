@@ -14,9 +14,11 @@ const expectedPeople = [
   ['Tom Mensch', 'Software & Legal'],
   ['Rebecca Toni', 'Team'],
   ['Georgiana Fabrecce', 'Team'],
+  ['Bryce Merrson', 'Technical Support'],
+  ['Nouman Siddiqui', 'Team'],
 ];
 
-test('puppeteer: people page renders ten cards with responsive 4-to-2-to-1 columns', async (t) => {
+test('puppeteer: people page renders twelve cards with responsive 4-to-2-to-1 columns', async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
@@ -67,7 +69,7 @@ test('puppeteer: people page renders ten cards with responsive 4-to-2-to-1 colum
   assert.equal(await columnCount(), 1);
 
   const remotePhotos = await page.$$('[data-people-photo]');
-  assert.equal(remotePhotos.length, 4);
+  assert.equal(remotePhotos.length, 7);
   await page.$$eval('[data-people-photo]', (images) => {
     for (const image of images) image.dispatchEvent(new Event('error'));
   });
@@ -79,10 +81,10 @@ test('puppeteer: people page renders ten cards with responsive 4-to-2-to-1 colum
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
-  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 10);
+  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 12);
   for (const [width, columns] of [[1440, 4], [1024, 4], [800, 2], [375, 1]]) {
     await page.setViewport({ height: 900, width });
     assert.equal(await columnCount(), columns);

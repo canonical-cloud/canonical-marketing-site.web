@@ -1,4 +1,16 @@
 (() => {
+  const currentScriptSrc = document.currentScript?.src;
+  if (currentScriptSrc && document.head && typeof document.createElement === 'function') {
+    const existingBrandStyles = document.querySelector('link[data-canonical-brand-styles]');
+    if (!existingBrandStyles) {
+      const stylesheet = document.createElement('link');
+      stylesheet.rel = 'stylesheet';
+      stylesheet.href = new URL('./brand-overrides.css', currentScriptSrc).href;
+      stylesheet.dataset.canonicalBrandStyles = 'true';
+      document.head.append(stylesheet);
+    }
+  }
+
   const STORAGE_KEY = 'canonical-theme';
   const PREFERENCES = new Set(['auto', 'light', 'medium', 'dark']);
   const THEME_COLORS = {

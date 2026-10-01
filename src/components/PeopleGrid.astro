@@ -91,13 +91,14 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
   .person-card__photo {
     z-index: 2;
     object-fit: cover;
-    object-position: center top;
-    filter: saturate(0.86) contrast(1.02);
+    object-position: center;
+    filter: grayscale(1) contrast(1.04);
     transition: filter var(--duration-normal) var(--ease-out);
   }
 
-  .person-card:hover .person-card__photo {
-    filter: saturate(1) contrast(1.03);
+  .person-card:hover .person-card__photo,
+  .person-card:focus-within .person-card__photo {
+    filter: grayscale(0) saturate(1) contrast(1.03);
   }
 
   .person-card__fallback {

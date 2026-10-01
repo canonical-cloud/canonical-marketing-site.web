@@ -57,13 +57,28 @@
       "id": "rebecca-toni",
       "name": "Rebecca Toni",
       "role": "Team",
-      "initials": "RT"
+      "initials": "RT",
+      "photoUrl": "/team/rebecca-toni.jpg"
     },
     {
       "id": "georgiana-fabrecce",
       "name": "Georgiana Fabrecce",
       "role": "Team",
       "initials": "GF"
+    },
+    {
+      "id": "bryce-merrson",
+      "name": "Bryce Merrson",
+      "role": "Technical Support",
+      "initials": "BM",
+      "photoUrl": "/team/bryce-merrson.jpg"
+    },
+    {
+      "id": "nouman-siddiqui",
+      "name": "Nouman Siddiqui",
+      "role": "Team",
+      "initials": "NS",
+      "photoUrl": "/team/nouman-siddiqui.jpg"
     }
   ]
 }

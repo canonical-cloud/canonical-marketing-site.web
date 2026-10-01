@@ -5,6 +5,65 @@ const QUOTE_PATH = '/u/quote';
 const quoteUrl = new URL(QUOTE_PATH, APP_ORIGIN);
 const signInUrl = new URL(QUOTE_PATH, APP_ORIGIN);
 
+const configureBrandStyles = () => {
+  if (document.querySelector('link[data-canonical-brand-styles]')) {
+    return;
+  }
+
+  const stylesheet = document.createElement('link');
+  stylesheet.rel = 'stylesheet';
+  stylesheet.href = new URL('./brand-overrides.css', import.meta.url).href;
+  stylesheet.dataset.canonicalBrandStyles = 'true';
+  document.head.append(stylesheet);
+};
+
+configureBrandStyles();
+
+const configureHeaderBranding = () => {
+  const brand = document.getElementById('nav-logo');
+  if (!(brand instanceof HTMLAnchorElement) || brand.dataset.brandLockup === 'true') {
+    return;
+  }
+
+  const productMark = brand.querySelector('.nav__logo-icon');
+  const productName = brand.querySelector('.nav__logo-text');
+  if (!(productMark instanceof SVGElement) || !(productName instanceof HTMLElement)) {
+    return;
+  }
+
+  brand.dataset.brandLockup = 'true';
+  brand.classList.add('nav__brand-lockup');
+  brand.setAttribute('aria-label', 'Canonical Cloud — canonical.plus home');
+
+  const parentBrand = document.createElement('span');
+  parentBrand.className = 'nav__parent-brand';
+
+  const parentMark = document.createElement('img');
+  parentMark.className = 'nav__parent-brand-mark';
+  parentMark.src = new URL('./brand/canonical-cloud.svg', import.meta.url).href;
+  parentMark.alt = '';
+  parentMark.setAttribute('aria-hidden', 'true');
+  parentMark.width = 38;
+  parentMark.height = 38;
+
+  const parentName = document.createElement('span');
+  parentName.className = 'nav__parent-brand-name';
+  parentName.textContent = 'CANONICAL CLOUD';
+
+  parentBrand.append(parentMark, parentName);
+
+  const productBrand = document.createElement('span');
+  productBrand.className = 'nav__product-brand';
+  productMark.classList.add('nav__product-brand-mark');
+  productName.classList.add('nav__product-brand-name');
+  productName.setAttribute('aria-label', 'canonical.plus product');
+  productBrand.append(productMark, productName);
+
+  brand.replaceChildren(parentBrand, productBrand);
+};
+
+configureHeaderBranding();
+
 const configureApplicationLinks = () => {
   for (const link of document.querySelectorAll('[data-application-link]')) {
     if (!(link instanceof HTMLAnchorElement)) {
