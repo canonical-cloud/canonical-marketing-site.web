@@ -6,6 +6,7 @@ html:root[data-theme='dark'] {
   --av-orange-dark: #c2410c;
   --av-orange-glow: rgba(249, 115, 22, 0.14);
   --av-orange-border: rgba(249, 115, 22, 0.36);
+  --av-accent: var(--av-orange);
 
   /* Compatibility aliases while existing components migrate off the old accent token names. */
   --av-magenta: var(--av-orange);
@@ -21,6 +22,7 @@ html:root[data-theme='medium'] {
   --av-orange-dark: #ea580c;
   --av-orange-glow: rgba(251, 146, 60, 0.15);
   --av-orange-border: rgba(251, 146, 60, 0.4);
+  --av-accent: var(--av-orange);
 
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
@@ -35,6 +37,7 @@ html:root[data-theme='light'] {
   --av-orange-dark: #9a3412;
   --av-orange-glow: rgba(194, 65, 12, 0.1);
   --av-orange-border: rgba(194, 65, 12, 0.28);
+  --av-accent: var(--av-orange);
 
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
