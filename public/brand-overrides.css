@@ -6,8 +6,6 @@ html:root[data-theme='dark'] {
   --av-orange-dark: #c2410c;
   --av-orange-glow: rgba(249, 115, 22, 0.14);
   --av-orange-border: rgba(249, 115, 22, 0.36);
-
-  /* Compatibility aliases while existing components migrate off the old accent token names. */
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
   --av-magenta-dark: var(--av-orange-dark);
@@ -21,7 +19,6 @@ html:root[data-theme='medium'] {
   --av-orange-dark: #ea580c;
   --av-orange-glow: rgba(251, 146, 60, 0.15);
   --av-orange-border: rgba(251, 146, 60, 0.4);
-
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
   --av-magenta-dark: var(--av-orange-dark);
@@ -35,7 +32,6 @@ html:root[data-theme='light'] {
   --av-orange-dark: #9a3412;
   --av-orange-glow: rgba(194, 65, 12, 0.1);
   --av-orange-border: rgba(194, 65, 12, 0.28);
-
   --av-magenta: var(--av-orange);
   --av-magenta-light: var(--av-orange-light);
   --av-magenta-dark: var(--av-orange-dark);
@@ -43,7 +39,7 @@ html:root[data-theme='light'] {
   --av-magenta-border: var(--av-orange-border);
 }
 
-/* Make the highlighted word boundary explicit instead of relying on formatter/newline whitespace. */
+/* Make highlighted word boundaries explicit instead of relying on formatter/newline whitespace. */
 .page-hero__title > .gradient-text {
   margin-inline-start: 0.14em;
 }
@@ -116,37 +112,37 @@ html:root[data-theme='light'] {
   text-transform: uppercase;
 }
 
+.footer__prominent-contact {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: 0.8rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--av-orange-border);
+  border-radius: 0.65rem;
+  background: var(--av-orange-glow);
+  color: var(--av-orange-light);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.footer__prominent-contact:hover,
+.footer__prominent-contact:focus-visible {
+  border-color: var(--av-orange);
+  color: var(--av-orange);
+}
+
 @media (max-width: 1040px) {
-  .nav__brand-lockup {
-    gap: 0.55rem !important;
-  }
-
-  .nav__parent-brand {
-    gap: 0.4rem;
-    padding-right: 0.55rem;
-  }
-
-  .nav__parent-brand-name {
-    font-size: 0.78rem;
-  }
-
-  .nav__product-brand-name {
-    font-size: 0.65rem !important;
-  }
+  .nav__brand-lockup { gap: 0.55rem !important; }
+  .nav__parent-brand { gap: 0.4rem; padding-right: 0.55rem; }
+  .nav__parent-brand-name { font-size: 0.78rem; }
+  .nav__product-brand-name { font-size: 0.65rem !important; }
 }
 
 @media (max-width: 900px) {
-  .nav__product-brand-name {
-    display: none;
-  }
+  .nav__product-brand-name { display: none; }
 }
 
 @media (max-width: 680px) {
-  .nav__parent-brand-name {
-    display: none;
-  }
-
-  .nav__parent-brand {
-    padding-right: 0.5rem;
-  }
+  .nav__parent-brand-name { display: none; }
+  .nav__parent-brand { padding-right: 0.5rem; }
 }
