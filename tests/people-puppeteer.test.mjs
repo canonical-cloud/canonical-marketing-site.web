@@ -6,14 +6,14 @@ import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 const expectedPeople = [
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
-  ['Jack Johnson', 'Browser, Mobile, Clientside'],
+  ['Georgiana Fabrecce', 'Team'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
   ['Tom Mensch', 'Software & Legal'],
   ['Rebecca Toni', 'Team'],
-  ['Georgiana Fabrecce', 'Team'],
+  ['Bryce Merrson', 'Technical Support'],
 ];
 
 test('puppeteer: people page renders ten cards with responsive 4-to-2-to-1 columns', async (t) => {
@@ -67,7 +67,7 @@ test('puppeteer: people page renders ten cards with responsive 4-to-2-to-1 colum
   assert.equal(await columnCount(), 1);
 
   const remotePhotos = await page.$$('[data-people-photo]');
-  assert.equal(remotePhotos.length, 4);
+  assert.equal(remotePhotos.length, 6);
   await page.$$eval('[data-people-photo]', (images) => {
     for (const image of images) image.dispatchEvent(new Event('error'));
   });
@@ -79,7 +79,7 @@ test('puppeteer: people page renders ten cards with responsive 4-to-2-to-1 colum
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JJ', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'GF', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'BM']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
   assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 10);
