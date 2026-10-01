@@ -1,10 +1,10 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "currency": "USD",
   "estimateFloorUsd": 5000,
-  "estimateCeilingUsd": 15000,
+  "estimateCeilingUsd": 30000,
   "midpointFloorUsd": 5500,
-  "midpointCeilingUsd": 13500,
+  "midpointCeilingUsd": 26000,
   "roundToUsd": 500,
   "lowerFactor": 0.9,
   "upperFactor": 1.12,
@@ -33,10 +33,35 @@
     { "id": "growing", "label": "Growing environment", "amountUsd": 1000, "note": "Several systems, teams, vendors, or cloud accounts in scope." },
     { "id": "complex", "label": "Complex / regulated", "amountUsd": 2000, "note": "Multi-cloud, sensitive data, substantial remediation, or broad evidence collection." }
   ],
+  "organizationTypes": [
+    { "id": "startup", "label": "Startup", "amountUsd": 0 },
+    { "id": "business", "label": "Business", "amountUsd": 750 },
+    { "id": "enterprise", "label": "Enterprise", "amountUsd": 2000 }
+  ],
+  "employeeBands": [
+    { "id": "1-25", "label": "1–25 employees", "amountUsd": 0 },
+    { "id": "26-100", "label": "26–100 employees", "amountUsd": 500 },
+    { "id": "101-500", "label": "101–500 employees", "amountUsd": 1250 },
+    { "id": "501-2000", "label": "501–2,000 employees", "amountUsd": 2000 },
+    { "id": "2001-plus", "label": "2,001+ employees", "amountUsd": 3000 }
+  ],
+  "sectors": [
+    { "id": "software-saas", "label": "Software / SaaS", "amountUsd": 0 },
+    { "id": "financial-services", "label": "Financial services / fintech", "amountUsd": 1000 },
+    { "id": "healthcare", "label": "Healthcare / life sciences", "amountUsd": 1000 },
+    { "id": "retail-ecommerce", "label": "Retail / e-commerce", "amountUsd": 750 },
+    { "id": "professional-services", "label": "Professional services", "amountUsd": 250 },
+    { "id": "manufacturing", "label": "Manufacturing / industrial", "amountUsd": 500 },
+    { "id": "public-sector", "label": "Public sector / government contractor", "amountUsd": 1250 },
+    { "id": "other", "label": "Other", "amountUsd": 500 }
+  ],
   "defaults": {
     "speedWeeks": 5,
     "standardIds": ["soc2", "iso27001"],
     "deliveryDepthId": "managed",
-    "complexityId": "growing"
+    "complexityId": "growing",
+    "organizationTypeId": "startup",
+    "employeeBandId": "26-100",
+    "sectorId": "software-saas"
   }
 }
