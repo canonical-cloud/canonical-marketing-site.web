@@ -36,7 +36,7 @@ test("public copy never presents readiness as an independent audit or certificat
   }
 
   assert.match(corpus, /Readiness, not independent assurance/);
-  assert.match(corpus, /do not issue audit opinions, certifications, or regulatory approvals/i);
+  assert.match(corpus, /do not issue audit opinions,\s+certifications,\s+or regulatory approvals/i);
   assert.match(corpus, /Independent auditors, assessors, certification bodies, regulators, and legal counsel/);
 });
 
