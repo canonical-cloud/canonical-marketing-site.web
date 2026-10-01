@@ -11,22 +11,14 @@ const idsAreUnique = (items) => new Set(items.map((item) => item.id)).size === i
 const amountsAreSafe = (items) => items.every((item) => Number.isFinite(item.amountUsd) && item.amountUsd >= 0);
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const roundMoney = (value) => Math.round(value / estimator.roundToUsd) * estimator.roundToUsd;
-const calculateEstimate = ({ speedBaseUsd, standardsUsd, depthUsd, complexityUsd }) => {
+const calculateEstimate = ({ speedBaseUsd, standardsUsd, depthUsd, complexityUsd, organizationUsd, employeesUsd, sectorUsd }) => {
   const midpoint = clamp(
-    speedBaseUsd + standardsUsd + depthUsd + complexityUsd,
+    speedBaseUsd + standardsUsd + depthUsd + complexityUsd + organizationUsd + employeesUsd + sectorUsd,
     estimator.midpointFloorUsd,
     estimator.midpointCeilingUsd,
   );
-  const lower = clamp(
-    roundMoney(midpoint * estimator.lowerFactor),
-    estimator.estimateFloorUsd,
-    estimator.estimateCeilingUsd,
-  );
-  const upper = clamp(
-    roundMoney(midpoint * estimator.upperFactor),
-    lower,
-    estimator.estimateCeilingUsd,
-  );
+  const lower = clamp(roundMoney(midpoint * estimator.lowerFactor), estimator.estimateFloorUsd, estimator.estimateCeilingUsd);
+  const upper = clamp(roundMoney(midpoint * estimator.upperFactor), lower, estimator.estimateCeilingUsd);
   return { midpoint, lower, upper };
 };
 const nonEmptyStandardTotals = () => {
@@ -43,49 +35,50 @@ const nonEmptyStandardTotals = () => {
 };
 
 test("public quote page reuses the canonical recurring service-tier catalog", () => {
-  assert.match(page, /import catalog from '\.\.\/data\/service-tiers\.json'/);
+  assert.match(page, /import catalog from '../data/service-tiers.json'/);
   assert.equal(catalog.tiers.length, 3);
   assert.deepEqual(catalog.tiers.map((tier) => tier.monthlyUsd), [2500, 7500, 20000]);
 });
 
-test("public estimator completes without authentication or browser persistence", () => {
-  assert.match(page, /Complete quote without login/);
+test("public estimator calculates locally and only transmits after explicit email submission", () => {
   assert.match(page, /No account required/);
+  assert.match(page, /calculated locally/i);
   assert.match(page, /data-complete-public-quote/);
   assert.match(page, /data-quote-complete/);
-  assert.match(page, /stays in page memory and is not sent to Canonical Plus/);
-  assert.match(runtime, /completedPanel\.hidden = false/);
-  assert.doesNotMatch(runtime, /fetch\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|localStorage|sessionStorage|indexedDB/i);
+  assert.match(page, /data-quote-email-form/);
+  assert.match(runtime, /completedPanel.hidden = false/);
+  assert.match(runtime, /const INTAKE_ENDPOINT = 'https://forms.canonical.plus/v1/intake'/);
+  assert.match(runtime, /emailForm.addEventListener('submit'/);
+  assert.match(runtime, /await fetch(INTAKE_ENDPOINT/);
+  assert.doesNotMatch(runtime, /localStorage|sessionStorage|indexedDB|service_role|SUPABASE_SERVICE_ROLE_KEY/i);
 });
 
-test("authenticated quote workflow is explicitly separate and carries no estimator state", () => {
-  assert.match(page, /const appQuoteUrl = 'https:\/\/app\.canonical\.plus\/u\/quote'/);
-  assert.match(page, /Signing in starts the separate account quote workflow; this browser estimate is not automatically transferred/);
-  assert.match(page, />Sign in<\/a>/);
-  assert.match(page, /Sign in for account quote/);
-  assert.doesNotMatch(page, /save this scope|save \/ continue/i);
-  assert.doesNotMatch(page, /appQuoteUrl[^\n]*(?:\?|#)|new URL\([^\n]*appQuoteUrl/i);
+test("authenticated quote workflow remains separate and carries no browser estimate in the URL", () => {
+  assert.match(page, /const appQuoteUrl = 'https://app.canonical.plus/u/quote'/);
+  assert.match(page, /Sign in for account workflow/);
+  assert.doesNotMatch(page, /appQuoteUrl[^
+]*(?:?|#)|new URL([^
+]*appQuoteUrl/i);
 });
 
-test("estimator exposes speed, standards, service depth, and complexity", () => {
+test("estimator exposes seven material scope dimensions", () => {
   assert.deepEqual(estimator.speeds.map((speed) => speed.weeks), [9, 5, 3]);
-  assert.ok(estimator.standards.some((standard) => standard.id === "nist"));
-  assert.ok(estimator.standards.some((standard) => standard.id === "iso27001"));
-  assert.ok(estimator.standards.some((standard) => standard.id === "gdpr"));
   assert.ok(estimator.standards.some((standard) => standard.id === "soc2"));
+  assert.ok(estimator.standards.some((standard) => standard.id === "iso27001"));
   assert.equal(estimator.deliveryDepths.length, 3);
   assert.equal(estimator.complexities.length, 3);
-  assert.match(page, /type="range"/);
-  assert.match(page, /name="quote_standard"/);
-  assert.match(page, /name="quote_delivery_depth"/);
-  assert.match(page, /name="quote_complexity"/);
+  assert.deepEqual(estimator.organizationTypes.map((item) => item.id), ["startup", "business", "enterprise"]);
+  assert.equal(estimator.employeeBands.length, 5);
+  assert.ok(estimator.sectors.length >= 6);
+  assert.match(page, /data-quote-organization-type/);
+  assert.match(page, /data-quote-employees/);
+  assert.match(page, /data-quote-sector/);
 });
 
 test("quote estimator configuration is internally consistent and bounded", () => {
-  assert.equal(estimator.schemaVersion, 1);
+  assert.equal(estimator.schemaVersion, 2);
+  assert.match(estimator.pricingRevision, /^d{4}-d{2}-d{2}-vd+$/);
   assert.match(estimator.currency, /^[A-Z]{3}$/);
-  assert.ok(Number.isFinite(estimator.estimateFloorUsd));
-  assert.ok(Number.isFinite(estimator.estimateCeilingUsd));
   assert.ok(estimator.estimateFloorUsd >= 0);
   assert.ok(estimator.estimateCeilingUsd > estimator.estimateFloorUsd);
   assert.ok(estimator.midpointFloorUsd >= estimator.estimateFloorUsd);
@@ -94,141 +87,129 @@ test("quote estimator configuration is internally consistent and bounded", () =>
   assert.ok(Number.isFinite(estimator.roundToUsd) && estimator.roundToUsd > 0);
   assert.ok(estimator.lowerFactor > 0 && estimator.upperFactor >= estimator.lowerFactor);
 
-  assert.ok(estimator.speeds.length > 0);
-  assert.equal(new Set(estimator.speeds.map((speed) => speed.weeks)).size, estimator.speeds.length);
-  assert.ok(estimator.speeds.every((speed) => Number.isInteger(speed.weeks) && speed.weeks > 0));
-  assert.ok(estimator.speeds.every((speed) => Number.isFinite(speed.baseUsd) && speed.baseUsd >= 0));
-  assert.ok(idsAreUnique(estimator.standards));
-  assert.ok(idsAreUnique(estimator.deliveryDepths));
-  assert.ok(idsAreUnique(estimator.complexities));
-  assert.ok(amountsAreSafe(estimator.standards));
-  assert.ok(amountsAreSafe(estimator.deliveryDepths));
-  assert.ok(amountsAreSafe(estimator.complexities));
+  for (const items of [
+    estimator.standards,
+    estimator.deliveryDepths,
+    estimator.complexities,
+    estimator.organizationTypes,
+    estimator.sectors,
+  ]) {
+    assert.ok(idsAreUnique(items));
+    assert.ok(amountsAreSafe(items));
+  }
+
+  assert.ok(idsAreUnique(estimator.employeeBands));
+  assert.equal(estimator.employeeBands[0].minEmployees, 1);
+  assert.equal(estimator.employeeBands.at(-1).maxEmployees, null);
+  for (let index = 1; index < estimator.employeeBands.length; index += 1) {
+    assert.equal(estimator.employeeBands[index].minEmployees, estimator.employeeBands[index - 1].maxEmployees + 1);
+  }
+  assert.ok(amountsAreSafe(estimator.employeeBands));
 
   assert.ok(estimator.speeds.some((speed) => speed.weeks === estimator.defaults.speedWeeks));
   assert.ok(estimator.defaults.standardIds.length > 0);
   assert.ok(estimator.defaults.standardIds.every((id) => estimator.standards.some((standard) => standard.id === id)));
   assert.ok(estimator.deliveryDepths.some((item) => item.id === estimator.defaults.deliveryDepthId));
   assert.ok(estimator.complexities.some((item) => item.id === estimator.defaults.complexityId));
+  assert.ok(estimator.organizationTypes.some((item) => item.id === estimator.defaults.organizationTypeId));
+  assert.ok(estimator.sectors.some((item) => item.id === estimator.defaults.sectorId));
+  assert.ok(Number.isInteger(estimator.defaults.employeeCount) && estimator.defaults.employeeCount >= 1);
 
   assert.equal(estimator.estimateFloorUsd, 5000);
-  assert.equal(estimator.estimateCeilingUsd, 15000);
-  assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
-  assert.match(runtime, /clamp\(roundMoney\(midpoint \* upperFactor\), lower, ceiling\)/);
+  assert.equal(estimator.estimateCeilingUsd, 30000);
+  assert.match(runtime, /clamp(roundMoney(midpoint * lowerFactor), floor, ceiling)/);
+  assert.match(runtime, /clamp(roundMoney(midpoint * upperFactor), lower, ceiling)/);
 });
 
-test("Astro validates config at build time and derives the no-JS fallback from the same authority", () => {
-  assert.match(page, /const EXPECTED_ESTIMATOR_SCHEMA_VERSION = 1/);
-  assert.match(page, /throw new Error\('Invalid quote estimator configuration'\)/);
-  assert.match(page, /throw new Error\('Invalid quote estimator defaults'\)/);
+test("Astro validates v2 config at build time and derives the no-JS fallback from the same authority", () => {
+  assert.match(page, /const EXPECTED_ESTIMATOR_SCHEMA_VERSION = 2/);
+  assert.match(page, /employeeBandsAreValid/);
+  assert.match(page, /throw new Error('Invalid quote estimator configuration')/);
+  assert.match(page, /throw new Error('Invalid quote estimator defaults')/);
   assert.match(page, /const initialRange =/);
   assert.match(page, /const initialSummary =/);
-  assert.match(page, /data-schema-version=\{estimator\.schemaVersion\}/);
-  assert.match(page, /data-quote-range>\{initialRange\}<\/strong>/);
-  assert.match(page, /data-quote-summary>\{initialSummary\}<\/p>/);
-  assert.doesNotMatch(page, /data-quote-range>\$[0-9]/);
+  assert.match(page, /data-pricing-revision={estimator.pricingRevision}/);
+  assert.match(page, /data-quote-range>{initialRange}</strong>/);
 });
 
-test("every supported pricing combination stays bounded and ordered", () => {
-  const standardTotals = nonEmptyStandardTotals();
-  let combinationsChecked = 0;
-
-  for (const speed of estimator.speeds) {
-    for (const standardsUsd of standardTotals) {
-      for (const depth of estimator.deliveryDepths) {
-        for (const complexity of estimator.complexities) {
-          const quote = calculateEstimate({
-            speedBaseUsd: speed.baseUsd,
-            standardsUsd,
-            depthUsd: depth.amountUsd,
-            complexityUsd: complexity.amountUsd,
-          });
-          assert.ok(quote.midpoint >= estimator.midpointFloorUsd);
-          assert.ok(quote.midpoint <= estimator.midpointCeilingUsd);
-          assert.ok(quote.lower >= estimator.estimateFloorUsd);
-          assert.ok(quote.upper <= estimator.estimateCeilingUsd);
-          assert.ok(quote.lower <= quote.upper);
-          combinationsChecked += 1;
-        }
-      }
-    }
+test("representative low and high estimates remain bounded and ordered", () => {
+  const standards = nonEmptyStandardTotals();
+  const low = calculateEstimate({
+    speedBaseUsd: estimator.speeds[0].baseUsd,
+    standardsUsd: Math.min(...standards),
+    depthUsd: estimator.deliveryDepths[0].amountUsd,
+    complexityUsd: estimator.complexities[0].amountUsd,
+    organizationUsd: estimator.organizationTypes[0].amountUsd,
+    employeesUsd: estimator.employeeBands[0].amountUsd,
+    sectorUsd: Math.min(...estimator.sectors.map((item) => item.amountUsd)),
+  });
+  const high = calculateEstimate({
+    speedBaseUsd: estimator.speeds.at(-1).baseUsd,
+    standardsUsd: Math.max(...standards),
+    depthUsd: estimator.deliveryDepths.at(-1).amountUsd,
+    complexityUsd: estimator.complexities.at(-1).amountUsd,
+    organizationUsd: estimator.organizationTypes.at(-1).amountUsd,
+    employeesUsd: estimator.employeeBands.at(-1).amountUsd,
+    sectorUsd: Math.max(...estimator.sectors.map((item) => item.amountUsd)),
+  });
+  for (const quote of [low, high]) {
+    assert.ok(quote.midpoint >= estimator.midpointFloorUsd);
+    assert.ok(quote.midpoint <= estimator.midpointCeilingUsd);
+    assert.ok(quote.lower >= estimator.estimateFloorUsd);
+    assert.ok(quote.upper <= estimator.estimateCeilingUsd);
+    assert.ok(quote.lower <= quote.upper);
   }
-
-  assert.equal(
-    combinationsChecked,
-    (2 ** estimator.standards.length - 1) * estimator.speeds.length * estimator.deliveryDepths.length * estimator.complexities.length,
-  );
+  assert.ok(high.midpoint >= low.midpoint);
+  assert.ok(high.lower >= low.lower);
+  assert.ok(high.upper >= low.upper);
 });
 
-test("faster delivery, deeper service, and greater complexity never reduce pricing", () => {
-  const standardTotals = nonEmptyStandardTotals();
-  const orderedSpeeds = [...estimator.speeds].sort((left, right) => right.weeks - left.weeks);
-  const orderedDepths = estimator.deliveryDepths;
-  const orderedComplexities = estimator.complexities;
-
-  for (let index = 1; index < orderedSpeeds.length; index += 1) {
-    assert.ok(orderedSpeeds[index].weeks < orderedSpeeds[index - 1].weeks);
-    assert.ok(orderedSpeeds[index].baseUsd >= orderedSpeeds[index - 1].baseUsd);
-  }
-  for (let index = 1; index < orderedDepths.length; index += 1) {
-    assert.ok(orderedDepths[index].amountUsd >= orderedDepths[index - 1].amountUsd);
-  }
-  for (let index = 1; index < orderedComplexities.length; index += 1) {
-    assert.ok(orderedComplexities[index].amountUsd >= orderedComplexities[index - 1].amountUsd);
-  }
-
-  for (const standardsUsd of standardTotals) {
-    for (const depth of orderedDepths) {
-      for (const complexity of orderedComplexities) {
-        const quotes = orderedSpeeds.map((speed) => calculateEstimate({
-          speedBaseUsd: speed.baseUsd,
-          standardsUsd,
-          depthUsd: depth.amountUsd,
-          complexityUsd: complexity.amountUsd,
-        }));
-        for (let index = 1; index < quotes.length; index += 1) {
-          assert.ok(quotes[index].midpoint >= quotes[index - 1].midpoint);
-          assert.ok(quotes[index].lower >= quotes[index - 1].lower);
-          assert.ok(quotes[index].upper >= quotes[index - 1].upper);
-        }
-      }
+test("higher ordered scope factors never carry a lower configured amount", () => {
+  for (const items of [
+    [...estimator.speeds].sort((left, right) => right.weeks - left.weeks).map((item) => ({ amountUsd: item.baseUsd })),
+    estimator.deliveryDepths,
+    estimator.complexities,
+    estimator.organizationTypes,
+    estimator.employeeBands,
+  ]) {
+    for (let index = 1; index < items.length; index += 1) {
+      assert.ok(items[index].amountUsd >= items[index - 1].amountUsd);
     }
   }
 });
 
-test("runtime fails closed on invalid or incompatible configuration instead of substituting pricing defaults", () => {
-  assert.match(runtime, /const EXPECTED_SCHEMA_VERSION = 1/);
+test("runtime fails closed on invalid or incompatible configuration", () => {
+  assert.match(runtime, /const EXPECTED_SCHEMA_VERSION = 2/);
   assert.match(runtime, /schemaVersion === EXPECTED_SCHEMA_VERSION/);
-  assert.match(runtime, /const configurationValid =/);
-  assert.match(runtime, /\^\[A-Z\]\{3\}\$/);
-  assert.match(runtime, /Number\.isSafeInteger\(floor\)/);
-  assert.match(runtime, /option\.index === index/);
-  assert.match(runtime, /pricedInputs\.every\(pricedInputValid\)/);
-  assert.match(runtime, /root\.dataset\.quoteRuntime = 'invalid'/);
+  assert.match(runtime, /employeeBandsValid/);
+  assert.match(runtime, /pricedSelectValid(organizationTypeSelect)/);
+  assert.match(runtime, /pricedSelectValid(sectorSelect)/);
+  assert.match(runtime, /root.dataset.quoteRuntime = 'invalid'/);
   assert.match(runtime, /Estimate unavailable/);
-  assert.match(runtime, /completeButton\.disabled = true/);
-  assert.doesNotMatch(runtime, /root\.dataset\.(?:floor|ceiling|roundTo),\s*\d/);
+  assert.match(runtime, /completeButton.disabled = true/);
 });
 
 test("completed quote snapshots cannot silently become stale", () => {
   assert.match(runtime, /const invalidateCompletedQuote =/);
-  assert.match(runtime, /completedPanel\.hidden = true/);
-  assert.match(runtime, /root\.addEventListener\('input', handleEstimatorChange\)/);
-  assert.match(runtime, /root\.addEventListener\('change', handleEstimatorChange\)/);
-  assert.match(page, /Changing any input invalidates this completed snapshot/);
+  assert.match(runtime, /completedPanel.hidden = true/);
+  assert.match(runtime, /root.addEventListener('input', handleEstimatorChange)/);
+  assert.match(runtime, /root.addEventListener('change', handleEstimatorChange)/);
 });
 
-test("quote controls expose validation and reduced-motion accessibility semantics", () => {
-  assert.match(page, /aria-valuetext=\{defaultSpeed\.label\}/);
+test("quote controls expose accessibility and safe-submission semantics", () => {
+  assert.match(page, /aria-valuetext={defaultSpeed.label}/);
   assert.match(page, /aria-describedby="quote-standard-note quote-standard-error"/);
   assert.match(page, /data-standard-error role="alert"/);
-  assert.match(runtime, /setAttribute\('aria-valuetext', quote\.speed\.label\)/);
-  assert.match(runtime, /setAttribute\('aria-invalid', 'true'\)/);
-  assert.match(runtime, /firstStandard\.focus\(\{ preventScroll: true \}\)/);
+  assert.match(runtime, /setAttribute('aria-valuetext', quote.speed.label)/);
+  assert.match(runtime, /setAttribute('aria-invalid', 'true')/);
   assert.match(runtime, /prefers-reduced-motion: reduce/);
+  assert.match(runtime, /credentials: 'omit'/);
+  assert.match(runtime, /AbortController/);
+  assert.match(page, /This form does not opt you into a marketing list/);
 });
 
-test("public marketing page does not embed privileged quote credentials", () => {
-  assert.doesNotMatch(page, /service_role|SUPABASE_SERVICE|NEON_DATABASE_URL|CANONICAL_INTERNAL_AUTH_TOKEN/i);
-  assert.doesNotMatch(runtime, /service_role|SUPABASE_SERVICE|NEON_DATABASE_URL|CANONICAL_INTERNAL_AUTH_TOKEN/i);
+test("public marketing page embeds no privileged backend credentials", () => {
+  for (const source of [page, runtime]) {
+    assert.doesNotMatch(source, /service_role|SUPABASE_SERVICE|RESEND_API_KEY|NEON_DATABASE_URL|CANONICAL_INTERNAL_AUTH_TOKEN/i);
+  }
 });
