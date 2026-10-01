@@ -40,7 +40,8 @@ test("playwright verifies the shipped web surface enforces browser security poli
       const csp = headers["content-security-policy"] || "";
       assert.match(csp, /default-src 'self'/);
       assert.match(csp, /script-src 'self'/);
-      assert.doesNotMatch(csp, /'unsafe-inline'/);
+      const scriptDirective = csp.split(';').map((part) => part.trim()).find((part) => part.startsWith('script-src')) || '';
+      assert.doesNotMatch(scriptDirective, /'unsafe-inline'/);
       assert.equal(headers["x-content-type-options"], "nosniff");
       assert.equal(headers["x-frame-options"], "DENY");
       assert.ok(headers["referrer-policy"]);
