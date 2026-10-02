@@ -44,8 +44,12 @@ test("quote delivery uses a public Supabase Edge Function without privileged bro
   assert.match(page, /PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
   assert.match(runtime, /functions\/v1\/public-intake/);
   assert.match(runtime, /kind: 'quote'/);
-  assert.match(runtime, /companyStage:/);
-  assert.doesNotMatch(page + runtime, /SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|NEON_DATABASE_URL/);
+  assert.match(runtime, /selection:/);
+  assert.match(runtime, /standardIds:/);
+  assert.match(runtime, /idempotencyKey:/);
+  assert.doesNotMatch(runtime, /range:\s*\{\s*lowerUsd:/);
+  assert.doesNotMatch(runtime, /deliverySpeed:\s*quote\.speed\.label/);
+  assert.doesNotMatch(page + runtime, /SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|PUBLIC_INTAKE_RATE_LIMIT_SALT|NEON_DATABASE_URL/);
 });
 
 test("quote requires a valid recipient and copies hello in user-facing disclosure", () => {
@@ -61,4 +65,10 @@ test("runtime fails closed when estimator configuration is invalid", () => {
   assert.match(runtime, /root\.dataset\.quoteRuntime = 'invalid'/);
   assert.match(runtime, /Estimate unavailable/);
   assert.match(runtime, /root\.dataset\.quoteRuntime = 'ready'/);
+});
+
+test("public quote form includes an offscreen bot trap without exposing secrets", () => {
+  assert.match(page, /name="quote_website"/);
+  assert.match(page, /aria-hidden="true"/);
+  assert.match(runtime, /websiteInput\.value\.trim\(\)/);
 });
