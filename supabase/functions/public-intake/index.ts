@@ -21,7 +21,7 @@ const json = (status: number, body: unknown, origin = '', extraHeaders: Record<s
       'cache-control': 'no-store, max-age=0',
       'x-content-type-options': 'nosniff',
       ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
-      'access-control-allow-headers': 'authorization, apikey, content-type',
+      'access-control-allow-headers': 'content-type',
       'access-control-allow-methods': 'POST, OPTIONS',
       'vary': 'Origin',
       ...extraHeaders,
@@ -33,6 +33,12 @@ const clean = (value: unknown, max: number) =>
 
 const cleanLine = (value: unknown, max: number) =>
   clean(value, max).replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+const cleanMultiline = (value: unknown, max: number) =>
+  clean(value, max)
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
+    .trim();
 
 const validEmail = (value: string) =>
   value.length >= 3 && value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -120,7 +126,7 @@ Deno.serve(async (request) => {
       status: allowedOrigins.has(origin) ? 204 : 403,
       headers: {
         ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
-        'access-control-allow-headers': 'authorization, apikey, content-type',
+        'access-control-allow-headers': 'content-type',
         'access-control-allow-methods': 'POST, OPTIONS',
         'vary': 'Origin',
       },
@@ -266,7 +272,7 @@ Deno.serve(async (request) => {
   } else {
     const name = cleanLine(payload.name, 120);
     const topic = cleanLine(payload.topic, 80);
-    const message = clean(payload.message, 4000);
+    const message = cleanMultiline(payload.message, 4000);
     const topicLabel = allowedContactTopics.get(topic);
     if (name.length < 2 || message.length < 20 || !topicLabel) {
       return json(400, { error: 'invalid_contact' }, origin);
@@ -282,7 +288,9 @@ Deno.serve(async (request) => {
 
   let stored: { id: string };
   if (retryRecordId) {
-    const retryUpdate = await fetch(`${supabaseUrl}/rest/v1/public_inquiries?id=eq.${retryRecordId}`, {
+    const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+    retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
+    const retryUpdate = await fetch(retryUrl, {
       method: 'PATCH',
       headers: {
         apikey: serviceRole,
@@ -340,7 +348,9 @@ Deno.serve(async (request) => {
   const sendBody = await send.json().catch(() => ({}));
   const deliveryStatus = send.ok ? 'sent' : 'failed';
 
-  const patch = await fetch(`${supabaseUrl}/rest/v1/public_inquiries?id=eq.${stored.id}`, {
+  const patchUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+  patchUrl.searchParams.set('id', `eq.${stored.id}`);
+  const patch = await fetch(patchUrl, {
     method: 'PATCH',
     headers: {
       ...adminHeaders(serviceRole),
