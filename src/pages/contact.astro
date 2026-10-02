@@ -8,7 +8,6 @@ const pricingHref = `${baseNoSlash}/pricing/`;
 const quoteHref = `${baseNoSlash}/quote/`;
 const contactScriptHref = `${baseNoSlash}/contact-form.js`;
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 ---
 
 <BaseLayout
@@ -52,7 +51,7 @@ const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
         <h2 id="contact-form-title">Contact our readiness team</h2>
         <p>Messages are delivered to <strong>hello@canonical.plus</strong>. Do not submit credentials, secrets, regulated records, or audit evidence through this public form.</p>
       </div>
-      <form class="card contact-form" data-contact-form data-supabase-url={supabaseUrl} data-supabase-key={supabaseKey}>
+      <form class="card contact-form" data-contact-form data-supabase-url={supabaseUrl}>
         <label>Name<input name="name" type="text" autocomplete="name" minlength="2" maxlength="120" required /></label>
         <label>Work email<input name="email" type="email" autocomplete="email" maxlength="320" required /></label>
         <label>Company<input name="company" type="text" autocomplete="organization" minlength="2" maxlength="160" required /></label>
