@@ -1,0 +1,69 @@
+// Server-side copy of the pinned public quote authority projection.
+// tests/public-intake-contract.test.mjs requires byte-for-byte semantic parity
+// with src/data/quote-estimator.json so emailed quotes cannot trust browser-supplied pricing.
+export default {
+  "schemaVersion": 2,
+  "currency": "USD",
+  "estimateFloorUsd": 5000,
+  "estimateCeilingUsd": 25000,
+  "midpointFloorUsd": 5500,
+  "midpointCeilingUsd": 22000,
+  "roundToUsd": 500,
+  "lowerFactor": 0.9,
+  "upperFactor": 1.12,
+  "speeds": [
+    { "weeks": 9, "label": "9 weeks", "baseUsd": 5000, "note": "Standard pace with more room for evidence collection, remediation, and stakeholder review." },
+    { "weeks": 5, "label": "5 weeks", "baseUsd": 7500, "note": "Accelerated readiness program with tighter working sessions and faster decision cycles." },
+    { "weeks": 3, "label": "3 weeks", "baseUsd": 10500, "note": "Compressed readiness window with intensive coordination and prioritized remediation." }
+  ],
+  "standards": [
+    { "id": "soc2", "label": "SOC 2", "amountUsd": 0 },
+    { "id": "iso27001", "label": "ISO 27001", "amountUsd": 750 },
+    { "id": "nist", "label": "NIST CSF / 800-series", "amountUsd": 500 },
+    { "id": "gdpr", "label": "GDPR", "amountUsd": 750 },
+    { "id": "hipaa", "label": "HIPAA", "amountUsd": 1000 },
+    { "id": "pci", "label": "PCI DSS", "amountUsd": 1000 },
+    { "id": "fedramp", "label": "FedRAMP readiness", "amountUsd": 1750 },
+    { "id": "cis", "label": "CIS Controls", "amountUsd": 350 }
+  ],
+  "deliveryDepths": [
+    { "id": "advisory", "label": "Advisory", "amountUsd": 0, "note": "Gap analysis, control mapping, roadmap, and pre-audit preparation." },
+    { "id": "managed", "label": "Managed readiness", "amountUsd": 1500, "note": "Adds recurring working sessions, evidence tracking, owner follow-through, and readiness operations." },
+    { "id": "remediation", "label": "Hands-on remediation", "amountUsd": 3000, "note": "Adds technical implementation support for cloud, IAM, SDLC, logging, and evidence automation." }
+  ],
+  "complexities": [
+    { "id": "focused", "label": "Focused scope", "amountUsd": 0, "note": "One primary cloud or application boundary with a small control-owner group." },
+    { "id": "growing", "label": "Growing environment", "amountUsd": 1000, "note": "Several systems, teams, vendors, or cloud accounts in scope." },
+    { "id": "complex", "label": "Complex / regulated", "amountUsd": 2000, "note": "Multi-cloud, sensitive data, substantial remediation, or broad evidence collection." }
+  ],
+  "companyStages": [
+    { "id": "startup", "label": "Startup", "multiplier": 0.95, "note": "Lean team and narrower operating footprint." },
+    { "id": "business", "label": "Business", "multiplier": 1.0, "note": "Established operating team and customer-driven compliance needs." },
+    { "id": "enterprise", "label": "Enterprise", "multiplier": 1.12, "note": "Larger stakeholder set, broader governance, and more coordination." }
+  ],
+  "employeeBands": [
+    { "id": "1-10", "label": "1–10 employees", "min": 1, "max": 10, "amountUsd": 0 },
+    { "id": "11-50", "label": "11–50 employees", "min": 11, "max": 50, "amountUsd": 500 },
+    { "id": "51-200", "label": "51–200 employees", "min": 51, "max": 200, "amountUsd": 1250 },
+    { "id": "201-1000", "label": "201–1,000 employees", "min": 201, "max": 1000, "amountUsd": 2500 },
+    { "id": "1001-plus", "label": "1,001+ employees", "min": 1001, "max": 1000000, "amountUsd": 4000 }
+  ],
+  "sectors": [
+    { "id": "technology", "label": "Technology / SaaS", "amountUsd": 0 },
+    { "id": "professional-services", "label": "Professional services", "amountUsd": 0 },
+    { "id": "financial-services", "label": "Financial services / fintech", "amountUsd": 0 },
+    { "id": "healthcare", "label": "Healthcare / life sciences", "amountUsd": 0 },
+    { "id": "retail", "label": "Retail / ecommerce", "amountUsd": 0 },
+    { "id": "public-sector", "label": "Public sector / defense", "amountUsd": 0 },
+    { "id": "other", "label": "Other", "amountUsd": 0 }
+  ],
+  "defaults": {
+    "speedWeeks": 5,
+    "standardIds": ["soc2", "iso27001"],
+    "deliveryDepthId": "managed",
+    "complexityId": "growing",
+    "companyStageId": "business",
+    "employeeCount": 50,
+    "sectorId": "technology"
+  }
+};
