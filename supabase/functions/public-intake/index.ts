@@ -111,7 +111,7 @@ const existingSubmission = async (
   idempotencyKey: string,
 ) => {
   const url = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
-  url.searchParams.set('select', 'id,delivery_status,created_at');
+  url.searchParams.set('select', 'id,delivery_status,updated_at');
   url.searchParams.set('idempotency_key', `eq.${idempotencyKey}`);
   url.searchParams.set('limit', '1');
   const response = await fetchTimed(url, {
@@ -201,11 +201,11 @@ Deno.serve(async (request) => {
   let retryRecordId = '';
   try {
     const prior = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
-    const priorCreatedAt = prior?.created_at ? Date.parse(prior.created_at) : Number.NaN;
+    const priorUpdatedAt = prior?.updated_at ? Date.parse(prior.updated_at) : Number.NaN;
     const pendingLeaseExpired =
       prior?.delivery_status === 'pending' &&
-      Number.isFinite(priorCreatedAt) &&
-      Date.now() - priorCreatedAt >= 15 * 60 * 1000;
+      Number.isFinite(priorUpdatedAt) &&
+      Date.now() - priorUpdatedAt >= 15 * 60 * 1000;
 
     if (prior && prior.delivery_status === 'sent') {
       return json(202, {
@@ -316,12 +316,16 @@ Deno.serve(async (request) => {
     const retryUpdate = await fetchTimed(retryUrl, {
       method: 'PATCH',
       headers: {
-        apikey: serviceRole,
-        authorization: `Bearer ${serviceRole}`,
+        ...adminHeaders(serviceRole),
         'content-type': 'application/json',
         prefer: 'return=representation',
       },
-      body: JSON.stringify({ ...record, delivery_status: 'pending', provider_message_id: null }),
+      body: JSON.stringify({
+        ...record,
+        delivery_status: 'pending',
+        provider_message_id: null,
+        updated_at: new Date().toISOString(),
+      }),
     });
     if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
     const [updated] = await retryUpdate.json();
@@ -331,8 +335,7 @@ Deno.serve(async (request) => {
     const insert = await fetchTimed(`${supabaseUrl}/rest/v1/public_inquiries`, {
       method: 'POST',
       headers: {
-        apikey: serviceRole,
-        authorization: `Bearer ${serviceRole}`,
+        ...adminHeaders(serviceRole),
         'content-type': 'application/json',
         prefer: 'return=representation',
       },
@@ -379,7 +382,11 @@ Deno.serve(async (request) => {
         ...adminHeaders(serviceRole),
         'content-type': 'application/json',
       },
-      body: JSON.stringify({ delivery_status: 'failed', provider_message_id: null }),
+      body: JSON.stringify({
+        delivery_status: 'failed',
+        provider_message_id: null,
+        updated_at: new Date().toISOString(),
+      }),
     }).catch(() => console.error('public-intake failed-send status update failed'));
     return json(502, { error: 'email_failed' }, origin);
   }
@@ -397,6 +404,7 @@ Deno.serve(async (request) => {
     body: JSON.stringify({
       delivery_status: deliveryStatus,
       provider_message_id: typeof sendBody.id === 'string' ? sendBody.id.slice(0, 256) : null,
+      updated_at: new Date().toISOString(),
     }),
   });
   if (!patch.ok) console.error('public-intake delivery status update failed');
