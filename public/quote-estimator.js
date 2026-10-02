@@ -90,9 +90,14 @@ if (root instanceof HTMLElement) {
 
   const failClosed = () => {
     root.dataset.quoteRuntime = 'invalid';
+    root.setAttribute('aria-disabled', 'true');
+    for (const control of root.querySelectorAll('button, input, select, textarea')) {
+      if (control instanceof HTMLButtonElement || control instanceof HTMLInputElement || control instanceof HTMLSelectElement || control instanceof HTMLTextAreaElement) {
+        control.disabled = true;
+      }
+    }
     if (rangeNode instanceof HTMLElement) rangeNode.textContent = 'Estimate unavailable';
     if (summaryNode instanceof HTMLElement) summaryNode.textContent = 'Quote configuration could not be validated. Please contact hello@canonical.plus.';
-    if (completeButton instanceof HTMLButtonElement) completeButton.disabled = true;
   };
 
   root.dataset.quoteRuntime = 'booting';
@@ -144,7 +149,7 @@ if (root instanceof HTMLElement) {
         const complexityLabel = complexity instanceof HTMLInputElement ? complexity.dataset.label || '' : '';
         const stageLabel = stage instanceof HTMLOptionElement ? stage.dataset.label || stage.textContent || '' : '';
         const sectorLabel = sector instanceof HTMLOptionElement ? sector.dataset.label || sector.textContent || '' : '';
-        const summary = `${stageLabel} · ${employeeBand.label} · ${sectorLabel} · ${standardLabels.join(' + ') || 'No standard selected'} · ${depthLabel} · ${complexityLabel}`;
+        const summary = `${speed.label} · ${stageLabel} · ${employeeBand.label} · ${sectorLabel} · ${standardLabels.join(' + ') || 'No standard selected'} · ${depthLabel} · ${complexityLabel}`;
 
         return {
           speed,
