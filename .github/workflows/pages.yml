@@ -37,7 +37,6 @@ jobs:
       - name: Build the canonical.plus site
         env:
           PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
-          PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ vars.PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
         run: >-
           npm run build --
           --site https://canonical.plus
