@@ -5,6 +5,8 @@ import test from "node:test";
 const root = new URL("../", import.meta.url);
 const edge = await readFile(new URL("supabase/functions/public-intake/index.ts", root), "utf8");
 const migration = await readFile(new URL("supabase/migrations/20261001203000_public_intake_hardening.sql", root), "utf8");
+const integrityMigration = await readFile(new URL("supabase/migrations/20261002123000_public_intake_integrity.sql", root), "utf8");
+const pagesWorkflow = await readFile(new URL(".github/workflows/pages.yml", root), "utf8");
 const contactPage = await readFile(new URL("src/pages/contact.astro", root), "utf8");
 const contactRuntime = await readFile(new URL("public/contact-form.js", root), "utf8");
 const localEstimator = JSON.parse(await readFile(new URL("src/data/quote-estimator.json", root), "utf8"));
@@ -66,6 +68,18 @@ test("server quote engine rejects tampered or ambiguous selections", () => {
     () => quoteEngineModule.computeQuote({ ...valid, speedWeeks: 1 }),
     /invalid_quote_selection/,
   );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, speedWeeks: "5" }),
+    /invalid_quote_selection/,
+  );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, standardIds: ["soc2", 7] }),
+    /invalid_quote_selection/,
+  );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, lowerUsd: 1 }),
+    /invalid_quote_selection/,
+  );
 });
 
 test("public intake is idempotent at both database and email-provider boundaries", () => {
@@ -90,6 +104,8 @@ test("contact intake is bounded, allowlisted, and honeypot protected", () => {
   assert.match(edge, /allowedContactTopics/);
   assert.match(edge, /message\.length < 20/);
   assert.match(edge, /payload\.website/);
+  assert.match(edge, /cleanMultiline/);
+  assert.doesNotMatch(edge, /access-control-allow-headers': 'authorization, apikey/);
   assert.match(contactPage, /name="website"/);
   assert.match(contactPage, /maxlength="4000"/);
   assert.match(contactRuntime, /crypto\.randomUUID\(\)/);
@@ -114,4 +130,27 @@ test("browser boundary is intentionally public without misusing API keys as bear
   assert.match(edge, /SUPABASE_SECRET_KEYS/);
   assert.match(edge, /SUPABASE_SECRET_KEY/);
   assert.match(edge, /SUPABASE_SERVICE_ROLE_KEY/);
+});
+
+
+test("pending deliveries use a bounded retry lease and storage calls time out", () => {
+  assert.match(edge, /updated_at/);
+  assert.match(edge, /15 \* 60 \* 1000/);
+  assert.match(edge, /AbortSignal\.timeout/);
+  assert.match(edge, /email_failed/);
+  assert.match(integrityMigration, /add column if not exists updated_at/);
+  assert.match(integrityMigration, /bucket_start < clock_timestamp\(\) - interval '2 days'/);
+});
+
+test("database constrains kind/source/payload integrity", () => {
+  assert.match(integrityMigration, /public_inquiries_source_kind_chk/);
+  assert.match(integrityMigration, /kind = 'quote' and source = 'canonical\.plus\/quote'/);
+  assert.match(integrityMigration, /kind = 'contact' and source = 'canonical\.plus\/contact'/);
+  assert.match(integrityMigration, /provider_message_id_length_chk/);
+});
+
+test("production Pages deployment fails closed on missing or invalid Supabase origin", () => {
+  assert.match(pagesWorkflow, /Validate production public-intake configuration/);
+  assert.match(pagesWorkflow, /https:\/\/\*\.supabase\.co/);
+  assert.match(pagesWorkflow, /PUBLIC_SUPABASE_URL must be configured/);
 });
