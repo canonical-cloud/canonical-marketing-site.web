@@ -59,3 +59,15 @@ test("edge function only accepts the two exact marketing sources and production 
   assert.match(edge, /canonical\.plus\/contact/);
   assert.match(edge, /source !== expectedSource/);
 });
+
+test("browser boundary is intentionally public without misusing API keys as bearer tokens", async () => {
+  const quotePage = await readFile(new URL("src/pages/quote.astro", root), "utf8");
+  const quoteRuntime = await readFile(new URL("public/quote-estimator.js", root), "utf8");
+  const contactRuntime = await readFile(new URL("public/contact-form.js", root), "utf8");
+  const config = await readFile(new URL("supabase/config.toml", root), "utf8");
+  assert.match(config, /\[functions\.public-intake\][\s\S]*verify_jwt = false/);
+  assert.doesNotMatch(quotePage + quoteRuntime + contactRuntime, /PUBLIC_SUPABASE_PUBLISHABLE_KEY|authorization:\s*`Bearer|apikey:\s*supabase/i);
+  assert.match(edge, /SUPABASE_SECRET_KEYS/);
+  assert.match(edge, /SUPABASE_SECRET_KEY/);
+  assert.match(edge, /SUPABASE_SERVICE_ROLE_KEY/);
+});
