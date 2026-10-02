@@ -66,6 +66,18 @@ test("server quote engine rejects tampered or ambiguous selections", () => {
     () => quoteEngineModule.computeQuote({ ...valid, speedWeeks: 1 }),
     /invalid_quote_selection/,
   );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, speedWeeks: "5" }),
+    /invalid_quote_selection/,
+  );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, standardIds: ["soc2", 7] }),
+    /invalid_quote_selection/,
+  );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, lowerUsd: 1 }),
+    /invalid_quote_selection/,
+  );
 });
 
 test("public intake is idempotent at both database and email-provider boundaries", () => {
@@ -90,6 +102,8 @@ test("contact intake is bounded, allowlisted, and honeypot protected", () => {
   assert.match(edge, /allowedContactTopics/);
   assert.match(edge, /message\.length < 20/);
   assert.match(edge, /payload\.website/);
+  assert.match(edge, /cleanMultiline/);
+  assert.doesNotMatch(edge, /access-control-allow-headers': 'authorization, apikey/);
   assert.match(contactPage, /name="website"/);
   assert.match(contactPage, /maxlength="4000"/);
   assert.match(contactRuntime, /crypto\.randomUUID\(\)/);
