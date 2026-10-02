@@ -30,7 +30,6 @@ const quoteEstimatorScriptHref = `${baseNoSlash}/quote-estimator.js`;
 const contactHref = `${baseNoSlash}/contact/`;
 const appQuoteUrl = 'https://app.canonical.plus/u/quote';
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY || '';
 const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: estimator.currency, maximumFractionDigits: 0 });
 ---
 
@@ -83,7 +82,6 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
         data-lower-factor={estimator.lowerFactor}
         data-upper-factor={estimator.upperFactor}
         data-supabase-url={supabaseUrl}
-        data-supabase-key={supabaseKey}
       >
         <div class="quote-estimator__controls">
           <section class="quote-control-card" role="group" aria-labelledby="quote-speed-title">
