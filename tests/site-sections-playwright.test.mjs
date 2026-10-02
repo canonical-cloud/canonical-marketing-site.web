@@ -101,7 +101,7 @@ test("playwright: readiness, frameworks, and comparison pages render independent
   await page.goto(page.url().replace("/readiness/", "/frameworks/"), { waitUntil: "networkidle" });
   await page.getByRole("heading", { level: 1 }).filter({ hasText: /Readiness across/ }).waitFor();
   await page.goto(page.url().replace("/frameworks/", "/compare/"), { waitUntil: "networkidle" });
-  await page.getByRole("heading", { level: 1 }).filter({ hasText: /Readiness support is not a substitute/ }).waitFor();
+  await page.getByRole("heading", { level: 1 }).filter({ hasText: /Build the right compliance operating model/ }).waitFor();
   await page.getByText(/Vanta/).first().waitFor();
   await page.getByText(/not positioned as a mature hundreds-of-integrations/).waitFor();
 
