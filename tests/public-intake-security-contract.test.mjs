@@ -35,8 +35,6 @@ test("server quote engine recomputes canonical values from bounded selection ids
     companyStageId: "business",
     employeeBandId: "11-50",
     sectorId: "technology",
-    lowerUsd: 1,
-    upperUsd: 2,
   };
   const quote = quoteEngineModule.computeQuote(selection);
   assert.deepEqual(quote.range, { lowerUsd: 10000, upperUsd: 12500, currency: "USD" });
