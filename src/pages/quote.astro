@@ -153,6 +153,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
                 <input type="text" name="quote_company" autocomplete="organization" minlength="2" maxlength="160" required placeholder="Company name" />
               </label>
             </div>
+            <label class="quote-form__trap" aria-hidden="true">Website<input type="text" name="quote_website" tabindex="-1" autocomplete="off" /></label>
             <p class="quote-control-note">We email the estimate and scope summary to you and copy <strong>hello@canonical.plus</strong> so our team can follow up.</p>
           </section>
         </div>
@@ -218,6 +219,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
   .quote-profile-grid label { display:grid; gap:.45rem; color:var(--av-text-secondary); font-weight:700; }
   .quote-profile-grid input,.quote-profile-grid select { width:100%; min-height:46px; padding:.7rem .8rem; border:1px solid var(--av-border); border-radius:var(--radius-md); background:var(--av-surface); color:var(--av-text-primary); }
   .quote-validation { color:#ef7b72; font-weight:700; }
+  .quote-form__trap{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
   .quote-estimator__result { position:sticky; top:6rem; display:grid; gap:1rem; padding:clamp(1.35rem,3vw,2rem); border:1px solid var(--av-border); border-radius:var(--radius-lg); background:var(--av-surface); box-shadow:var(--shadow-lg); }
   .quote-estimator__eyebrow { margin:0; color:var(--av-accent); font-weight:800; text-transform:uppercase; letter-spacing:.05em; }
   .quote-estimator__price { margin:0; }
