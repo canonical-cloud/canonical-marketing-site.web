@@ -56,7 +56,7 @@ test('global discovery and contact use the canonical.plus hello address', () => 
   }
   assert.match(baseLayout, /mailto:hello@canonical\.plus/);
   assert.match(contactPage, /hello@canonical\.plus/);
-  assert.match(contactPage, /Start readiness assessment/);
+  assert.match(contactPage, /Send a message/);
   for (const source of [baseLayout, pricesPage, pricingPage, securityPage, contactPage]) {
     assert.doesNotMatch(source, /compliance@canonical\.(?:plus|cloud)/i);
   }
