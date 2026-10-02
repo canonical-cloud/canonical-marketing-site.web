@@ -11,8 +11,23 @@ export const computeQuote = (raw) => {
     throw new Error('invalid_quote_selection');
   }
   const scope = raw;
+  const allowedKeys = new Set([
+    'speedWeeks',
+    'standardIds',
+    'deliveryDepthId',
+    'complexityId',
+    'companyStageId',
+    'employeeBandId',
+    'sectorId',
+  ]);
+  if (Object.keys(scope).some((key) => !allowedKeys.has(key))) {
+    throw new Error('invalid_quote_selection');
+  }
 
-  const speedWeeks = Number(scope.speedWeeks);
+  if (!Number.isInteger(scope.speedWeeks)) {
+    throw new Error('invalid_quote_selection');
+  }
+  const speedWeeks = scope.speedWeeks;
   const speed = quoteConfig.speeds.find((item) => item.weeks === speedWeeks);
   const depth = itemById(quoteConfig.deliveryDepths, scope.deliveryDepthId);
   const complexity = itemById(quoteConfig.complexities, scope.complexityId);
@@ -20,9 +35,14 @@ export const computeQuote = (raw) => {
   const employees = itemById(quoteConfig.employeeBands, scope.employeeBandId);
   const sector = itemById(quoteConfig.sectors, scope.sectorId);
 
-  const standardIds = Array.isArray(scope.standardIds)
-    ? scope.standardIds.filter((id) => typeof id === 'string')
-    : [];
+  if (
+    !Array.isArray(scope.standardIds) ||
+    scope.standardIds.length < 1 ||
+    !scope.standardIds.every((id) => typeof id === 'string' && id.length > 0)
+  ) {
+    throw new Error('invalid_quote_selection');
+  }
+  const standardIds = scope.standardIds;
   const uniqueStandardIds = [...new Set(standardIds)];
   const standards = uniqueStandardIds
     .map((id) => itemById(quoteConfig.standards, id))
