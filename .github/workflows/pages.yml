@@ -34,6 +34,19 @@ jobs:
           node-version: "22"
       - run: npm ci
       - run: npm test
+      - name: Validate production public-intake configuration
+        shell: bash
+        env:
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+        run: |
+          set -euo pipefail
+          case "$PUBLIC_SUPABASE_URL" in
+            https://*.supabase.co) ;;
+            *)
+              echo "::error::PUBLIC_SUPABASE_URL must be configured as an https://*.supabase.co origin"
+              exit 1
+              ;;
+          esac
       - name: Build the canonical.plus site
         env:
           PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
