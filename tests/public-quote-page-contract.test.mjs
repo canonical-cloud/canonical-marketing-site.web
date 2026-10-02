@@ -71,3 +71,10 @@ test("public quote form includes an offscreen bot trap without exposing secrets"
   assert.match(page, /aria-hidden="true"/);
   assert.match(runtime, /websiteInput\.value\.trim\(\)/);
 });
+
+
+test("quote copy distinguishes priced organization factors from sector context", () => {
+  assert.match(page, /company stage, and employee count\. Business sector is captured as scoping context/i);
+  assert.match(page, /Business sector captured for scoping context/i);
+  assert.ok(estimator.sectors.every((item) => item.amountUsd === 0));
+});
