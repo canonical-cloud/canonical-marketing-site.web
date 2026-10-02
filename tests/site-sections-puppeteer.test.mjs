@@ -35,7 +35,7 @@ test("puppeteer: outcome strip shows the four readiness deliverables in order", 
     { name: "Gap map", description: "What is missing or not yet evidenced" },
     { name: "Control roadmap", description: "What to implement, in what order, and why" },
     { name: "Evidence plan", description: "What an independent reviewer is likely to request" },
-    { name: "Handoff boundary", description: "What Canonical prepares versus what an assessor decides" },
+    { name: "Review handoff", description: "A structured package for the reviewer you select" },
   ]);
   assert.deepEqual(pageErrors, []);
 });
@@ -55,20 +55,16 @@ test("puppeteer: process section lists the four ordered readiness phases", async
   assert.deepEqual(pageErrors, []);
 });
 
-test("puppeteer: hero CTAs target the readiness app and explanatory page", async (t) => {
+test("puppeteer: hero CTAs target the public quote and contact pages", async (t) => {
   const { page, pageErrors } = await open(t);
 
   assert.equal(
     await page.$eval("#hero-cta-primary", (element) => element.getAttribute("href")),
-    "https://app.canonical.plus/u/quote",
-  );
-  assert.equal(
-    await page.$eval("#hero-cta-primary", (element) => element.getAttribute("data-application-link")),
-    "quote",
+    "/quote/",
   );
   assert.equal(
     await page.$eval("#hero-cta-secondary", (element) => element.getAttribute("href")),
-    "/readiness/",
+    "/contact/",
   );
 
   const featured = await page.$$eval("#frameworks .frameworks__item h4", (nodes) =>
