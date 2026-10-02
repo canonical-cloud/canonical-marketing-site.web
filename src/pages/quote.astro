@@ -70,7 +70,7 @@ const defaultMidpoint = clamp(defaultBase * defaultStage.multiplier, estimator.m
 const defaultLower = clamp(roundMoney(defaultMidpoint * estimator.lowerFactor), estimator.estimateFloorUsd, estimator.estimateCeilingUsd);
 const defaultUpper = clamp(roundMoney(defaultMidpoint * estimator.upperFactor), defaultLower, estimator.estimateCeilingUsd);
 const initialRange = `${money.format(defaultLower)}–${money.format(defaultUpper)}`;
-const initialSummary = `${defaultStage.label} · ${defaultEmployeeBand.label} · ${defaultSector.label} · ${defaultStandards.map((standard) => standard.label).join(' + ')}`;
+const initialSummary = `${defaultSpeed.label} · ${defaultStage.label} · ${defaultEmployeeBand.label} · ${defaultSector.label} · ${defaultStandards.map((standard) => standard.label).join(' + ')} · ${defaultDepth.label} · ${defaultComplexity.label}`;
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const quoteEstimatorScriptHref = `${baseNoSlash}/quote-estimator.js`;
