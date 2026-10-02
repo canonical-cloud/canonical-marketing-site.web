@@ -45,6 +45,7 @@ if (root instanceof HTMLElement) {
   const sector = root.querySelector('select[name="quote_sector"]');
   const emailInput = root.querySelector('input[name="quote_email"]');
   const companyInput = root.querySelector('input[name="quote_company"]');
+  const websiteInput = root.querySelector('input[name="quote_website"]');
 
   const pricedInputValid = (input) =>
     input instanceof HTMLInputElement &&
@@ -94,6 +95,7 @@ if (root instanceof HTMLElement) {
     selectOptionsValid(sector, 'amount') &&
     emailInput instanceof HTMLInputElement &&
     companyInput instanceof HTMLInputElement &&
+    websiteInput instanceof HTMLInputElement &&
     rangeNode instanceof HTMLElement &&
     summaryNode instanceof HTMLElement &&
     meterNode instanceof HTMLElement &&
@@ -223,7 +225,7 @@ if (root instanceof HTMLElement) {
           email: emailInput.value.trim(),
           company: companyInput.value.trim(),
           idempotencyKey: submissionKey,
-          website: '',
+          website: websiteInput.value.trim(),
           selection: {
             speedWeeks: Number(quote.speed.id),
             standardIds: quote.standards.map((item) => item.value),
