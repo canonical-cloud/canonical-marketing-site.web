@@ -16,12 +16,18 @@ This repository contains the migration and Edge Function required by
    - `PUBLIC_INTAKE_RATE_LIMIT_SALT` — at least 24 random characters; rotate only with awareness that rate-limit buckets will reset
    - `CANONICAL_FROM_EMAIL=Canonical Plus <hello@canonical.plus>`
 5. Deploy `supabase/functions/public-intake`.
-6. Set the marketing-site build variables:
+6. Set the marketing-site build variable:
    - `PUBLIC_SUPABASE_URL`
-   - `PUBLIC_SUPABASE_PUBLISHABLE_KEY`
 
-The browser receives only the public Supabase URL and publishable key. The service-role
-key and mail-provider credential stay inside the Edge Function environment.
+The browser receives only the public Supabase URL. `public-intake` is explicitly
+configured with `verify_jwt = false` because it is a public marketing endpoint; the
+application handler enforces origin, bounded inputs, idempotency, honeypot handling, and
+server-side quotas. No Supabase API key is required in the browser.
+
+Hosted Supabase injects the new secret-key environment used for privileged REST calls.
+The implementation prefers `SUPABASE_SECRET_KEYS` / `SUPABASE_SECRET_KEY` and retains
+`SUPABASE_SERVICE_ROLE_KEY` only as a migration fallback. Mail-provider and quota-salt
+credentials remain server-side.
 
 ## Email behavior
 
