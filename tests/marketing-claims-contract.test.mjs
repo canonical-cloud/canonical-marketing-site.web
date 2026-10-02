@@ -49,7 +49,7 @@ test("public copy never presents readiness as an independent audit or certificat
 
 test("public comparison acknowledges current product limits", () => {
   assert.match(corpus, /not positioned as a mature hundreds-of-integrations continuous-monitoring suite/);
-  assert.match(corpus, /should be selected for its current strengths—not for capabilities it has not yet proven/);
+  assert.match(corpus, /should complement those workflows where they fit rather\s+than imply feature parity with mature automation suites/);
   assert.match(corpus, /Vendor capabilities and commercial terms change/);
 });
 
