@@ -32,11 +32,9 @@ alter table public.public_inquiries
       (kind = 'contact' and source = 'canonical.plus/contact' and quote_payload is null and message is not null)
     ) not valid;
 
-alter table public.public_inquiries validate constraint public_inquiries_company_length_chk;
-alter table public.public_inquiries validate constraint public_inquiries_name_length_chk;
-alter table public.public_inquiries validate constraint public_inquiries_message_length_chk;
-alter table public.public_inquiries validate constraint public_inquiries_provider_message_id_length_chk;
-alter table public.public_inquiries validate constraint public_inquiries_source_kind_chk;
+-- Constraints are intentionally added NOT VALID so an existing linked development
+-- project cannot be bricked by legacy rows. PostgreSQL still enforces them for all
+-- new and updated rows. After legacy-data review/backfill, validate them explicitly.
 
 create index if not exists public_inquiries_updated_at_idx
   on public.public_inquiries (updated_at desc);
