@@ -29,7 +29,6 @@ if (root instanceof HTMLElement) {
   const upperFactor = numeric('upperFactor');
   const currency = root.dataset.currency || '';
   const supabaseUrl = (root.dataset.supabaseUrl || '').replace(/\/+$/, '');
-  const supabaseKey = root.dataset.supabaseKey || '';
 
   const speedOptions = [...root.querySelectorAll('[data-option="speed"]')].map((node) => ({
     index: Number(node.dataset.index),
@@ -214,7 +213,7 @@ if (root instanceof HTMLElement) {
         }
         if (!emailInput.reportValidity() || !companyInput.reportValidity()) return;
 
-        if (!supabaseUrl || !supabaseKey) {
+        if (!supabaseUrl) {
           setStatus('Quote email is temporarily unavailable. Please email hello@canonical.plus.', true);
           return;
         }
@@ -245,8 +244,6 @@ if (root instanceof HTMLElement) {
             method: 'POST',
             headers: {
               'content-type': 'application/json',
-              apikey: supabaseKey,
-              authorization: `Bearer ${supabaseKey}`,
             },
             body: JSON.stringify(payload),
           });
