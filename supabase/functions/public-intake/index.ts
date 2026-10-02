@@ -310,48 +310,56 @@ Deno.serve(async (request) => {
   }
 
   let stored: { id: string };
-  if (retryRecordId) {
-    const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
-    retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
-    const retryUpdate = await fetchTimed(retryUrl, {
-      method: 'PATCH',
-      headers: {
-        ...adminHeaders(serviceRole),
-        'content-type': 'application/json',
-        prefer: 'return=representation',
-      },
-      body: JSON.stringify({
-        ...record,
-        delivery_status: 'pending',
-        provider_message_id: null,
-        updated_at: new Date().toISOString(),
-      }),
-    });
-    if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
-    const [updated] = await retryUpdate.json();
-    if (!updated?.id) return json(503, { error: 'storage_failed' }, origin);
-    stored = updated;
-  } else {
-    const insert = await fetchTimed(`${supabaseUrl}/rest/v1/public_inquiries`, {
-      method: 'POST',
-      headers: {
-        ...adminHeaders(serviceRole),
-        'content-type': 'application/json',
-        prefer: 'return=representation',
-      },
-      body: JSON.stringify(record),
-    });
-    if (insert.status === 409) {
-      return json(202, {
-        accepted: true,
-        duplicate: true,
-        ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
-      }, origin);
+  try {
+    if (retryRecordId) {
+      const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+      retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
+      const retryUpdate = await fetchTimed(retryUrl, {
+        method: 'PATCH',
+        headers: {
+          ...adminHeaders(serviceRole),
+          'content-type': 'application/json',
+          prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          ...record,
+          delivery_status: 'pending',
+          provider_message_id: null,
+          updated_at: new Date().toISOString(),
+        }),
+      });
+      if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
+      const [updated] = await retryUpdate.json();
+      if (!updated?.id || !validUuid(updated.id)) {
+        return json(503, { error: 'storage_failed' }, origin);
+      }
+      stored = updated;
+    } else {
+      const insert = await fetchTimed(`${supabaseUrl}/rest/v1/public_inquiries`, {
+        method: 'POST',
+        headers: {
+          ...adminHeaders(serviceRole),
+          'content-type': 'application/json',
+          prefer: 'return=representation',
+        },
+        body: JSON.stringify(record),
+      });
+      if (insert.status === 409) {
+        return json(202, {
+          accepted: true,
+          duplicate: true,
+          ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+        }, origin);
+      }
+      if (!insert.ok) return json(503, { error: 'storage_failed' }, origin);
+      const [created] = await insert.json();
+      if (!created?.id || !validUuid(created.id)) {
+        return json(503, { error: 'storage_failed' }, origin);
+      }
+      stored = created;
     }
-    if (!insert.ok) return json(503, { error: 'storage_failed' }, origin);
-    const [created] = await insert.json();
-    if (!created?.id) return json(503, { error: 'storage_failed' }, origin);
-    stored = created;
+  } catch {
+    return json(503, { error: 'storage_failed' }, origin);
   }
 
   let send: Response;
