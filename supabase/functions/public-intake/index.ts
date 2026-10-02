@@ -259,14 +259,18 @@ Deno.serve(async (request) => {
     return json(503, { error: 'service_unavailable' }, origin);
   }
 
+  let retryRecordId = '';
   try {
     const prior = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
-    if (prior) {
+    if (prior && prior.delivery_status !== 'failed') {
       return json(202, {
         accepted: true,
         duplicate: true,
         ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
       }, origin);
+    }
+    if (prior?.delivery_status === 'failed' && typeof prior.id === 'string') {
+      retryRecordId = prior.id;
     }
 
     const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
@@ -349,25 +353,45 @@ Deno.serve(async (request) => {
     recipients = ['hello@canonical.plus'];
   }
 
-  const insert = await fetch(`${supabaseUrl}/rest/v1/public_inquiries`, {
-    method: 'POST',
-    headers: {
-      apikey: serviceRole,
-      authorization: `Bearer ${serviceRole}`,
-      'content-type': 'application/json',
-      prefer: 'return=representation',
-    },
-    body: JSON.stringify(record),
-  });
-  if (insert.status === 409) {
-    return json(202, {
-      accepted: true,
-      duplicate: true,
-      ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
-    }, origin);
+  let stored: { id: string };
+  if (retryRecordId) {
+    const retryUpdate = await fetch(`${supabaseUrl}/rest/v1/public_inquiries?id=eq.${retryRecordId}`, {
+      method: 'PATCH',
+      headers: {
+        apikey: serviceRole,
+        authorization: `Bearer ${serviceRole}`,
+        'content-type': 'application/json',
+        prefer: 'return=representation',
+      },
+      body: JSON.stringify({ ...record, delivery_status: 'pending', provider_message_id: null }),
+    });
+    if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
+    const [updated] = await retryUpdate.json();
+    if (!updated?.id) return json(503, { error: 'storage_failed' }, origin);
+    stored = updated;
+  } else {
+    const insert = await fetch(`${supabaseUrl}/rest/v1/public_inquiries`, {
+      method: 'POST',
+      headers: {
+        apikey: serviceRole,
+        authorization: `Bearer ${serviceRole}`,
+        'content-type': 'application/json',
+        prefer: 'return=representation',
+      },
+      body: JSON.stringify(record),
+    });
+    if (insert.status === 409) {
+      return json(202, {
+        accepted: true,
+        duplicate: true,
+        ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+      }, origin);
+    }
+    if (!insert.ok) return json(503, { error: 'storage_failed' }, origin);
+    const [created] = await insert.json();
+    if (!created?.id) return json(503, { error: 'storage_failed' }, origin);
+    stored = created;
   }
-  if (!insert.ok) return json(503, { error: 'storage_failed' }, origin);
-  const [stored] = await insert.json();
 
   const send = await fetch('https://api.resend.com/emails', {
     method: 'POST',
