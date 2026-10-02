@@ -141,6 +141,28 @@ const sha256Hex = async (value: string) => {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 };
 
+const adminHeaders = (key: string) => ({
+  apikey: key,
+  ...(key.startsWith('eyJ') ? { authorization: `Bearer ${key}` } : {}),
+});
+
+const resolveAdminKey = () => {
+  const direct = Deno.env.get('SUPABASE_SECRET_KEY') || '';
+  if (direct) return direct;
+  const raw = Deno.env.get('SUPABASE_SECRET_KEYS') || '';
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (parsed?.default && typeof parsed.default === 'string') return parsed.default;
+      const first = Object.values(parsed).find((value) => typeof value === 'string');
+      if (typeof first === 'string') return first;
+    } catch {
+      // Fall through to the legacy key while projects migrate.
+    }
+  }
+  return Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+};
+
 const consumeQuota = async (
   supabaseUrl: string,
   serviceRole: string,
@@ -151,8 +173,7 @@ const consumeQuota = async (
   const response = await fetch(`${supabaseUrl}/rest/v1/rpc/consume_public_intake_quota`, {
     method: 'POST',
     headers: {
-      apikey: serviceRole,
-      authorization: `Bearer ${serviceRole}`,
+      ...adminHeaders(serviceRole),
       'content-type': 'application/json',
     },
     body: JSON.stringify({
@@ -176,8 +197,7 @@ const existingSubmission = async (
   url.searchParams.set('limit', '1');
   const response = await fetch(url, {
     headers: {
-      apikey: serviceRole,
-      authorization: `Bearer ${serviceRole}`,
+      ...adminHeaders(serviceRole),
     },
   });
   if (!response.ok) throw new Error('idempotency_backend_failed');
@@ -251,7 +271,7 @@ Deno.serve(async (request) => {
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
-  const serviceRole = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+  const serviceRole = resolveAdminKey();
   const resendKey = Deno.env.get('RESEND_API_KEY') || '';
   const rateSalt = Deno.env.get('PUBLIC_INTAKE_RATE_LIMIT_SALT') || '';
   const from = Deno.env.get('CANONICAL_FROM_EMAIL') || 'Canonical Plus <hello@canonical.plus>';
@@ -416,8 +436,7 @@ Deno.serve(async (request) => {
   const patch = await fetch(`${supabaseUrl}/rest/v1/public_inquiries?id=eq.${stored.id}`, {
     method: 'PATCH',
     headers: {
-      apikey: serviceRole,
-      authorization: `Bearer ${serviceRole}`,
+      ...adminHeaders(serviceRole),
       'content-type': 'application/json',
     },
     body: JSON.stringify({
