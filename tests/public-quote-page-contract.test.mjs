@@ -41,7 +41,6 @@ test("estimate remains bounded by the shared authority", () => {
 
 test("quote delivery uses a public Supabase Edge Function without privileged browser credentials", () => {
   assert.match(page, /PUBLIC_SUPABASE_URL/);
-  assert.match(page, /PUBLIC_SUPABASE_PUBLISHABLE_KEY/);
   assert.match(runtime, /functions\/v1\/public-intake/);
   assert.match(runtime, /kind: 'quote'/);
   assert.match(runtime, /selection:/);
@@ -49,7 +48,7 @@ test("quote delivery uses a public Supabase Edge Function without privileged bro
   assert.match(runtime, /idempotencyKey:/);
   assert.doesNotMatch(runtime, /range:\s*\{\s*lowerUsd:/);
   assert.doesNotMatch(runtime, /deliverySpeed:\s*quote\.speed\.label/);
-  assert.doesNotMatch(page + runtime, /SUPABASE_SERVICE_ROLE_KEY|RESEND_API_KEY|PUBLIC_INTAKE_RATE_LIMIT_SALT|NEON_DATABASE_URL/);
+  assert.doesNotMatch(page + runtime, /SUPABASE_(?:SERVICE_ROLE|SECRET|PUBLISHABLE)|RESEND_API_KEY|PUBLIC_INTAKE_RATE_LIMIT_SALT|NEON_DATABASE_URL/);
 });
 
 test("quote requires a valid recipient and copies hello in user-facing disclosure", () => {
