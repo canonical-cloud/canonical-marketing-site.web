@@ -13,7 +13,7 @@ const launchBrowser = async (t) => {
   return browser;
 };
 
-test("playwright: public quote completes locally without auth, persistence, or network submission", async (t) => {
+test("playwright: public quote completes locally without auth or persistence when intake is unconfigured", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
@@ -40,12 +40,12 @@ test("playwright: public quote completes locally without auth, persistence, or n
 
   assert.equal(await estimator.getAttribute('data-quote-runtime'), 'ready');
   assert.equal(await completeButton.isEnabled(), true);
-  assert.equal((await range.textContent())?.trim(), '$9,500–$12,000');
+  assert.equal((await range.textContent())?.trim(), '$10,000–$12,500');
   assert.equal(await slider.getAttribute('aria-valuetext'), '5 weeks');
-  assert.equal(await page.locator('a[data-quote-login]').first().getAttribute('href'), 'https://app.canonical.plus/u/quote');
+  assert.equal(await page.locator('a[data-quote-login]').count(), 0);
 
   await slider.fill('2');
-  assert.equal((await range.textContent())?.trim(), '$12,000–$15,000');
+  assert.equal((await range.textContent())?.trim(), '$13,000–$16,000');
   assert.equal(await slider.getAttribute('aria-valuetext'), '3 weeks');
 
   const standards = page.locator('input[name="quote_standard"]');
@@ -62,15 +62,16 @@ test("playwright: public quote completes locally without auth, persistence, or n
   // SOC 2 + ISO 27001 scope, so the completed range is lower than the 3-week
   // range asserted above before the standards were cleared.
   await standards.first().check();
+  await page.locator('[data-quote-email]').fill('buyer@example.com');
   await completeButton.click();
   assert.equal(await completion.isVisible(), true);
-  assert.equal((await page.locator('[data-completed-range]').textContent())?.trim(), '$11,500–$14,500');
-  assert.match((await page.locator('[data-completed-summary]').textContent()) ?? '', /3 weeks · SOC 2/);
+  assert.equal((await page.locator('[data-completed-range]').textContent())?.trim(), '$12,000–$15,000');
+  assert.match((await page.locator('[data-completed-summary]').textContent()) ?? '', /3 weeks · Business · 11–50 employees · Technology \/ SaaS · SOC 2/);
 
   await page.locator('input[name="quote_delivery_depth"][value="remediation"]').check();
   assert.equal(await completion.isHidden(), true, 'changing an input must invalidate the completed snapshot');
 
-  assert.deepEqual(interactionRequests, [], 'quote interactions must not submit or persist over the network');
+  assert.deepEqual(interactionRequests, [], 'an unconfigured intake endpoint must not create a network submission');
   assert.deepEqual(pageErrors, []);
 });
 
@@ -87,7 +88,7 @@ test("playwright: public quote remains usable at mobile width without horizontal
   }));
   assert.ok(dimensions.scrollWidth <= dimensions.clientWidth + 1, JSON.stringify(dimensions));
   assert.equal(await page.locator('[data-complete-public-quote]').isVisible(), true);
-  assert.equal(await page.locator('[data-quote-login]').first().isVisible(), true);
+  assert.equal(await page.locator('[data-quote-email]').isVisible(), true);
 });
 
 test("playwright: no-JavaScript fallback never creates a false completed quote", async (t) => {
@@ -102,7 +103,7 @@ test("playwright: no-JavaScript fallback never creates a false completed quote",
   const page = await context.newPage();
 
   await page.goto(`${server.url}/quote/`, { waitUntil: "load" });
-  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$10,000–$12,500');
   assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), null);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 
