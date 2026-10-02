@@ -4,7 +4,6 @@ if (form instanceof HTMLFormElement) {
   const status = form.querySelector('[data-contact-status]');
   const submit = form.querySelector('button[type="submit"]');
   const supabaseUrl = (form.dataset.supabaseUrl || '').replace(/\/+$/, '');
-  const supabaseKey = form.dataset.supabaseKey || '';
   let submissionKey = '';
 
   const setStatus = (message, error = false) => {
@@ -21,7 +20,7 @@ if (form instanceof HTMLFormElement) {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!form.reportValidity()) return;
-    if (!supabaseUrl || !supabaseKey) {
+    if (!supabaseUrl) {
       setStatus('The contact form is temporarily unavailable. Please email hello@canonical.plus.', true);
       return;
     }
@@ -47,8 +46,6 @@ if (form instanceof HTMLFormElement) {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          apikey: supabaseKey,
-          authorization: `Bearer ${supabaseKey}`,
         },
         body: JSON.stringify(payload),
       });
