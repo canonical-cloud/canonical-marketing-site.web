@@ -50,10 +50,10 @@ test("playwright: the differentiators state readiness and independence boundarie
   assert.deepEqual(
     items.map((text) => text.trim()),
     [
-      "Readiness before assurance",
+      "Buyer-ready scoping",
       "Engineering-aware remediation",
       "Reusable control mapping",
-      "Transparent platform fit",
+      "Flexible engagement structure",
     ],
   );
   assert.deepEqual(pageErrors, []);
@@ -64,10 +64,10 @@ test("playwright: contact CTA preserves the application and email boundaries", a
 
   const contact = page.locator("#contact");
   await contact.waitFor({ state: "visible" });
-  await contact.getByRole("link", { name: /Start readiness assessment/ }).waitFor({ state: "visible" });
+  await contact.getByRole("link", { name: /Build a readiness quote/ }).waitFor({ state: "visible" });
   assert.equal(
     await page.locator("#cta-readiness-btn").getAttribute("href"),
-    "https://app.canonical.plus/u/quote",
+    "/quote/",
   );
   assert.equal(
     await page.locator("#cta-contact-btn").getAttribute("href"),
@@ -80,7 +80,7 @@ test("playwright: page ships readiness SEO metadata, a single h1, and survives m
   const { page, pageErrors } = await open(t, "/", { height: 812, width: 375 });
 
   const meta = async (selector) => page.locator(selector).getAttribute("content");
-  assert.match(await meta('meta[name="description"]'), /identify compliance gaps/);
+  assert.match(await meta('meta[name="description"]'), /assess compliance readiness/);
   assert.match(await meta('meta[property="og:title"]'), /Compliance readiness/);
   assert.ok((await meta('meta[property="og:description"]'))?.length > 0);
 
@@ -97,11 +97,11 @@ test("playwright: page ships readiness SEO metadata, a single h1, and survives m
 test("playwright: readiness, frameworks, and comparison pages render independently", async (t) => {
   const { page, pageErrors } = await open(t, "/readiness/");
 
-  await page.getByRole("heading", { level: 1 }).filter({ hasText: /Get ready for independent review/ }).waitFor();
+  await page.getByRole("heading", { level: 1 }).filter({ hasText: /Build a program that is ready/ }).waitFor();
   await page.goto(page.url().replace("/readiness/", "/frameworks/"), { waitUntil: "networkidle" });
   await page.getByRole("heading", { level: 1 }).filter({ hasText: /Readiness across/ }).waitFor();
   await page.goto(page.url().replace("/frameworks/", "/compare/"), { waitUntil: "networkidle" });
-  await page.getByRole("heading", { level: 1 }).filter({ hasText: /Readiness support is not a substitute/ }).waitFor();
+  await page.getByRole("heading", { level: 1 }).filter({ hasText: /Compare readiness approaches/ }).waitFor();
   await page.getByText(/Vanta/).first().waitFor();
   await page.getByText(/not positioned as a mature hundreds-of-integrations/).waitFor();
 
