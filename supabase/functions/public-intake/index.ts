@@ -54,6 +54,12 @@ const sha256Hex = async (value: string) => {
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 };
 
+const fetchTimed = (
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  timeoutMs = 6000,
+) => fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+
 const adminHeaders = (key: string) => ({
   apikey: key,
   ...(key.startsWith('eyJ') ? { authorization: `Bearer ${key}` } : {}),
@@ -83,7 +89,7 @@ const consumeQuota = async (
   windowSeconds: number,
   limit: number,
 ) => {
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/consume_public_intake_quota`, {
+  const response = await fetchTimed(`${supabaseUrl}/rest/v1/rpc/consume_public_intake_quota`, {
     method: 'POST',
     headers: {
       ...adminHeaders(serviceRole),
@@ -105,10 +111,10 @@ const existingSubmission = async (
   idempotencyKey: string,
 ) => {
   const url = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
-  url.searchParams.set('select', 'id,delivery_status');
+  url.searchParams.set('select', 'id,delivery_status,created_at');
   url.searchParams.set('idempotency_key', `eq.${idempotencyKey}`);
   url.searchParams.set('limit', '1');
-  const response = await fetch(url, {
+  const response = await fetchTimed(url, {
     headers: {
       ...adminHeaders(serviceRole),
     },
@@ -195,14 +201,31 @@ Deno.serve(async (request) => {
   let retryRecordId = '';
   try {
     const prior = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
-    if (prior && prior.delivery_status !== 'failed') {
+    const priorCreatedAt = prior?.created_at ? Date.parse(prior.created_at) : Number.NaN;
+    const pendingLeaseExpired =
+      prior?.delivery_status === 'pending' &&
+      Number.isFinite(priorCreatedAt) &&
+      Date.now() - priorCreatedAt >= 15 * 60 * 1000;
+
+    if (prior && prior.delivery_status === 'sent') {
       return json(202, {
         accepted: true,
         duplicate: true,
         ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
       }, origin);
     }
-    if (prior?.delivery_status === 'failed' && typeof prior.id === 'string') {
+    if (prior?.delivery_status === 'pending' && !pendingLeaseExpired) {
+      return json(202, {
+        accepted: true,
+        duplicate: true,
+        ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+      }, origin);
+    }
+    if (
+      (prior?.delivery_status === 'failed' || pendingLeaseExpired) &&
+      typeof prior.id === 'string' &&
+      validUuid(prior.id)
+    ) {
       retryRecordId = prior.id;
     }
 
@@ -290,7 +313,7 @@ Deno.serve(async (request) => {
   if (retryRecordId) {
     const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
     retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
-    const retryUpdate = await fetch(retryUrl, {
+    const retryUpdate = await fetchTimed(retryUrl, {
       method: 'PATCH',
       headers: {
         apikey: serviceRole,
@@ -305,7 +328,7 @@ Deno.serve(async (request) => {
     if (!updated?.id) return json(503, { error: 'storage_failed' }, origin);
     stored = updated;
   } else {
-    const insert = await fetch(`${supabaseUrl}/rest/v1/public_inquiries`, {
+    const insert = await fetchTimed(`${supabaseUrl}/rest/v1/public_inquiries`, {
       method: 'POST',
       headers: {
         apikey: serviceRole,
@@ -328,7 +351,9 @@ Deno.serve(async (request) => {
     stored = created;
   }
 
-  const send = await fetch('https://api.resend.com/emails', {
+  let send: Response;
+  try {
+    send = await fetchTimed('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       authorization: `Bearer ${resendKey}`,
@@ -344,13 +369,26 @@ Deno.serve(async (request) => {
       html,
       text: textBody,
     }),
-  });
+    }, 10_000);
+  } catch {
+    const failedUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+    failedUrl.searchParams.set('id', `eq.${stored.id}`);
+    await fetchTimed(failedUrl, {
+      method: 'PATCH',
+      headers: {
+        ...adminHeaders(serviceRole),
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ delivery_status: 'failed', provider_message_id: null }),
+    }).catch(() => console.error('public-intake failed-send status update failed'));
+    return json(502, { error: 'email_failed' }, origin);
+  }
   const sendBody = await send.json().catch(() => ({}));
   const deliveryStatus = send.ok ? 'sent' : 'failed';
 
   const patchUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
   patchUrl.searchParams.set('id', `eq.${stored.id}`);
-  const patch = await fetch(patchUrl, {
+  const patch = await fetchTimed(patchUrl, {
     method: 'PATCH',
     headers: {
       ...adminHeaders(serviceRole),
