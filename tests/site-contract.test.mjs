@@ -14,9 +14,9 @@ const siteScript = await readFile(new URL("../public/site.js", import.meta.url),
 test("landing page keeps the readiness services visible", () => {
   for (const label of [
     "Readiness assessment",
-    "Technical remediation roadmap",
+    "Technical remediation",
     "Evidence operations",
-    "Independent-review handoff",
+    "Independent-review coordination",
   ]) {
     assert.ok(page.includes(label), `missing readiness service: ${label}`);
   }
@@ -47,7 +47,7 @@ test("framework catalog covers the approved readiness portfolio", () => {
 test("primary calls to action stay on reviewed boundaries", () => {
   const publicSources = [page, readiness, frameworks, compare, layout].join("\n");
   assert.match(page, /href=\{quoteHref\}/);
-  assert.match(page, /href=\{readinessHref\}/);
+  assert.match(page, /href=\{contactHref\}/);
   assert.match(page, /href="mailto:hello@canonical\.plus"/);
   assert.match(frameworks, /href="mailto:hello@canonical\.plus"/);
   assert.match(compare, /href="mailto:hello@canonical\.plus"/);
@@ -149,12 +149,9 @@ test("mobile navigation has a real open state and synchronized accessibility sta
   assert.match(siteScript, /matchMedia\('\(max-width: 768px\)'\)/);
 });
 
-test("quote links use the supported customer quote boundary and sign-in stays hidden until supported", () => {
-  assert.match(siteScript, /const APP_SCHEME = 'https'/);
-  assert.match(siteScript, /const APP_HOST = 'app\.canonical\.plus'/);
-  assert.match(siteScript, /\[APP_SCHEME, APP_HOST\]\.join\('\:\/\/'\)/);
-  assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
-  assert.match(siteScript, /new URL\(QUOTE_PATH, APP_ORIGIN\)/);
+test("public quote links stay same-origin and sign-in stays hidden until supported", () => {
+  assert.match(layout, /const publicQuoteHref = `\$\{baseNoSlash\}\/quote\/`/);
+  assert.match(layout, /id="nav-quote">Get a quote<\/a>/);
   assert.doesNotMatch(siteScript, /signInUrl|nav-sign-in|sign-in/);
   assert.doesNotMatch(layout, /Sign in|nav-sign-in|data-application-link="sign-in"/i);
   assert.doesNotMatch(siteScript, /\/u\/readiness/);
