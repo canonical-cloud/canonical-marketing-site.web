@@ -1,0 +1,5 @@
+[functions.public-intake]
+# This is intentionally a public marketing endpoint. Authentication is enforced
+# by the application-level origin, input, idempotency, and quota controls rather
+# than by Supabase user JWTs.
+verify_jwt = false
