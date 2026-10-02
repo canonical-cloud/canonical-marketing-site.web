@@ -10,7 +10,8 @@ This repository contains the migration and Edge Function required by
 
 1. Create or select the `canonical-cloud` project in the ORESoftware Supabase organization.
 2. Link this repository's `supabase/` directory to that project.
-3. Apply `supabase/migrations/20261001165000_public_inquiries.sql`.
+3. Apply all migrations in `supabase/migrations/` in filename order. This includes
+   public inquiry storage, idempotency/rate limits, and the later integrity/lease hardening.
 4. Set Edge Function secrets:
    - `RESEND_API_KEY`
    - `PUBLIC_INTAKE_RATE_LIMIT_SALT` — at least 24 random characters; rotate only with awareness that rate-limit buckets will reset
@@ -64,5 +65,12 @@ The browser `Origin` check is defense in depth, not authentication. The endpoint
 public, so production monitoring should alert on repeated 429/5xx responses and unusual
 mail-provider volume.
 
-If an email attempt fails, the same idempotency key may retry the failed record. Successful
-or in-flight submissions return the same accepted result without sending another message.
+If an email attempt fails, the same idempotency key may retry the failed record. A pending
+delivery is treated as a 15-minute processing lease; after that lease expires, it may be
+retried safely with the same mail-provider idempotency key. This recovers from an Edge
+Function timeout after database insertion without creating duplicate email. Successful or
+currently leased submissions return the same accepted result without sending another message.
+
+The production Pages deployment validates `PUBLIC_SUPABASE_URL` before publishing. A
+missing or non-`https://*.supabase.co` value blocks production deployment instead of
+silently publishing non-functional forms.

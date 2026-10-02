@@ -91,6 +91,7 @@ test(
       for (const directive of [
         "default-src 'self'",
         "script-src 'self'",
+        "connect-src 'self' https://*.supabase.co",
         "base-uri 'self'",
         "form-action 'self'",
         "frame-ancestors 'none'",
