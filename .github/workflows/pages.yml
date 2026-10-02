@@ -35,6 +35,8 @@ jobs:
       - run: npm ci
       - run: npm test
       - name: Build the canonical.plus site
+        env:
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
         run: >-
           npm run build --
           --site https://canonical.plus

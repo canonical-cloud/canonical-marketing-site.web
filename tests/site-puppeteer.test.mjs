@@ -66,7 +66,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
     await page.$eval('a[href="mailto:hello@canonical.plus"]', (element) => Boolean(element)),
     true,
   );
-  assert.match(await pageText(page), /Readiness, not independent assurance/);
+  assert.match(await pageText(page), /Canonical supports readiness and pre-audits/);
   assert.match(await pageText(page), /canonical\.plus\. All rights reserved/);
 
   assert.deepEqual(pageErrors, []);

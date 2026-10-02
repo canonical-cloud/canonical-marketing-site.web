@@ -121,12 +121,18 @@ test(
       assert.ok(response);
       assert.equal(response.status(), 200);
       assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), 'ready');
-      assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+      assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$10,000–$12,500');
+      await page.locator('input[name="quote_email"]').fill('buyer@example.com');
+      await page.locator('input[name="quote_company"]').fill('Example Co');
       await page.locator('[data-complete-public-quote]').click();
-      assert.equal(await page.locator('[data-quote-complete]').isVisible(), true);
+      assert.match(
+        (await page.locator('[data-quote-status]').textContent()) || '',
+        /temporarily unavailable|hello@canonical\.plus/i,
+      );
+      assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 
-      // Neither the landing page nor the public quote flow may silently expand
-      // the production network/CSP trust surface.
+      // A build without public Supabase deployment variables must fail closed:
+      // it must not create a false sent state or make an external request.
       assert.deepEqual(externalRequests, []);
       assert.deepEqual(pageErrors, []);
     } catch (error) {

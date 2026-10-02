@@ -1,20 +1,27 @@
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const paths = [
-  "../README.md",
-  "../src/layouts/BaseLayout.astro",
-  "../src/pages/index.astro",
-  "../src/pages/readiness.astro",
-  "../src/pages/frameworks.astro",
-  "../src/pages/compare.astro",
-  "../src/pages/prices.astro",
-  "../src/pages/training.astro",
-];
+const root = new URL("../", import.meta.url);
 
+const collectAstro = async (directory) => {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const target = new URL(`${entry.name}${entry.isDirectory() ? "/" : ""}`, directory);
+    if (entry.isDirectory()) files.push(...await collectAstro(target));
+    else if (entry.name.endsWith(".astro")) files.push(target);
+  }
+  return files;
+};
+
+const publicPages = await collectAstro(new URL("src/pages/", root));
 const corpus = (
-  await Promise.all(paths.map((path) => readFile(new URL(path, import.meta.url), "utf8")))
+  await Promise.all([
+    readFile(new URL("README.md", root), "utf8"),
+    readFile(new URL("src/layouts/BaseLayout.astro", root), "utf8"),
+    ...publicPages.map((url) => readFile(url, "utf8")),
+  ])
 ).join("\n");
 
 test("public copy never presents readiness as an independent audit or certification", () => {
@@ -35,9 +42,9 @@ test("public copy never presents readiness as an independent audit or certificat
     assert.doesNotMatch(corpus, prohibited);
   }
 
-  assert.match(corpus, /Readiness, not independent assurance/);
-  assert.match(corpus, /do not issue audit opinions,\s+certifications,\s+or regulatory approvals/i);
-  assert.match(corpus, /Independent auditors, assessors, certification bodies, regulators, and legal counsel/);
+  assert.match(corpus, /Canonical supports readiness and pre-audits/i);
+  assert.match(corpus, /qualified independent auditor, assessor, certification body, regulator, or legal adviser makes that determination/i);
+  assert.match(corpus, /independent assurance/i);
 });
 
 test("public comparison acknowledges current product limits", () => {

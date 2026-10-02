@@ -1,4 +1,7 @@
-{
+// Server-side copy of the pinned public quote authority projection.
+// tests/public-intake-contract.test.mjs requires byte-for-byte semantic parity
+// with src/data/quote-estimator.json so emailed quotes cannot trust browser-supplied pricing.
+export default {
   "schemaVersion": 2,
   "currency": "USD",
   "estimateFloorUsd": 5000,
@@ -63,4 +66,4 @@
     "employeeCount": 50,
     "sectorId": "technology"
   }
-}
+};
