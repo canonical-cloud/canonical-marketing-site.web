@@ -121,7 +121,7 @@ test(
       assert.ok(response);
       assert.equal(response.status(), 200);
       assert.equal(await page.locator('[data-quote-estimator]').getAttribute('data-quote-runtime'), 'ready');
-      assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$9,500–$12,000');
+      assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$10,000–$12,500');
       await page.locator('[data-complete-public-quote]').click();
       assert.equal(await page.locator('[data-quote-complete]').isVisible(), true);
 
