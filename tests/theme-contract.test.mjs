@@ -75,7 +75,7 @@ test('header and footer expose synchronized auto, light, medium, and dark contro
     builtIndex.indexOf('/theme-init.js') < builtIndex.indexOf('/site.js'),
     'the synchronous initializer must load before the module that wires controls',
   );
-  assert.match(siteScript, /setAttribute\('aria-pressed', String\(selected\)\)/);
+  assert.match(siteScript, /setAttribute\('aria-pressed', String\(button\.dataset\.themeChoice === themePreference\)\)/);
   assert.match(siteScript, /themeController\.apply\(button\.dataset\.themeChoice, \{ persist: true \}\)/);
 });
 
