@@ -191,7 +191,9 @@ if (root instanceof HTMLElement) {
         statusNode.dataset.error = error ? 'true' : 'false';
       };
 
+      let submissionKey = '';
       const invalidate = () => {
+        submissionKey = '';
         if (completedPanel instanceof HTMLElement) completedPanel.hidden = true;
         setStatus('');
         render();
@@ -215,19 +217,21 @@ if (root instanceof HTMLElement) {
           return;
         }
 
+        if (!submissionKey) submissionKey = crypto.randomUUID();
         const payload = {
           kind: 'quote',
           email: emailInput.value.trim(),
           company: companyInput.value.trim(),
-          range: { lowerUsd: quote.lower, upperUsd: quote.upper, currency },
-          scope: {
-            deliverySpeed: quote.speed.label,
-            standards: quote.standards.map(labelOf),
-            serviceDepth: labelOf(quote.depth),
-            complexity: labelOf(quote.complexity),
-            companyStage: labelOf(quote.stage),
-            employeeBand: labelOf(quote.employees),
-            sector: labelOf(quote.sector),
+          idempotencyKey: submissionKey,
+          website: '',
+          selection: {
+            speedWeeks: Number(quote.speed.id),
+            standardIds: quote.standards.map((item) => item.value),
+            deliveryDepthId: quote.depth?.value || '',
+            complexityId: quote.complexity?.value || '',
+            companyStageId: quote.stage?.value || '',
+            employeeBandId: quote.employees?.value || '',
+            sectorId: quote.sector?.value || '',
           },
           source: 'canonical.plus/quote',
         };
@@ -244,16 +248,29 @@ if (root instanceof HTMLElement) {
             },
             body: JSON.stringify(payload),
           });
+          const result = await response.json().catch(() => ({}));
           if (!response.ok) throw new Error(`quote delivery failed: ${response.status}`);
+          const serverRange = result?.quote?.range;
+          const serverSummary = result?.quote?.summary;
+          if (
+            !serverRange ||
+            !Number.isFinite(Number(serverRange.lowerUsd)) ||
+            !Number.isFinite(Number(serverRange.upperUsd)) ||
+            typeof serverSummary !== 'string'
+          ) throw new Error('quote response was missing canonical server pricing');
 
-          if (completedRange instanceof HTMLElement) completedRange.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
-          if (completedSummary instanceof HTMLElement) completedSummary.textContent = quote.summary;
+          const canonicalRange = `${money.format(Number(serverRange.lowerUsd))}–${money.format(Number(serverRange.upperUsd))}`;
+          rangeNode.textContent = canonicalRange;
+          summaryNode.textContent = serverSummary;
+          if (completedRange instanceof HTMLElement) completedRange.textContent = canonicalRange;
+          if (completedSummary instanceof HTMLElement) completedSummary.textContent = serverSummary;
           if (completedPanel instanceof HTMLElement) {
             completedPanel.hidden = false;
             completedPanel.focus({ preventScroll: true });
             completedPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }
           setStatus('Quote sent successfully.');
+          submissionKey = '';
         } catch {
           setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
         } finally {
