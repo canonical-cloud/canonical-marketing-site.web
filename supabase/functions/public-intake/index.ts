@@ -21,7 +21,7 @@ const json = (status: number, body: unknown, origin = '', extraHeaders: Record<s
       'cache-control': 'no-store, max-age=0',
       'x-content-type-options': 'nosniff',
       ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
-      'access-control-allow-headers': 'authorization, apikey, content-type',
+      'access-control-allow-headers': 'content-type',
       'access-control-allow-methods': 'POST, OPTIONS',
       'vary': 'Origin',
       ...extraHeaders,
@@ -33,6 +33,12 @@ const clean = (value: unknown, max: number) =>
 
 const cleanLine = (value: unknown, max: number) =>
   clean(value, max).replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+const cleanMultiline = (value: unknown, max: number) =>
+  clean(value, max)
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, '')
+    .trim();
 
 const validEmail = (value: string) =>
   value.length >= 3 && value.length <= 320 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -47,6 +53,12 @@ const sha256Hex = async (value: string) => {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 };
+
+const fetchTimed = (
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+  timeoutMs = 6000,
+) => fetch(input, { ...init, signal: AbortSignal.timeout(timeoutMs) });
 
 const adminHeaders = (key: string) => ({
   apikey: key,
@@ -77,7 +89,7 @@ const consumeQuota = async (
   windowSeconds: number,
   limit: number,
 ) => {
-  const response = await fetch(`${supabaseUrl}/rest/v1/rpc/consume_public_intake_quota`, {
+  const response = await fetchTimed(`${supabaseUrl}/rest/v1/rpc/consume_public_intake_quota`, {
     method: 'POST',
     headers: {
       ...adminHeaders(serviceRole),
@@ -99,10 +111,10 @@ const existingSubmission = async (
   idempotencyKey: string,
 ) => {
   const url = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
-  url.searchParams.set('select', 'id,delivery_status');
+  url.searchParams.set('select', 'id,delivery_status,updated_at');
   url.searchParams.set('idempotency_key', `eq.${idempotencyKey}`);
   url.searchParams.set('limit', '1');
-  const response = await fetch(url, {
+  const response = await fetchTimed(url, {
     headers: {
       ...adminHeaders(serviceRole),
     },
@@ -120,7 +132,7 @@ Deno.serve(async (request) => {
       status: allowedOrigins.has(origin) ? 204 : 403,
       headers: {
         ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
-        'access-control-allow-headers': 'authorization, apikey, content-type',
+        'access-control-allow-headers': 'content-type',
         'access-control-allow-methods': 'POST, OPTIONS',
         'vary': 'Origin',
       },
@@ -189,14 +201,31 @@ Deno.serve(async (request) => {
   let retryRecordId = '';
   try {
     const prior = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
-    if (prior && prior.delivery_status !== 'failed') {
+    const priorUpdatedAt = prior?.updated_at ? Date.parse(prior.updated_at) : Number.NaN;
+    const pendingLeaseExpired =
+      prior?.delivery_status === 'pending' &&
+      Number.isFinite(priorUpdatedAt) &&
+      Date.now() - priorUpdatedAt >= 15 * 60 * 1000;
+
+    if (prior && prior.delivery_status === 'sent') {
       return json(202, {
         accepted: true,
         duplicate: true,
         ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
       }, origin);
     }
-    if (prior?.delivery_status === 'failed' && typeof prior.id === 'string') {
+    if (prior?.delivery_status === 'pending' && !pendingLeaseExpired) {
+      return json(202, {
+        accepted: true,
+        duplicate: true,
+        ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+      }, origin);
+    }
+    if (
+      (prior?.delivery_status === 'failed' || pendingLeaseExpired) &&
+      typeof prior.id === 'string' &&
+      validUuid(prior.id)
+    ) {
       retryRecordId = prior.id;
     }
 
@@ -266,7 +295,7 @@ Deno.serve(async (request) => {
   } else {
     const name = cleanLine(payload.name, 120);
     const topic = cleanLine(payload.topic, 80);
-    const message = clean(payload.message, 4000);
+    const message = cleanMultiline(payload.message, 4000);
     const topicLabel = allowedContactTopics.get(topic);
     if (name.length < 2 || message.length < 20 || !topicLabel) {
       return json(400, { error: 'invalid_contact' }, origin);
@@ -281,46 +310,61 @@ Deno.serve(async (request) => {
   }
 
   let stored: { id: string };
-  if (retryRecordId) {
-    const retryUpdate = await fetch(`${supabaseUrl}/rest/v1/public_inquiries?id=eq.${retryRecordId}`, {
-      method: 'PATCH',
-      headers: {
-        apikey: serviceRole,
-        authorization: `Bearer ${serviceRole}`,
-        'content-type': 'application/json',
-        prefer: 'return=representation',
-      },
-      body: JSON.stringify({ ...record, delivery_status: 'pending', provider_message_id: null }),
-    });
-    if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
-    const [updated] = await retryUpdate.json();
-    if (!updated?.id) return json(503, { error: 'storage_failed' }, origin);
-    stored = updated;
-  } else {
-    const insert = await fetch(`${supabaseUrl}/rest/v1/public_inquiries`, {
-      method: 'POST',
-      headers: {
-        apikey: serviceRole,
-        authorization: `Bearer ${serviceRole}`,
-        'content-type': 'application/json',
-        prefer: 'return=representation',
-      },
-      body: JSON.stringify(record),
-    });
-    if (insert.status === 409) {
-      return json(202, {
-        accepted: true,
-        duplicate: true,
-        ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
-      }, origin);
+  try {
+    if (retryRecordId) {
+      const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+      retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
+      const retryUpdate = await fetchTimed(retryUrl, {
+        method: 'PATCH',
+        headers: {
+          ...adminHeaders(serviceRole),
+          'content-type': 'application/json',
+          prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          ...record,
+          delivery_status: 'pending',
+          provider_message_id: null,
+          updated_at: new Date().toISOString(),
+        }),
+      });
+      if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
+      const [updated] = await retryUpdate.json();
+      if (!updated?.id || !validUuid(updated.id)) {
+        return json(503, { error: 'storage_failed' }, origin);
+      }
+      stored = updated;
+    } else {
+      const insert = await fetchTimed(`${supabaseUrl}/rest/v1/public_inquiries`, {
+        method: 'POST',
+        headers: {
+          ...adminHeaders(serviceRole),
+          'content-type': 'application/json',
+          prefer: 'return=representation',
+        },
+        body: JSON.stringify(record),
+      });
+      if (insert.status === 409) {
+        return json(202, {
+          accepted: true,
+          duplicate: true,
+          ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+        }, origin);
+      }
+      if (!insert.ok) return json(503, { error: 'storage_failed' }, origin);
+      const [created] = await insert.json();
+      if (!created?.id || !validUuid(created.id)) {
+        return json(503, { error: 'storage_failed' }, origin);
+      }
+      stored = created;
     }
-    if (!insert.ok) return json(503, { error: 'storage_failed' }, origin);
-    const [created] = await insert.json();
-    if (!created?.id) return json(503, { error: 'storage_failed' }, origin);
-    stored = created;
+  } catch {
+    return json(503, { error: 'storage_failed' }, origin);
   }
 
-  const send = await fetch('https://api.resend.com/emails', {
+  let send: Response;
+  try {
+    send = await fetchTimed('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       authorization: `Bearer ${resendKey}`,
@@ -336,11 +380,30 @@ Deno.serve(async (request) => {
       html,
       text: textBody,
     }),
-  });
+    }, 10_000);
+  } catch {
+    const failedUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+    failedUrl.searchParams.set('id', `eq.${stored.id}`);
+    await fetchTimed(failedUrl, {
+      method: 'PATCH',
+      headers: {
+        ...adminHeaders(serviceRole),
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        delivery_status: 'failed',
+        provider_message_id: null,
+        updated_at: new Date().toISOString(),
+      }),
+    }).catch(() => console.error('public-intake failed-send status update failed'));
+    return json(502, { error: 'email_failed' }, origin);
+  }
   const sendBody = await send.json().catch(() => ({}));
   const deliveryStatus = send.ok ? 'sent' : 'failed';
 
-  const patch = await fetch(`${supabaseUrl}/rest/v1/public_inquiries?id=eq.${stored.id}`, {
+  const patchUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
+  patchUrl.searchParams.set('id', `eq.${stored.id}`);
+  const patch = await fetchTimed(patchUrl, {
     method: 'PATCH',
     headers: {
       ...adminHeaders(serviceRole),
@@ -349,6 +412,7 @@ Deno.serve(async (request) => {
     body: JSON.stringify({
       delivery_status: deliveryStatus,
       provider_message_id: typeof sendBody.id === 'string' ? sendBody.id.slice(0, 256) : null,
+      updated_at: new Date().toISOString(),
     }),
   });
   if (!patch.ok) console.error('public-intake delivery status update failed');
