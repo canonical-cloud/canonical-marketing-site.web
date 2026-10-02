@@ -9,19 +9,63 @@ const contactPage = await readFile(new URL("src/pages/contact.astro", root), "ut
 const contactRuntime = await readFile(new URL("public/contact-form.js", root), "utf8");
 const localEstimator = JSON.parse(await readFile(new URL("src/data/quote-estimator.json", root), "utf8"));
 const serverEstimatorModule = await import(new URL("../supabase/functions/public-intake/quote-estimator.v2.mjs", import.meta.url));
+const quoteEngineModule = await import(new URL("../supabase/functions/public-intake/quote-engine.mjs", import.meta.url));
+const quoteEngineSource = await readFile(new URL("supabase/functions/public-intake/quote-engine.mjs", root), "utf8");
 
 test("server quote authority projection stays semantically identical to the browser projection", () => {
   assert.deepEqual(serverEstimatorModule.default, localEstimator);
 });
 
-test("edge function recomputes quote values from bounded selection ids", () => {
-  assert.match(edge, /const computeQuote =/);
-  assert.match(edge, /quoteConfig\.speeds\.find/);
-  assert.match(edge, /itemById\(quoteConfig\.companyStages/);
-  assert.match(edge, /additive \* stage\.multiplier/);
-  assert.match(edge, /invalid_quote_selection/);
+test("server quote engine recomputes canonical values from bounded selection ids", () => {
+  assert.match(edge, /import \{ computeQuote \} from '\.\/quote-engine\.mjs'/);
+  assert.match(quoteEngineSource, /quoteConfig\.speeds\.find/);
+  assert.match(quoteEngineSource, /itemById\(quoteConfig\.companyStages/);
+  assert.match(quoteEngineSource, /additive \* stage\.multiplier/);
+  assert.match(quoteEngineSource, /invalid_quote_selection/);
   assert.doesNotMatch(edge, /payload\.range/);
   assert.doesNotMatch(edge, /scope\.deliverySpeed/);
+
+  const selection = {
+    speedWeeks: 5,
+    standardIds: ["soc2", "iso27001"],
+    deliveryDepthId: "managed",
+    complexityId: "growing",
+    companyStageId: "business",
+    employeeBandId: "11-50",
+    sectorId: "technology",
+    lowerUsd: 1,
+    upperUsd: 2,
+  };
+  const quote = quoteEngineModule.computeQuote(selection);
+  assert.deepEqual(quote.range, { lowerUsd: 10000, upperUsd: 12500, currency: "USD" });
+  assert.equal(
+    quote.summary,
+    "5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS",
+  );
+});
+
+test("server quote engine rejects tampered or ambiguous selections", () => {
+  const valid = {
+    speedWeeks: 5,
+    standardIds: ["soc2"],
+    deliveryDepthId: "managed",
+    complexityId: "growing",
+    companyStageId: "business",
+    employeeBandId: "11-50",
+    sectorId: "technology",
+  };
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, standardIds: ["soc2", "soc2"] }),
+    /invalid_quote_selection/,
+  );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, companyStageId: "invented-enterprise" }),
+    /invalid_quote_selection/,
+  );
+  assert.throws(
+    () => quoteEngineModule.computeQuote({ ...valid, speedWeeks: 1 }),
+    /invalid_quote_selection/,
+  );
 });
 
 test("public intake is idempotent at both database and email-provider boundaries", () => {
