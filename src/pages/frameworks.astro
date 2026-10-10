@@ -104,6 +104,59 @@ const privacyAndRegulation = [
   },
 ];
 
+const starterGuides = [
+  {
+    id: 'soc2',
+    title: 'SOC 2 readiness',
+    questions: [
+      'Which product, services, people, vendors, and trust criteria are in scope?',
+      'Are access, change, incident, and vendor controls assigned to owners?',
+      'Where will time-period evidence and exceptions be tracked?'
+    ],
+    handoff: 'System-description inputs, scoped control/evidence map, open exceptions, and a Type I/II planning discussion with the independent CPA firm.'
+  },
+  {
+    id: 'iso27001',
+    title: 'ISO/IEC 27001 readiness',
+    questions: [
+      'Is the ISMS boundary and organizational context documented?',
+      'How are information-security risks assessed and treatment owners assigned?',
+      'Are applicability decisions, internal-review inputs, and management-review preparation documented?'
+    ],
+    handoff: 'ISMS scope, risk-treatment artifacts, draft Statement of Applicability inputs, and certification-body readiness questions.'
+  },
+  {
+    id: 'hipaa',
+    title: 'HIPAA Security Rule readiness',
+    questions: [
+      'Does the business handle ePHI and in which systems, vendors, and workflows?',
+      'Are risk analysis, access safeguards, incident procedures, and BAAs in scope where applicable?',
+      'Can the team point to the policies, implementation records, and supporting evidence?'
+    ],
+    handoff: 'ePHI boundary, safeguards gap register, responsible owners, and a specialist legal/compliance review path. There is no general HHS HIPAA certification.'
+  },
+  {
+    id: 'pci-dss',
+    title: 'PCI DSS 4.0.1 readiness',
+    questions: [
+      'Where are payment-card data stored, processed, or transmitted?',
+      'What systems and service providers affect the cardholder-data environment boundary?',
+      'Who maintains the applicable control evidence and validates the right SAQ, ROC, or QSA path?'
+    ],
+    handoff: 'Data-flow and environment scope, prioritized control gaps, evidence inventory, and the appropriate independent validation path.'
+  },
+  {
+    id: 'nist-csf',
+    title: 'NIST CSF 2.0 readiness',
+    questions: [
+      'Which business risks and outcomes belong in the current and target profiles?',
+      'Who owns the Govern, Identify, Protect, Detect, Respond, and Recover work?',
+      'What capabilities, evidence, and dependencies separate current from target state?'
+    ],
+    handoff: 'Current/target profiles, prioritized gap register, and implementation roadmap. The CSF is not itself an audit certificate.'
+  },
+];
+
 const sections = [
   { title: 'Assurance and certification targets', frameworks: assuranceTargets },
   { title: 'Security and cloud programs', frameworks: securityPrograms },
@@ -176,6 +229,30 @@ const sections = [
           </div>
         </section>
       ))}
+    </div>
+  </section>
+
+  <section class="section" id="starter-checklists" aria-labelledby="starter-guides-title">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Free scoping questions</span>
+        <h2 id="starter-guides-title">Pre-audit readiness starter checklists</h2>
+        <p>Use these short guides to prepare your first scoping conversation. They are non-exhaustive starting points, not complete control tests, legal determinations, or claims that a certification is available.</p>
+      </header>
+      <div class="starter-guides">
+        {starterGuides.map((guide) => (
+          <details class="starter-guide" id={guide.id}>
+            <summary>{guide.title}<span aria-hidden="true">+</span></summary>
+            <div class="starter-guide__body">
+              <h3>Questions to answer</h3>
+              <ul>{guide.questions.map((question) => <li>{question}</li>)}</ul>
+              <h3>What to prepare for handoff</h3>
+              <p>{guide.handoff}</p>
+            </div>
+          </details>
+        ))}
+      </div>
+      <p class="source-note">Requirements and applicable versions must be confirmed for the customer's jurisdiction, contractual scope, and chosen independent reviewer.</p>
     </div>
   </section>
 

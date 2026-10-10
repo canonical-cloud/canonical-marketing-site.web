@@ -107,3 +107,32 @@ test("playwright: readiness, frameworks, and comparison pages render independent
 
   assert.deepEqual(pageErrors, []);
 });
+
+test("playwright: pre-audit previews and framework checklists work on mobile and desktop", async (t) => {
+  const { page, pageErrors } = await open(t, "/", { height: 812, width: 375 });
+  await page.locator("#readiness-preview").getByRole("heading", { name: "Gap register" }).waitFor();
+  assert.equal(await page.locator("#preview-sample-link").getAttribute("href"), "/readiness/#sample-finding");
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1));
+  const origin = new URL(page.url()).origin;
+
+  await page.goto(`${origin}/readiness/#sample-finding`, { waitUntil: "networkidle" });
+  await page.locator("#sample-finding").getByText("Evidence gap", { exact: true }).waitFor();
+  await page.locator("#evidence-readiness").getByText("Evidence stale or incomplete").waitFor();
+
+  await page.goto(`${origin}/frameworks/`, { waitUntil: "networkidle" });
+  const guide = page.locator("#starter-checklists details#soc2");
+  await guide.locator("summary").click();
+  assert.equal(await guide.getAttribute("open"), "");
+  await guide.getByText(/System-description inputs/).waitFor();
+
+  await page.goto(`${origin}/compare/`, { waitUntil: "networkidle" });
+  await page.locator("#existing-platforms").getByRole("heading", { name: /Already using Vanta/ }).waitFor();
+
+  await page.goto(`${origin}/quote/`, { waitUntil: "networkidle" });
+  await page.locator("#quote-scope-summary").getByText(/independent audit testing/).waitFor();
+  assert.equal(
+    await page.locator("#quote-estimate-book-intro").getAttribute("href"),
+    "https://calendly.com/hello-canonical/30min",
+  );
+  assert.deepEqual(pageErrors, []);
+});

@@ -169,6 +169,17 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
           <p class="quote-estimator__boundary">Typical estimator range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Final pricing depends on validated scope.</p>
+          <div class="quote-scope" id="quote-scope-summary" aria-labelledby="quote-scope-title">
+            <h3 id="quote-scope-title">What this estimate is for</h3>
+            <p>Typical proposed readiness work, subject to the agreed scope:</p>
+            <ul>
+              <li>Confirm systems, data, selected frameworks, and exclusions.</li>
+              <li>Map control and evidence gaps to proposed owners and priorities.</li>
+              <li>Plan remediation and prepare an evidence handoff.</li>
+            </ul>
+            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, or third-party assessor fees. The signed SOW determines the actual deliverables, timelines, and fees.</p>
+            <a href={introHref} class="btn btn--secondary" id="quote-estimate-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
+          </div>
           <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Email my quote</button>
           <p class="quote-estimator__status" data-quote-status role="status"></p>
           <p class="quote-estimator__privacy">Quote submissions are stored for follow-up and delivery. Do not include secrets, credentials, regulated data, or audit evidence in this public form.</p>

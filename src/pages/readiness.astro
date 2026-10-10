@@ -210,6 +210,53 @@ const deliverables = [
     </div>
   </section>
 
+  <section class="section bg-noise" id="sample-finding" aria-labelledby="sample-finding-title">
+    <div class="container" style="position: relative; z-index: 1;">
+      <header class="section-header">
+        <span class="badge">Illustrative pre-audit finding</span>
+        <h2 id="sample-finding-title">What an actionable readiness finding looks like</h2>
+        <p>This fictional IAM example demonstrates the format of a working gap register. It is not a finding about any customer, an official control ID, a test result, or an independent auditor's conclusion.</p>
+      </header>
+
+      <article class="readiness-finding" aria-label="Illustrative privileged access review evidence gap">
+        <div class="readiness-finding__header">
+          <div>
+            <p class="readiness-finding__eyebrow">Example reference IAM-04 · Identity and access management</p>
+            <h3>Privileged access review evidence is incomplete</h3>
+          </div>
+          <span class="readiness-finding__status">Evidence gap</span>
+        </div>
+        <p>The fictional team reports quarterly access reviews, but the available sample does not establish that every in-scope privileged account was reviewed. The control could exist even though evidence is incomplete.</p>
+        <dl class="readiness-finding__details">
+          <div><dt>Suggested priority</dt><dd>High, subject to actual exposure and scope</dd></div>
+          <div><dt>Suggested owner</dt><dd>IT / Security</dd></div>
+          <div><dt>Next action</dt><dd>Reconcile the privileged-account inventory and collect dated review approvals.</dd></div>
+          <div><dt>Completion evidence</dt><dd>Inventory, review record, reviewer identity, exceptions, and resolution evidence.</dd></div>
+        </dl>
+        <p class="readiness-finding__note">Our role is to document the gap, recommend a remediation path, and prepare the evidence for qualified independent review. We do not certify that this control has passed an audit.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="evidence-readiness" aria-labelledby="evidence-readiness-title">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Evidence readiness</span>
+        <h2 id="evidence-readiness-title">A practical status for every control and artifact</h2>
+        <p>We distinguish implementation from proof. These are working readiness labels, not official assessor verdicts or a certification score.</p>
+      </header>
+      <div class="card-grid card-grid--three">
+        <article class="deliverable"><strong>Not implemented</strong><p>A necessary control has not been established for the agreed scope.</p></article>
+        <article class="deliverable"><strong>Partially implemented</strong><p>The control exists only for some systems, identities, or required activities.</p></article>
+        <article class="deliverable"><strong>Implemented; evidence missing</strong><p>A control may operate, but supporting evidence has not been supplied or verified.</p></article>
+        <article class="deliverable"><strong>Evidence stale or incomplete</strong><p>Artifacts are outdated, insufficiently scoped, or lack required context.</p></article>
+        <article class="deliverable"><strong>Unverified</strong><p>Current information is insufficient to conclude readiness; more review is needed.</p></article>
+        <article class="deliverable"><strong>Out of scope (documented)</strong><p>The exclusion and its supporting rationale are recorded for independent review.</p></article>
+      </div>
+      <p class="source-note">Applicability, exceptions, evidence quality, and final judgments are determined against each customer's chosen requirements by the appropriately qualified independent reviewer.</p>
+    </div>
+  </section>
+
   <section class="section">
     <div class="container">
       <div class="cta-panel">
