@@ -58,3 +58,47 @@ test("framework copy keeps qualified independent roles explicit", () => {
     assert.match(corpus, new RegExp(role, "i"));
   }
 });
+
+test("new pre-audit sections demonstrate real outputs without false audit or integration claims", async () => {
+  const [home, readiness, frameworks, compare, quote, styles] = await Promise.all([
+    "index.astro", "readiness.astro", "frameworks.astro", "compare.astro", "quote.astro"
+  ].map((path) => readFile(new URL(`src/pages/${path}`, root), "utf8")).concat([
+    readFile(new URL("src/styles/marketing-pages.css", root), "utf8"),
+  ]));
+
+  assert.ok(home.includes('id="readiness-preview"'));
+  for (const output of ["Scope map", "Gap register", "Remediation roadmap", "Evidence-readiness index"]) {
+    assert.ok(home.includes(output), `home missing ${output}`);
+  }
+  assert.ok(home.includes('#sample-finding'));
+
+  assert.ok(readiness.includes('id="sample-finding"'));
+  assert.ok(readiness.includes('This fictional IAM example'));
+  assert.ok(readiness.includes('not an independent auditor'));
+  assert.ok(readiness.includes('id="evidence-readiness"'));
+  for (const label of ["Not implemented", "Partially implemented", "Implemented; evidence missing", "Evidence stale or incomplete", "Unverified", "Out of scope (documented)"]) {
+    assert.ok(readiness.includes(label), `readiness missing ${label}`);
+  }
+
+  assert.ok(frameworks.includes('id="starter-checklists"'));
+  for (const id of ["soc2", "iso27001", "hipaa", "pci-dss", "nist-csf"]) {
+    assert.ok(frameworks.includes(`id: '${id}'`), `framework guide missing ${id}`);
+  }
+  assert.ok(frameworks.includes('There is no general HHS HIPAA certification'));
+  assert.ok(frameworks.includes('The CSF is not itself an audit certificate'));
+
+  assert.ok(compare.includes('id="existing-platforms"'));
+  for (const vendor of ["Vanta", "Drata", "Secureframe"]) assert.ok(compare.includes(vendor));
+  assert.ok(compare.includes('not a claim of a native integration or feature parity'));
+  assert.ok(compare.includes('no claim of partnership, endorsement, API integration'));
+
+  assert.ok(quote.includes('id="quote-scope-summary"'));
+  assert.ok(quote.includes('Not included by default:'));
+  assert.ok(quote.includes('signed SOW'));
+  assert.ok(quote.includes('id="quote-estimate-book-intro"'));
+  assert.ok(quote.includes("https://calendly.com/hello-canonical/30min"));
+
+  for (const selector of [".readiness-preview-grid", ".readiness-finding", ".starter-guide", ".quote-scope"]) {
+    assert.ok(styles.includes(selector), `missing responsive presentation for ${selector}`);
+  }
+});
