@@ -1,4 +1,4 @@
-name: live people profile smoke
+name: live marketing smoke
 
 on:
   workflow_dispatch:
@@ -51,4 +51,32 @@ jobs:
           assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
           assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
           console.log('PASS: live profile, role, and supplied WebP portrait are published.');
+          const fetchPage = async (url) => {
+            const result = await fetch(url, {
+              headers: { 'Cache-Control': 'no-cache' },
+              redirect: 'follow',
+              signal: AbortSignal.timeout(20000),
+            });
+            console.log('Public page:', result.url, 'status:', result.status);
+            assert.equal(result.status, 200, `public page must respond: ${url}`);
+            return result.text();
+          };
+
+          const homepage = await fetchPage('https://canonical.plus/');
+          const quotePage = await fetchPage('https://canonical.plus/quote/');
+          const bookingUrl = 'https://calendly.com/hello-canonical/30min';
+          for (const [pageName, page] of [['homepage', homepage], ['quote', quotePage]]) {
+            assert.ok(page.includes('Book an intro'), `${pageName}: Book an intro is visible`);
+            assert.ok(page.includes(bookingUrl), `${pageName}: the direct Calendly link is present`);
+          }
+          assert.equal(quotePage.includes('Sign in for account quote'), false, 'quote page has no sign-in button');
+          console.log('PASS: public home and quote have direct Calendly links with no quote sign-in CTA.');
+
+          const cloudHome = await fetchPage('https://canonical-cloud.github.io/');
+          const header = cloudHome.match(/<header\b[\s\S]*?<\/header>/)?.[0];
+          assert.ok(header, 'Canonical Cloud public header must render');
+          assert.doesNotMatch(header, />\s*Product\s*</i, 'public header has no Product label');
+          assert.doesNotMatch(header, /Log in|Sign up|Sign in|Create an account/i, 'public header has no auth CTAs');
+          console.log('PASS: Canonical Cloud header has no Product or login/signup actions.');
+
           NODE
