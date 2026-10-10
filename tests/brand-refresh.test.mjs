@@ -39,8 +39,10 @@ test('header lockup pairs Canonical Cloud and Canonical Plus without a product b
   assert.match(siteScript, /parentName\.textContent = 'CANONICAL CLOUD'/);
   assert.match(siteScript, /canonical-cloud\.svg/);
   assert.match(siteScript, /nav__plus-brand-name/);
-  assert.doesNotMatch(siteScript, /canonical\\.plus product|nav__product-brand/i);
-  assert.doesNotMatch(brandCss, /content:\\s*['"]product['"]|nav__product-brand/i);
+  assert.equal(siteScript.includes('canonical.plus product'), false);
+  assert.equal(siteScript.includes('nav__product-brand'), false);
+  assert.equal(brandCss.includes("content: 'product'"), false);
+  assert.equal(brandCss.includes('nav__product-brand'), false);
   assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*CANONICAL CLOUD/);
   assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*canonical-cloud\.svg/);
   assert.match(brandCss, /\.nav__parent-brand-name[\s\S]*font-size:\s*0\.9rem/);
