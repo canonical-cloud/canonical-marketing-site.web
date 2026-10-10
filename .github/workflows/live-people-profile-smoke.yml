@@ -79,4 +79,17 @@ jobs:
           assert.doesNotMatch(header, /Log in|Sign up|Sign in|Create an account/i, 'public header has no auth CTAs');
           console.log('PASS: Canonical Cloud header has no Product or login/signup actions.');
 
+          // Check served JS and CSS, not only server HTML: CSS ::before introduced
+          // the original visible Product badge that previous HTML checks missed.
+          assert.ok(homepage.includes('site.js?v=20261010-clean-logo'), 'live HTML must load revised header JS');
+          const liveBrandCss = await fetchPage('https://canonical.plus/brand-overrides.css?v=20261010-clean-logo');
+          const liveBrandJs = await fetchPage('https://canonical.plus/site.js?v=20261010-clean-logo');
+          assert.ok(liveBrandCss.includes('.nav__plus-brand-name'), 'served CSS must style the new header classes');
+          assert.ok(liveBrandJs.includes('nav__plus-brand-name'), 'served JS must create the new header classes');
+          assert.equal(liveBrandCss.includes("content: 'product'"), false, 'served CSS must not inject Product');
+          assert.equal(liveBrandCss.includes('nav__product-brand'), false, 'served CSS has no old Product selectors');
+          assert.equal(liveBrandJs.includes('canonical.plus product'), false, 'served JS has no Product aria label');
+          assert.equal(liveBrandJs.includes('nav__product-brand'), false, 'served JS has no old Product class');
+          console.log('PASS: live header assets contain no CSS Product badge, ARIA label, or legacy class.');
+
           NODE
