@@ -5,7 +5,7 @@
     if (!existingBrandStyles) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = new URL('./brand-overrides.css', currentScriptSrc).href;
+      stylesheet.href = new URL('./brand-overrides.css?v=20261010-clean-logo', currentScriptSrc).href;
       stylesheet.dataset.canonicalBrandStyles = 'true';
       document.head.append(stylesheet);
     }
