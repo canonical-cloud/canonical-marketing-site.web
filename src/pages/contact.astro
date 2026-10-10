@@ -49,7 +49,11 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
       <div>
         <span class="badge">Send a message</span>
         <h2 id="contact-form-title">Contact our readiness team</h2>
-        <p>Messages are delivered to <strong>hello@canonical.plus</strong>. Do not submit credentials, secrets, regulated records, or audit evidence through this public form.</p>
+        {supabaseUrl ? (
+          <p>Messages are delivered to <strong>hello@canonical.plus</strong>. Do not submit credentials, secrets, regulated records, or audit evidence through this public form.</p>
+        ) : (
+          <p role="status" data-intake-unavailable>Online message delivery is temporarily unavailable. Contact the team directly at <a href="mailto:hello@canonical.plus">hello@canonical.plus</a>.</p>
+        )}
       </div>
       <form class="card contact-form" data-contact-form data-supabase-url={supabaseUrl}>
         <label>Name<input name="name" type="text" autocomplete="name" minlength="2" maxlength="120" required /></label>
@@ -67,7 +71,7 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || '';
         <label class="contact-form__wide">Message<textarea name="message" minlength="20" maxlength="4000" rows="7" required></textarea></label>
         <label class="contact-form__trap" aria-hidden="true">Website<input name="website" type="text" tabindex="-1" autocomplete="off" /></label>
         <div class="contact-form__wide action-row">
-          <button class="btn btn--primary btn--large" type="submit">Send to hello@canonical.plus</button>
+          <button class="btn btn--primary btn--large" type="submit" disabled={!supabaseUrl}>Send to hello@canonical.plus</button>
           <a class="btn btn--secondary btn--large" href={pricingHref}>View pricing</a>
         </div>
         <p class="contact-form__wide" data-contact-status role="status"></p>

@@ -41,9 +41,10 @@ jobs:
         run: |
           set -euo pipefail
           case "$PUBLIC_SUPABASE_URL" in
+            "") echo "::warning::PUBLIC_SUPABASE_URL is not configured: publish public pages with quote/contact delivery disabled and an email fallback" ;;
             https://*.supabase.co) ;;
             *)
-              echo "::error::PUBLIC_SUPABASE_URL must be configured as an https://*.supabase.co origin"
+              echo "::error::PUBLIC_SUPABASE_URL must be configured as an https://*.supabase.co origin when set"
               exit 1
               ;;
           esac

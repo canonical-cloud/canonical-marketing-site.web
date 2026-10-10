@@ -147,8 +147,12 @@ test("database constrains kind/source/payload integrity", () => {
   assert.match(integrityMigration, /provider_message_id_length_chk/);
 });
 
-test("production Pages deployment fails closed on missing or invalid Supabase origin", () => {
-  assert.match(pagesWorkflow, /Validate production public-intake configuration/);
-  assert.match(pagesWorkflow, /https:\/\/\*\.supabase\.co/);
-  assert.match(pagesWorkflow, /PUBLIC_SUPABASE_URL must be configured/);
+test("Pages publishes content with explicit offline intake fallback, but rejects malformed configured origins", () => {
+  assert.ok(pagesWorkflow.includes("Validate production public-intake configuration"));
+  assert.ok(pagesWorkflow.includes("https://*.supabase.co"));
+  assert.ok(pagesWorkflow.includes("PUBLIC_SUPABASE_URL must be configured"));
+  assert.ok(pagesWorkflow.includes("quote/contact delivery disabled"));
+  assert.ok(contactPage.includes("data-intake-unavailable"));
+  assert.ok(contactPage.includes("disabled={!supabaseUrl}"));
+  assert.ok(contactRuntime.includes("if (!supabaseUrl)"));
 });
