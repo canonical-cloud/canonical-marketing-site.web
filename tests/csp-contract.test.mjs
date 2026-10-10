@@ -42,7 +42,7 @@ test("production CSS needs no external style, font, or image origin", async () =
 });
 
 test("same-origin executable asset is present in the production build", async () => {
-  assert.match(html, /<script\b[^>]*\bsrc=["']\/site\.js["'][^>]*><\/script>/i);
+  assert.match(html, /<script\b[^>]*\bsrc=["']\/site\.js(?:\?v=[a-z0-9-]+)?["'][^>]*><\/script>/i);
   const script = await readFile(new URL("site.js", distUrl), "utf8");
   assert.doesNotMatch(script, /(?:https?:\/\/|wss?:\/\/|blob:|data:)/i);
 });
