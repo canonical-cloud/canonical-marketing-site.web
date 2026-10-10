@@ -32,7 +32,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   const brand = await page.$eval(".nav__logo-text", (element) =>
     (element.textContent ?? "").replace(/\s+/g, "").trim(),
   );
-  assert.match(brand, /CANONICAL\\.PLUS/);
+  assert.ok(brand.includes("CANONICAL.PLUS"));
 
   // The live DOM and computed CSS must never insert a Product badge,
   // including via the ::before pseudo-element or a redundant ARIA label.
@@ -48,8 +48,8 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
     };
   });
   assert.match(logo.text, /CANONICAL CLOUD/);
-  assert.match(logo.text, /CANONICAL\\s*\\.PLUS/);
-  assert.doesNotMatch(logo.text, /\\bproduct\\b/i);
+  assert.ok(logo.text.replace(/\s+/g, "").includes("CANONICAL.PLUS"));
+  assert.equal(logo.text.toLowerCase().includes("product"), false);
   assert.equal(logo.aria, "Canonical Cloud — canonical.plus home");
   assert.equal(logo.innerAria, null);
   assert.equal(logo.legacyBadgeCount, 0);
