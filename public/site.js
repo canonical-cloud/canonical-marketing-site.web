@@ -11,7 +11,7 @@ const configureBrandStyles = () => {
 
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
-  stylesheet.href = new URL('./brand-overrides.css', import.meta.url).href;
+  stylesheet.href = new URL('./brand-overrides.css?v=20261010-clean-logo', import.meta.url).href;
   stylesheet.dataset.canonicalBrandStyles = 'true';
   document.head.append(stylesheet);
 };
