@@ -152,7 +152,11 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
               </label>
             </div>
             <label class="quote-form__trap" aria-hidden="true">Website<input type="text" name="quote_website" tabindex="-1" autocomplete="off" /></label>
-            <p class="quote-control-note">We email the estimate and scope summary to you and copy <strong>hello@canonical.plus</strong> so our team can follow up.</p>
+            {supabaseUrl ? (
+              <p class="quote-control-note">We email the estimate and scope summary to you and copy <strong>hello@canonical.plus</strong> so our team can follow up.</p>
+            ) : (
+              <p class="quote-control-note" role="status" data-intake-unavailable>Quote email delivery is temporarily unavailable. You can still explore the estimate; for a written quote, email <a href="mailto:hello@canonical.plus">hello@canonical.plus</a>.</p>
+            )}
           </section>
         </div>
 
