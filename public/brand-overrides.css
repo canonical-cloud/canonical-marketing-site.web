@@ -1,4 +1,4 @@
-/* Canonical Cloud parent-brand + canonical.plus product lockup and orange accent layer. */
+/* Canonical Cloud and Canonical Plus co-branding and orange accent layer. */
 
 html:root[data-theme='dark'] {
   --av-orange-light: #fb923c;
@@ -45,7 +45,7 @@ html:root[data-theme='light'] {
 
 /* Reassert orange directly on every selector touched by the old magenta layer. */
 .nav__logo-compliance,
-.nav__product-brand-name {
+.nav__plus-brand-name {
   color: var(--av-orange) !important;
 }
 
@@ -97,7 +97,7 @@ html:root[data-theme='light'] {
 }
 
 /*
- * Server markup still contains the canonical.plus product mark. This fallback
+ * Server markup includes the Canonical Plus logo. This fallback
  * presents Canonical Cloud alongside it before the module script upgrades the
  * header, so there is no single-brand flash or regression if that upgrade is delayed.
  */
@@ -150,7 +150,7 @@ html:root[data-theme='light'] {
 }
 
 .nav__parent-brand,
-.nav__product-brand {
+.nav__plus-brand {
   display: inline-flex;
   align-items: center;
   min-width: 0;
@@ -178,17 +178,17 @@ html:root[data-theme='light'] {
   white-space: nowrap;
 }
 
-.nav__product-brand {
+.nav__plus-brand {
   gap: 0.45rem;
 }
 
-.nav__product-brand-mark {
+.nav__plus-brand-mark {
   width: 25px !important;
   height: 25px !important;
   flex: 0 0 25px !important;
 }
 
-.nav__product-brand-name {
+.nav__plus-brand-name {
   display: grid;
   grid-template-columns: auto auto;
   align-items: end;
@@ -199,17 +199,6 @@ html:root[data-theme='light'] {
   line-height: 1.05;
   text-transform: lowercase;
   white-space: nowrap;
-}
-
-.nav__product-brand-name::before {
-  content: 'product';
-  grid-column: 1 / -1;
-  margin-bottom: 0.12rem;
-  color: var(--av-text-muted);
-  font-size: 0.52rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 @media (max-width: 1040px) {
@@ -228,14 +217,14 @@ html:root[data-theme='light'] {
     font-size: 0.78rem;
   }
 
-  .nav__product-brand-name,
+  .nav__plus-brand-name,
   #nav-logo:not([data-brand-lockup='true']) > .nav__logo-text {
     font-size: 0.65rem !important;
   }
 }
 
 @media (max-width: 900px) {
-  .nav__product-brand-name,
+  .nav__plus-brand-name,
   #nav-logo:not([data-brand-lockup='true']) > .nav__logo-text {
     display: none;
   }
