@@ -1,0 +1,54 @@
+name: live people profile smoke
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "41 9 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-people-profile
+  cancel-in-progress: true
+
+jobs:
+  public-profile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify deployed Utkarsh profile and actual photo
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+
+          const url = 'https://canonical.plus/people/';
+          const response = await fetch(url, {
+            headers: { 'Cache-Control': 'no-cache' },
+            redirect: 'follow',
+            signal: AbortSignal.timeout(20000),
+          });
+          console.log('People page status:', response.status, 'URL:', response.url);
+          assert.equal(response.status, 200, 'public People page must be available');
+
+          const html = await response.text();
+          assert.match(html, /Utkarsh Shukla/, 'deployed People page must include Utkarsh');
+          assert.match(html, /Infosec Expert/, 'deployed People page must include the correct role');
+          assert.match(html, /data-person-id="utkarsh-shukla"/, 'profile must render as a card');
+          const portraitPath = '/team/utkarsh-shukla.webp';
+          assert.ok(html.includes(portraitPath), 'profile must point to the supplied local portrait');
+
+          const portraitUrl = new URL(portraitPath, response.url);
+          const photoResponse = await fetch(portraitUrl, {
+            headers: { 'Cache-Control': 'no-cache' },
+            signal: AbortSignal.timeout(20000),
+          });
+          console.log('Portrait response:', photoResponse.status, portraitUrl.href);
+          assert.equal(photoResponse.status, 200, 'profile photo must load');
+          const bytes = Buffer.from(await photoResponse.arrayBuffer());
+          assert.ok(bytes.length > 1000, 'photo must not be an empty placeholder');
+          assert.equal(bytes.toString('ascii', 0, 4), 'RIFF');
+          assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+          console.log('PASS: live profile, role, and supplied WebP portrait are published.');
+          NODE
