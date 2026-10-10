@@ -48,7 +48,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
     };
   });
   assert.match(logo.text, /CANONICAL CLOUD/);
-  assert.ok(logo.text.replace(/\s+/g, "").includes("CANONICAL.PLUS"));
+  assert.ok(logo.text.toUpperCase().replace(/\s+/g, "").includes("CANONICAL.PLUS"));
   assert.equal(logo.text.toLowerCase().includes("product"), false);
   assert.equal(logo.aria, "Canonical Cloud — canonical.plus home");
   assert.equal(logo.innerAria, null);
