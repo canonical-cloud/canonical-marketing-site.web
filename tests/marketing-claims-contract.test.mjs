@@ -74,7 +74,7 @@ test("new pre-audit sections demonstrate real outputs without false audit or int
 
   assert.ok(readiness.includes('id="sample-finding"'));
   assert.ok(readiness.includes('This fictional IAM example'));
-  assert.ok(readiness.includes('not an independent auditor'));
+  assert.ok(readiness.includes("an independent auditor's conclusion"));
   assert.ok(readiness.includes('id="evidence-readiness"'));
   for (const label of ["Not implemented", "Partially implemented", "Implemented; evidence missing", "Evidence stale or incomplete", "Unverified", "Out of scope (documented)"]) {
     assert.ok(readiness.includes(label), `readiness missing ${label}`);
