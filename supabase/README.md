@@ -71,6 +71,9 @@ retried safely with the same mail-provider idempotency key. This recovers from a
 Function timeout after database insertion without creating duplicate email. Successful or
 currently leased submissions return the same accepted result without sending another message.
 
-The production Pages deployment validates `PUBLIC_SUPABASE_URL` before publishing. A
-missing or non-`https://*.supabase.co` value blocks production deployment instead of
-silently publishing non-functional forms.
+The production Pages deployment validates `PUBLIC_SUPABASE_URL`. A non-empty
+value must be a `https://*.supabase.co` origin; other non-empty values block
+deployment. When the variable is missing, the public website may still publish
+marketing content, but contact/quote delivery is explicitly unavailable and the
+site displays email fallbacks. Configure the actual Supabase project URL and deploy
+the Edge Function before claiming those intake routes are operational.
