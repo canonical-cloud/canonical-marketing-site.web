@@ -27,14 +27,15 @@ const roster = [
   ['Georgiana Fabrecce', 'Team'],
   ['Bryce Merrson', 'Technical Support'],
   ['Nouman Siddiqui', 'Team'],
+  ['Utkarsh Shukla', 'Infosec Expert'],
 ];
 
-test('people directory has exactly twelve named roles in the requested order', () => {
+test('people directory has exactly thirteen named roles in the requested order', () => {
   assert.equal(directory.schemaVersion, 'canonical-cloud.people/v1');
   assert.deepEqual(directory.people.map(({ name, role }) => [name, role]), roster);
-  assert.equal(directory.people.length, 12);
-  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 12, 'person ids must be unique');
-  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 12, 'initials must be unique');
+  assert.equal(directory.people.length, 13);
+  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 13, 'person ids must be unique');
+  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 13, 'initials must be unique');
 });
 
 test('homepage and people page share the validated directory', () => {
@@ -42,7 +43,7 @@ test('homepage and people page share the validated directory', () => {
   assert.match(grid, /const people = directory\.people/);
   assert.match(grid, /people\.map\(\(person\)/);
   assert.match(grid, /data-person-id=\{person\.id\}/);
-  assert.match(source, /Twelve people, one readiness platform/);
+  assert.match(source, /Thirteen people, one readiness platform/);
   for (const page of [source, home]) assert.match(page, /<PeopleGrid\s*\/>/);
 });
 
@@ -64,6 +65,7 @@ test('local team headshots are used and unresolved identities stay neutral', () 
     '/team/rebecca-toni.jpg',
     '/team/bryce-merrson.jpg',
     '/team/nouman-siddiqui.jpg',
+    '/team/utkarsh-shukla.webp',
   ]);
 
   for (const name of ['John Siliciano', 'Jeremy Reynolds', 'Eugene Li', 'Tom Mensch', 'Georgiana Fabrecce']) {
@@ -78,7 +80,7 @@ test('local team headshots are used and unresolved identities stay neutral', () 
 test('team portraits are served locally and remain base-aware', async () => {
   for (const person of directory.people) {
     if (person.photoUrl) {
-      assert.match(person.photoUrl, /^\/team\/[a-z-]+\.(?:jpe?g|png)$/);
+      assert.match(person.photoUrl, /^\/team\/[a-z-]+\.(?:jpe?g|png|webp)$/);
       const image = await readFile(new URL(`../public${person.photoUrl}`, import.meta.url));
       assert.ok(image.length > 0);
     }

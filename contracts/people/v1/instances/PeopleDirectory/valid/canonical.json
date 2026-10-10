@@ -79,6 +79,13 @@
       "role": "Team",
       "initials": "NS",
       "photoUrl": "/team/nouman-siddiqui.jpg"
+    },
+    {
+      "id": "utkarsh-shukla",
+      "name": "Utkarsh Shukla",
+      "role": "Infosec Expert",
+      "initials": "US",
+      "photoUrl": "/team/utkarsh-shukla.webp"
     }
   ]
 }
