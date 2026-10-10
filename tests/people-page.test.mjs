@@ -65,7 +65,7 @@ test('local team headshots are used and unresolved identities stay neutral', () 
     '/team/rebecca-toni.jpg',
     '/team/bryce-merrson.jpg',
     '/team/nouman-siddiqui.jpg',
-    '/team/utkarsh-shukla.jpg',
+    '/team/utkarsh-shukla.webp',
   ]);
 
   for (const name of ['John Siliciano', 'Jeremy Reynolds', 'Eugene Li', 'Tom Mensch', 'Georgiana Fabrecce']) {
@@ -80,7 +80,7 @@ test('local team headshots are used and unresolved identities stay neutral', () 
 test('team portraits are served locally and remain base-aware', async () => {
   for (const person of directory.people) {
     if (person.photoUrl) {
-      assert.match(person.photoUrl, /^\/team\/[a-z-]+\.(?:jpe?g|png)$/);
+      assert.match(person.photoUrl, /^\/team\/[a-z-]+\.(?:jpe?g|png|webp)$/);
       const image = await readFile(new URL(`../public${person.photoUrl}`, import.meta.url));
       assert.ok(image.length > 0);
     }
