@@ -34,6 +34,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          fetch-depth: 0 # compare the actual changed range, never the whole shallow root tree
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: "22"
@@ -61,5 +62,13 @@ jobs:
           test -s artifacts/people.parity.json
       - name: Run People regression tests
         run: node --test tests/people-page.test.mjs
-      - name: Reject whitespace and patch errors
-        run: git diff-tree --check --root HEAD --
+      - name: Reject whitespace and patch errors in the actual change set
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$BASE_SHA" || "$BASE_SHA" =~ ^0+$ ]]; then
+            git diff --check HEAD^ HEAD --
+          else
+            git diff --check "$BASE_SHA" HEAD --
+          fi
