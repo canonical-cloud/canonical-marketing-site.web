@@ -32,7 +32,29 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   const brand = await page.$eval(".nav__logo-text", (element) =>
     (element.textContent ?? "").replace(/\s+/g, "").trim(),
   );
-  assert.match(brand, /CANONICAL\.PLUS/);
+  assert.ok(brand.includes("CANONICAL.PLUS"));
+
+  // The live DOM and computed CSS must never insert a Product badge,
+  // including via the ::before pseudo-element or a redundant ARIA label.
+  const logo = await page.$eval("#nav-logo", (element) => {
+    const plusName = element.querySelector(".nav__plus-brand-name");
+    return {
+      text: element.innerText,
+      aria: element.getAttribute("aria-label"),
+      innerAria: plusName?.getAttribute("aria-label") ?? null,
+      className: plusName?.className ?? "",
+      beforeContent: plusName ? getComputedStyle(plusName, "::before").content : null,
+      legacyBadgeCount: element.querySelectorAll("[class*='product-brand']").length,
+    };
+  });
+  assert.match(logo.text, /CANONICAL CLOUD/);
+  assert.ok(logo.text.toUpperCase().replace(/\s+/g, "").includes("CANONICAL.PLUS"));
+  assert.equal(logo.text.toLowerCase().includes("product"), false);
+  assert.equal(logo.aria, "Canonical Cloud — canonical.plus home");
+  assert.equal(logo.innerAria, null);
+  assert.equal(logo.legacyBadgeCount, 0);
+  assert.equal(logo.className.includes("nav__plus-brand-name"), true);
+  assert.ok(["none", "normal", '""'].includes(logo.beforeContent), `unexpected generated header label: ${logo.beforeContent}`);
 
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),

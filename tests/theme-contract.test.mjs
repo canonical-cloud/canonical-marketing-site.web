@@ -70,7 +70,7 @@ test('header and footer expose synchronized auto, light, medium, and dark contro
 
   assert.match(layout, /theme-init\.js/);
   assert.match(layout, /<script is:inline src=\{themeInitScriptHref\}><\/script>/);
-  assert.match(builtIndex, /<script src="\/theme-init\.js"><\/script>/);
+  assert.match(builtIndex, /<script src="\/theme-init\.js(?:\?v=[a-z0-9-]+)?"><\/script>/);
   assert.ok(
     builtIndex.indexOf('/theme-init.js') < builtIndex.indexOf('/site.js'),
     'the synchronous initializer must load before the module that wires controls',

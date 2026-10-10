@@ -11,7 +11,7 @@ const configureBrandStyles = () => {
 
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
-  stylesheet.href = new URL('./brand-overrides.css', import.meta.url).href;
+  stylesheet.href = new URL('./brand-overrides.css?v=20261010-clean-logo', import.meta.url).href;
   stylesheet.dataset.canonicalBrandStyles = 'true';
   document.head.append(stylesheet);
 };
@@ -24,9 +24,9 @@ const configureHeaderBranding = () => {
     return;
   }
 
-  const productMark = brand.querySelector('.nav__logo-icon');
-  const productName = brand.querySelector('.nav__logo-text');
-  if (!(productMark instanceof SVGElement) || !(productName instanceof HTMLElement)) {
+  const plusMark = brand.querySelector('.nav__logo-icon');
+  const plusName = brand.querySelector('.nav__logo-text');
+  if (!(plusMark instanceof SVGElement) || !(plusName instanceof HTMLElement)) {
     return;
   }
 
@@ -51,14 +51,13 @@ const configureHeaderBranding = () => {
 
   parentBrand.append(parentMark, parentName);
 
-  const productBrand = document.createElement('span');
-  productBrand.className = 'nav__product-brand';
-  productMark.classList.add('nav__product-brand-mark');
-  productName.classList.add('nav__product-brand-name');
-  productName.setAttribute('aria-label', 'canonical.plus product');
-  productBrand.append(productMark, productName);
+  const plusBrand = document.createElement('span');
+  plusBrand.className = 'nav__plus-brand';
+  plusMark.classList.add('nav__plus-brand-mark');
+  plusName.classList.add('nav__plus-brand-name');
+  plusBrand.append(plusMark, plusName);
 
-  brand.replaceChildren(parentBrand, productBrand);
+  brand.replaceChildren(parentBrand, plusBrand);
 };
 
 configureHeaderBranding();

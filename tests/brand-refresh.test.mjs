@@ -34,15 +34,19 @@ test('brand stylesheet starts loading in the head and has a module fallback', ()
   assert.match(siteScript, /data-canonical-brand-styles/);
 });
 
-test('header lockup presents Canonical Cloud as parent and canonical.plus as product', () => {
+test('header lockup pairs Canonical Cloud and Canonical Plus without a product badge', () => {
   assert.match(siteScript, /Canonical Cloud — canonical\.plus home/);
   assert.match(siteScript, /parentName\.textContent = 'CANONICAL CLOUD'/);
   assert.match(siteScript, /canonical-cloud\.svg/);
-  assert.match(siteScript, /canonical\.plus product/);
+  assert.match(siteScript, /nav__plus-brand-name/);
+  assert.equal(siteScript.includes('canonical.plus product'), false);
+  assert.equal(siteScript.includes('nav__product-brand'), false);
+  assert.equal(brandCss.includes("content: 'product'"), false);
+  assert.equal(brandCss.includes('nav__product-brand'), false);
   assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*CANONICAL CLOUD/);
   assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*canonical-cloud\.svg/);
   assert.match(brandCss, /\.nav__parent-brand-name[\s\S]*font-size:\s*0\.9rem/);
-  assert.match(brandCss, /\.nav__product-brand-name[\s\S]*font-size:\s*0\.72rem/);
+  assert.match(brandCss, /\.nav__plus-brand-name[\s\S]*font-size:\s*0\.72rem/);
   assert.match(cloudLogo, /Canonical Cloud layered C/);
 });
 
