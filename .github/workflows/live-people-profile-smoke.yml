@@ -72,6 +72,48 @@ jobs:
           assert.equal(quotePage.includes('Sign in for account quote'), false, 'quote page has no sign-in button');
           console.log('PASS: public home and quote have direct Calendly links with no quote sign-in CTA.');
 
+          // Verify deployed readiness content, not just merged source or home HTML.
+          const readinessPage = await fetchPage('https://canonical.plus/readiness/');
+          const frameworksPage = await fetchPage('https://canonical.plus/frameworks/');
+          const comparePage = await fetchPage('https://canonical.plus/compare/');
+
+          for (const marker of [
+            'id="readiness-preview"',
+            'Find the gaps before your independent reviewer does',
+            'Evidence-readiness index',
+            'id="preview-sample-link"',
+          ]) assert.ok(homepage.includes(marker), `homepage missing: ${marker}`);
+
+          for (const marker of [
+            'id="sample-finding"',
+            'What an actionable readiness finding looks like',
+            'Privileged access review evidence is incomplete',
+            'This fictional IAM example',
+            'id="evidence-readiness"',
+            'Out of scope (documented)',
+          ]) assert.ok(readinessPage.includes(marker), `readiness page missing: ${marker}`);
+
+          for (const marker of [
+            'id="starter-checklists"',
+            'Pre-audit readiness starter checklists',
+            'id="soc2"', 'id="iso27001"', 'id="hipaa"', 'id="pci-dss"', 'id="nist-csf"',
+          ]) assert.ok(frameworksPage.includes(marker), `frameworks page missing: ${marker}`);
+
+          for (const marker of [
+            'id="existing-platforms"',
+            'Already using Vanta, Drata, or Secureframe?',
+            'no claim of partnership, endorsement, API integration',
+          ]) assert.ok(comparePage.includes(marker), `comparison page missing: ${marker}`);
+
+          for (const marker of [
+            'id="quote-scope-summary"',
+            'Not included by default:',
+            'id="quote-estimate-book-intro"',
+          ]) assert.ok(quotePage.includes(marker), `quote page missing: ${marker}`);
+
+          console.log('PASS: all five live marketing pages expose scoped, illustrative pre-audit content and quote handoff.');
+
+
           const cloudHome = await fetchPage('https://canonical-cloud.github.io/');
           const header = cloudHome.match(/<header\b[\s\S]*?<\/header>/)?.[0];
           assert.ok(header, 'Canonical Cloud public header must render');
