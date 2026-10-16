@@ -1,0 +1,216 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/global.css';
+import '../../styles/marketing-pages.css';
+
+const insightsHref = import.meta.env.BASE_URL.replace(/\/+$/, '') + '/insights/';
+const markdownHref = 'https://github.com/canonical-cloud/canonical-marketing-site.web/blob/main/docs/insights/cpp26-standardization.md';
+const isoStages = [
+  ['30.00–30.99', 'Committee stage (CD)', 'National experts review the Committee Draft and submit comments; disagreements can require another revision.'],
+  ['40.00–40.20', 'Enquiry stage (DIS)', 'The Draft International Standard is registered and balloted by ISO/IEC national members.'],
+  ['40.60+', 'Ballot result and comment resolution', 'The result and any technical/editorial comments determine whether further work is needed.'],
+  ['50.x (if applicable)', 'Approval stage', 'Final text or Final Draft International Standard (FDIS), under applicable ISO/IEC procedures.'],
+  ['60.00–60.60', 'Publication stage', 'ISO/IEC publishes the new edition of ISO/IEC 14882 after required approvals.'],
+];
+const steps = [
+  ['01', 'Idea and P-paper', 'State the problem, design tradeoffs, examples, implementation experience, and proposed standard wording.'],
+  ['02', 'Study and evolution', 'A study group may incubate a proposal. EWG or LEWG discusses language or library design and can request revisions.'],
+  ['03', 'Wording review', 'CWG or LWG verifies normative language, consistency, and implementability; insufficiently precise text returns for work.'],
+  ['04', 'WG21 plenary', 'Accepted motions add wording to the working draft; papers may instead be revised, deferred, or rejected.'],
+  ['05', 'National-body review', 'ISO/IEC Committee Draft (CD) consultation gathers national comments; WG21 addresses issues.'],
+  ['06', 'DIS ballot and publication', 'National bodies vote on the Draft International Standard. ISO/IEC applies approval, any required final steps, and publication.'],
+];
+const takeaways = [
+  ['Follow the P-paper revision', 'Votes in a subgroup, plenary adoption and an international ISO ballot are not the same milestone.'],
+  ['Account for iteration', 'A paper may loop through revisions after study, evolution, wording, plenary or national comments.'],
+  ['Separate paper from product', 'A finalized draft does not mean GCC, Clang and MSVC all implement a feature the same way.'],
+  ['Plan real migrations', 'Reflection, contracts, library hardening and std::execution affect tooling, testing and deployment decisions.'],
+];
+const refs = [
+  ['ISO/IEC DIS 14882 status', 'https://www.iso.org/standard/91179.html'],
+  ['International C++ working group WG21', 'https://www.open-std.org/jtc1/sc22/wg21/'],
+  ['WG21 organization and stages', 'https://isocpp.org/std/the-committee'],
+  ['INCITS/C++: U.S. technical advisory group', 'https://www.incits.org/committees/pl22.16'],
+  ['ANSI: U.S. representation in ISO', 'https://ansi.org/iso/us-representation-in-iso/introduction'],
+  ['ISO/IEC JTC 1/SC 22', 'https://www.iso.org/committee/45202.html'],
+  ['March 2026 C++26 committee report', 'https://herbsutter.com/2026/03/29/c26-is-done-trip-report-march-2026-iso-c-standards-meeting-london-croydon-uk/'],
+];
+---
+
+<BaseLayout title="How C++26 becomes an ISO standard" description="How C++26 moves through WG21, INCITS/C++, ANSI, ISO/IEC review and international approval ballots.">
+  <article class="insight-article">
+    <header class="article-hero section--hero bg-grid bg-radial">
+      <div class="container article-width">
+        <a href={insightsHref} class="backlink">&larr; All insights</a>
+        <p class="eyebrow">Blog 01 / Engineering insights / Standards / C++</p>
+        <h1>How C++26 becomes an <span class="gradient-text">ISO standard</span></h1>
+        <p class="lede">The full story of how C++26 is proposed, debated, approved, balloted, published and implemented—with the roles of WG21, ISO/IEC, ANSI, INCITS/C++, decision loops and four visual process graphs on one page.</p>
+        <p class="byline"><time datetime="2026-10-16">October 16, 2026</time> · Comprehensive guide</p>
+        <aside class="status">
+          <strong>C++26 status on October 16, 2026</strong>
+          <p>WG21 completed technical work in March 2026. The new ISO/IEC 14882 edition was at <strong>DIS ballot stage 40.20</strong>, begun July 31, 2026—not yet a published International Standard. <a href="https://www.iso.org/standard/91179.html">Check the live ISO status &nearr;</a></p>
+        </aside>
+      </div>
+    </header>
+
+    <div class="container article-width article-body">
+      <nav class="article-toc" aria-label="On this page">
+        <strong>In this guide</strong>
+        <ol>
+          <li><a href="#people">Who governs C++?</a></li>
+          <li><a href="#pipeline">P-papers and WG21 decisions</a></li>
+          <li><a href="#iso-approval">ISO/IEC ballots and publication</a></li>
+          <li><a href="#us-approval">ANSI and the U.S. TAG</a></li>
+          <li><a href="#status-cpp">C++26 timeline</a></li>
+          <li><a href="#engineering">Implementation versus standardization</a></li>
+          <li><a href="#takeaways">Engineering insights</a></li>
+          <li><a href="#sources">Official sources and Markdown graphs</a></li>
+        </ol>
+      </nav>
+      <section aria-labelledby="people">
+        <p class="eyebrow">The organizations</p>
+        <h2 id="people">Who writes C++? Who approves it?</h2>
+        <p>The international language specification is <strong>ISO/IEC 14882</strong>, developed through ISO/IEC JTC 1, SC 22, WG21. <strong>ANSI</strong> represents the United States at ISO. <strong>INCITS/C++</strong> (formerly PL22.16) is the U.S. Technical Advisory Group (TAG) to WG21. They are connected but distinct.</p>
+        <figure class="graph" aria-labelledby="graph-title">
+          <h3 id="graph-title">Technical development and national-body governance</h3>
+          <div class="branches">
+            <div class="branch">
+              <span class="branch-label">International technical path</span>
+              <div class="node"><strong>Experts + P-papers</strong><small>Research, designs, proposals</small></div>
+              <span class="arrow" aria-hidden="true">↓</span>
+              <div class="node node--emphasis"><strong>WG21</strong><small>Study · Evolution · Wording · Plenary</small></div>
+              <span class="arrow" aria-hidden="true">↓</span>
+              <div class="node"><strong>Working draft</strong><small>ISO/IEC 14882 text</small></div>
+            </div>
+            <div class="branch">
+              <span class="branch-label">U.S. national-body path</span>
+              <div class="node"><strong>U.S. stakeholders</strong><small>Engineers, organizations, experts</small></div>
+              <span class="arrow" aria-hidden="true">↓</span>
+              <div class="node node--emphasis"><strong>INCITS/C++</strong><small>U.S. consensus and advisory group</small></div>
+              <span class="arrow" aria-hidden="true">↓</span>
+              <div class="node"><strong>ANSI</strong><small>U.S. member body of ISO</small></div>
+            </div>
+          </div>
+          <div class="join" aria-hidden="true">↘ &nbsp; ISO national-body review and ballots &nbsp; ↙</div>
+          <div class="node node--outcome"><strong>ISO/IEC 14882</strong><small>Published International Standard, after approval</small></div>
+          <figcaption>International experts develop the working draft; national standards bodies including ANSI provide formal national positions and ballot votes. Simplified relationship graph, not an organization chart.</figcaption>
+        </figure>
+        <p><strong>What about “ANSI C++”?</strong> This is historical shorthand, not a second C++26 technical design committee. ANSI coordinates U.S. participation and positions. A separate American National Standard or national adoption designation, if applicable, is not the same as approval of features by WG21.</p>
+        <div class="table-scroll" role="region" aria-label="Standards bodies comparison" tabindex="0"><table class="org-table"><caption>Standards bodies and what their approval means</caption><thead><tr><th scope="col">Body</th><th scope="col">Primary role</th><th scope="col">What its decision is not</th></tr></thead><tbody>
+          <tr><th scope="row">ISO / IEC</th><td>International standards organizations; C++ is ISO/IEC 14882 through JTC 1 and SC 22.</td><td>Independent design of every C++ language feature.</td></tr>
+          <tr><th scope="row">WG21</th><td>Expert working group that develops, refines, and adopts draft technical text.</td><td>A final publication decision by ISO.</td></tr>
+          <tr><th scope="row">INCITS/C++</th><td>U.S. Technical Advisory Group: coordinates U.S. technical consensus and positions.</td><td>A substitute for all other national-body votes.</td></tr>
+          <tr><th scope="row">ANSI</th><td>U.S. ISO member body coordinating the U.S. national position.</td><td>A separate C++26 feature-selection committee.</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section aria-labelledby="pipeline">
+        <p class="eyebrow">A proposal is a process, not a switch</p>
+        <h2 id="pipeline">The C++ approval pipeline</h2>
+        <figure class="graph">
+          <ol class="pipeline">
+            {steps.map(([number, title, detail]) => (
+              <li><span class="stepnum">{number}</span><div class="step"><h3>{title}</h3><p>{detail}</p></div></li>
+            ))}
+          </ol>
+          <p class="loop"><strong>Revision loop:</strong> A failed consensus check, wording problem, committee decision, or national comment can return a proposal to earlier stages. A study group is not mandatory for every proposal.</p>
+          <figcaption>Pipeline graphic. See the <a href="https://github.com/canonical-cloud/canonical-marketing-site.web/blob/main/docs/insights/cpp26-standardization.md">Markdown/Mermaid source</a> for explicit decision diamonds, alternate paths, and a U.S. governance graph.</figcaption>
+        </figure>
+        <h3>How a paper wins consensus</h3>
+        <p>Most proposals start as numbered P-papers. Experts must explain the motivation and alternatives, demonstrate what code means, discuss implementation experience, and—when ready—supply exact wording. SGs (study groups) are often optional incubators. EWG evaluates language evolution, LEWG library evolution; CWG and LWG review final wording. A consensus poll is a signal of support in the working group, not a national-body ISO ballot.</p>
+        <div class="decision-grid">
+          <div><h3>EWG / LEWG</h3><p>Design consensus: advance, revise or defer a language/library feature.</p></div>
+          <div><h3>CWG / LWG</h3><p>Normative wording, defects, compatibility and integration into the draft.</p></div>
+          <div><h3>WG21 plenary</h3><p>Motions adopt technical wording. That is not the final ISO publication vote.</p></div>
+          <div><h3>ISO / IEC national bodies</h3><p>CD comments and DIS ballots; additional editorial or FDIS steps as applicable.</p></div>
+        </div>
+      </section>
+
+      <section aria-labelledby="iso-approval">
+        <p class="eyebrow">The international approval graph</p>
+        <h2 id="iso-approval">From C++ working draft to published ISO/IEC 14882</h2>
+        <p>Even after WG21 accepts technical wording, formal international standardization involves national member bodies. The Committee Draft (CD) stage solicits national comments, followed by the Draft International Standard (DIS) enquiry ballot. Comments or failed approval criteria can reopen work; the final approval route, including whether FDIS is needed, follows ISO/IEC procedures.</p>
+        <figure class="graph" aria-labelledby="iso-graph-title">
+          <h3 id="iso-graph-title">ISO/IEC approval and revision pipeline</h3>
+          <ol class="pipeline iso-pipeline" aria-label="ISO approval stages">
+            {isoStages.map(([stage, name, detail]) => (
+              <li><span class="stepnum">{stage}</span><div class="step"><h3>{name}</h3><p>{detail}</p></div></li>
+            ))}
+          </ol>
+          <p class="loop"><strong>Decision gate:</strong> Has the national comment set been resolved, and has the DIS met the applicable ISO/IEC approval criteria? If not, the draft can return to WG21 for corrections and a revised ballot or other disposition. Publication is not automatic.</p>
+          <figcaption>The ISO stage codes reflect the <a href="https://www.iso.org/standard/91179.html">official DIS 14882 life cycle</a>. A published ISO/IEC standard is a specification, not ISO certification of any product, organization, or service.</figcaption>
+        </figure>
+        <div class="table-scroll" role="region" tabindex="0" aria-label="Meaning of standards approval milestones"><table class="org-table"><caption>Four approvals that should not be confused</caption><thead><tr><th scope="col">Event</th><th scope="col">Meaning</th><th scope="col">Does it finish standardization?</th></tr></thead><tbody>
+        <tr><th scope="row">Subgroup consensus</th><td>Technical group supports a direction or wording.</td><td>No</td></tr>
+        <tr><th scope="row">WG21 plenary motion</th><td>Technical wording is accepted into the working draft.</td><td>No</td></tr>
+        <tr><th scope="row">ISO/IEC DIS ballot</th><td>National bodies review/vote on the international draft.</td><td>Only if all applicable approval requirements are subsequently completed</td></tr>
+        <tr><th scope="row">ISO/IEC publication</th><td>The new ISO/IEC 14882 edition is formally published.</td><td>Yes, for that edition; implementation remains separate</td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section aria-labelledby="us-approval">
+        <p class="eyebrow">The U.S. role in the global process</p>
+        <h2 id="us-approval">The ANSI / INCITS/C++ path is not a second C++ committee</h2>
+        <p>Engineers and organizations in the U.S. participate in international WG21 technical meetings. Separately, the U.S. Technical Advisory Group, INCITS/C++, helps develop a U.S. consensus position that is represented through ANSI as the U.S. ISO national member body. Both paths meet during international standardization, but a WG21 technical vote and an ANSI-transmitted national position are not the same vote.</p>
+        <figure class="graph" aria-labelledby="us-graph-title">
+          <h3 id="us-graph-title">U.S. experts and national ballots — parallel routes</h3>
+          <div class="branches">
+            <div class="branch"><span class="branch-label">Technical contribution</span><div class="node"><strong>U.S. and international experts</strong><small>Write and review C++ proposals</small></div><span class="arrow" aria-hidden="true">↓</span><div class="node node--emphasis"><strong>WG21</strong><small>International technical text and plenary</small></div><span class="arrow" aria-hidden="true">↓</span><div class="node"><strong>Draft ISO/IEC 14882</strong><small>Proposed standard wording</small></div></div>
+            <div class="branch"><span class="branch-label">U.S. national position</span><div class="node"><strong>U.S. stakeholders</strong><small>Input to U.S. consensus</small></div><span class="arrow" aria-hidden="true">↓</span><div class="node node--emphasis"><strong>INCITS/C++ TAG</strong><small>U.S. position and comment coordination</small></div><span class="arrow" aria-hidden="true">↓</span><div class="node"><strong>ANSI</strong><small>U.S. ISO member-body ballot</small></div></div>
+          </div>
+          <div class="join" aria-hidden="true">↘ &nbsp; All ISO/IEC national-body ballots &nbsp; ↙</div><div class="node node--outcome"><strong>ISO/IEC 14882 published</strong><small>Only after the formal ISO/IEC approval and publication stages</small></div>
+          <figcaption>Not all ISO member bodies are shown. U.S. national input is one of many participating national positions; WG21 technical participation is international.</figcaption>
+        </figure>
+      </section>
+
+      <section aria-labelledby="status-cpp">
+        <p class="eyebrow">The C++26 example</p>
+        <h2 id="status-cpp">“C++26 is done” is not “ISO has published it”</h2>
+        <p>WG21 finished the C++26 technical feature set in March 2026, including major work on <strong>compile-time reflection</strong>, <strong>contracts</strong>, <strong>standard-library hardening</strong> and <code>std::execution</code>. The international standards lifecycle continues separately.</p>
+        <div class="timeline">
+          <div><time datetime="2025-08">Aug 2025</time><strong>Committee Draft review</strong><p>International CD consultation starts.</p></div>
+          <div><time datetime="2026-03">Mar 2026</time><strong>Technical completion</strong><p>WG21 finalizes the feature set.</p></div>
+          <div><time datetime="2026-07-31">Jul 31, 2026</time><strong>DIS ballot starts</strong><p>ISO stage 40.20: 12 weeks.</p></div>
+          <div><span>Later</span><strong>Approval and publication</strong><p>Pending formal ISO/IEC process, not yet published as of this article.</p></div>
+        </div>
+        <p>The most recent <em>published</em> C++ edition on this date is ISO/IEC 14882:2024 (C++23). After ISO publication, teams still need to verify compiler versions, feature availability and the migration risks of adopting C++26.</p>
+      </section>
+
+      <section aria-labelledby="engineering">
+        <p class="eyebrow">From de jure standard to production toolchain</p>
+        <h2 id="engineering">Approval is not the last engineering checkpoint</h2>
+        <p>There are two different senses of “C++26 support.” The first is what the international standard specifies; the second is what a particular compiler, standard library, linker and build toolchain have shipped and validated. Versions, feature flags, platform ABIs and defect reports matter.</p>
+        <div class="decision-grid">
+          <div><h3>Reflection</h3><p>Evaluate compiler support, compile-time performance, tooling, metaprogramming patterns and generated APIs.</p></div>
+          <div><h3>Contracts</h3><p>Document supported contract behavior, build profiles, verification limits and what happens when an assertion fails.</p></div>
+          <div><h3>Library hardening</h3><p>Test hardened standard-library modes, diagnostics and compatibility with existing dependencies.</p></div>
+          <div><h3>Execution</h3><p>Benchmark and validate the sender/receiver execution model, scheduling choices and cancellation semantics where implemented.</p></div>
+        </div>
+        <p>A sound rollout requires compiler-version matrices, CI feature checks, reproducible builds, ABI policies, conformance tests and an explicit rollback. No language-standard ballot guarantees operational readiness.</p>
+      </section>
+
+      <section aria-labelledby="takeaways">
+        <p class="eyebrow">Insights</p>
+        <h2 id="takeaways">What engineering teams should take away</h2>
+        <div class="decision-grid">
+          {takeaways.map(([heading, detail]) => <div><h3>{heading}</h3><p>{detail}</p></div>)}
+        </div>
+        <p class="disclaimer">A programming-language standard is not a certification of a cloud provider, software product, or organization. Standardization and compliance assurance are different processes.</p>
+      </section>
+
+      <section aria-labelledby="sources">
+        <h2 id="sources">Primary sources and editable Markdown graphs</h2>
+        <p>All three canonical Mermaid diagrams—proposal branching, ISO CD/DIS approval and ANSI/INCITS national representation—are retained in the <a href={markdownHref} target="_blank" rel="noopener noreferrer">source Markdown</a>. The diagrams above are static, accessible web equivalents that do not require JavaScript or a third-party CDN.</p>
+        <ul class="references">
+          {refs.map(([label, url]) => <li><a href={url} target="_blank" rel="noopener noreferrer">{label} &nearr;</a></li>)}
+        </ul>
+        <p class="disclaimer">Independent editorial explanation. Not an official statement on behalf of ISO, IEC, WG21, ANSI, or INCITS. Status is current to the publication date; consult the source links for updates.</p>
+      </section>
+    </div>
+  </article>
+  <style>
+    .article-width{max-width:940px}.article-hero{padding-bottom:var(--space-3xl)}.backlink,.article-body a{color:var(--av-emerald);text-decoration:underline;text-underline-offset:3px}.backlink{display:inline-block;margin-bottom:var(--space-lg)}.eyebrow{color:var(--av-teal);font-size:.78rem;text-transform:uppercase;font-weight:800;letter-spacing:.13em}.article-hero h1{font-size:clamp(2.5rem,5vw,4.5rem);line-height:1.08;margin:1rem 0}.lede{font-size:clamp(1.06rem,2vw,1.32rem);max-width:800px;color:var(--av-text-secondary);line-height:1.7}.byline{margin:1.3rem 0;color:var(--av-text-muted);font-size:.86rem}.status{margin-top:1.8rem;border-left:4px solid var(--av-emerald);border-radius:var(--radius-sm);background:var(--av-emerald-glow);padding:1.25rem}.status p{margin-top:.4rem}.status a{color:var(--av-emerald);text-decoration:underline}.article-body{padding-bottom:var(--space-4xl)}.article-body section{padding-top:var(--space-2xl)}.article-body section+section{margin-top:var(--space-3xl);border-top:1px solid var(--av-border)}.article-body h2{font-size:clamp(1.7rem,3vw,2.35rem);margin:.6rem 0 1.1rem}.article-body section>p{line-height:1.8;color:var(--av-text-secondary);margin-bottom:1.2rem}.graph{padding:var(--space-lg);background:var(--av-surface);border:1px solid var(--av-border);border-radius:var(--radius-lg);margin:1.6rem 0}.graph>h3{font-size:1rem;margin-bottom:1.1rem}.branches{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.branch{display:flex;flex-direction:column;align-items:center;gap:.25rem;min-width:0}.branch-label{font-size:.75rem;font-weight:800;color:var(--av-teal);text-align:center;min-height:2rem}.node{width:100%;padding:1rem .6rem;border:1px solid var(--av-border-active);background:var(--av-surface-elevated);border-radius:var(--radius-md);text-align:center}.node strong,.node small{display:block}.node small{color:var(--av-text-secondary);font-size:.78rem;margin-top:.4rem}.node--emphasis{border-color:var(--av-emerald)}.node--outcome{border:2px solid var(--av-emerald);background:var(--av-emerald-glow)}.arrow{font-size:1.4rem;color:var(--av-emerald);font-weight:800}.join{text-align:center;color:var(--av-teal);font-size:.82rem;font-weight:800;margin:1rem 0 .5rem}figcaption{color:var(--av-text-muted);font-size:.83rem;line-height:1.6;margin-top:1rem}.pipeline{display:grid;gap:.85rem;list-style:none;padding:0}.pipeline li{display:grid;grid-template-columns:3rem minmax(0,1fr);gap:1rem;position:relative}.pipeline li:not(:last-child)::after{content:'↓';position:absolute;left:.9rem;bottom:-.95rem;color:var(--av-emerald);font-weight:800}.stepnum{background:var(--av-emerald-glow);border:1px solid var(--av-border-active);border-radius:var(--radius-md);padding:.8rem 0;text-align:center;color:var(--av-emerald);font-weight:800;align-self:start}.step{background:var(--av-surface-elevated);border:1px solid var(--av-border);border-radius:var(--radius-md);padding:.8rem 1rem}.step h3{font-size:1.02rem;margin-bottom:.3rem}.step p,.decision-grid p,.timeline p{color:var(--av-text-secondary);font-size:.9rem;line-height:1.6}.loop{border-left:3px solid var(--av-warning);background:var(--av-warning-glow);padding:1rem;margin-top:1rem;font-size:.92rem}.decision-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1.5rem 0}.decision-grid>div{background:var(--av-surface);border:1px solid var(--av-border);border-radius:var(--radius-md);padding:1.2rem}.decision-grid h3{font-size:1rem;margin-bottom:.4rem}.timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin:1.5rem 0}.timeline>div{background:var(--av-surface);border-top:3px solid var(--av-emerald);padding:1rem;border-radius:var(--radius-sm)}.timeline strong{display:block;margin-bottom:.4rem}.timeline time,.timeline span{display:block;color:var(--av-teal);font-size:.78rem;font-weight:800;margin-bottom:.75rem}.references{list-style:disc;padding-left:1.4rem}.references li{margin:.7rem 0}.disclaimer{border-left:3px solid var(--av-warning);padding:1rem;background:var(--av-warning-glow);font-size:.87rem}@media(max-width:750px){.branches,.decision-grid{grid-template-columns:1fr}.timeline{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:480px){.timeline{grid-template-columns:1fr}.graph{padding:.8rem}}
+
+    .article-toc{padding:1.35rem;margin-top:2rem;border:1px solid var(--av-border-active);border-radius:var(--radius-lg);background:var(--av-surface)}.article-toc>strong{display:block;margin-bottom:.7rem}.article-toc ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.45rem 1.3rem;list-style:decimal;padding-left:1.1rem}.article-toc li{color:var(--av-text-secondary)}.article-toc a:hover{color:var(--av-emerald)}.article-body section{scroll-margin-top:calc(var(--nav-height) + 1rem)}.table-scroll{max-width:100%;overflow-x:auto;margin:1.4rem 0;border:1px solid var(--av-border);border-radius:var(--radius-md)}.org-table{border-collapse:collapse;width:100%;min-width:570px;background:var(--av-surface);font-size:.88rem}.org-table caption{text-align:left;padding:1rem;font-weight:700}.org-table th,.org-table td{text-align:left;padding:.95rem;border-top:1px solid var(--av-border);vertical-align:top}.org-table thead th{background:var(--av-surface-elevated);color:var(--av-teal)}.org-table td{color:var(--av-text-secondary)}.org-table tbody th{min-width:130px}.iso-pipeline li{grid-template-columns:7rem minmax(0,1fr)}.iso-pipeline li:not(:last-child)::after{left:3rem}.iso-pipeline .stepnum{font-size:.85rem}@media(max-width:680px){.article-toc ol{grid-template-columns:1fr}.iso-pipeline li{grid-template-columns:5.8rem minmax(0,1fr);gap:.5rem}.iso-pipeline li:not(:last-child)::after{left:2rem}.org-table{min-width:570px}}
+  </style>
+</BaseLayout>
