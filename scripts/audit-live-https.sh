@@ -52,6 +52,14 @@ done
 echo "At least one GitHub Pages direct HTTPS origin succeeded: ${origin_valid}"
 echo "::endgroup::"
 
+echo "::group::GitHub Pages origin certificate identity and validity window"
+# Read public certificate metadata, even if the expired certificate fails curl.
+# A failed OpenSSL probe cannot itself mask the principal HTTP 526 failure.
+timeout 12 openssl s_client -connect 185.199.108.153:443 -servername "${host}" </dev/null 2>/dev/null \
+  | openssl x509 -noout -subject -issuer -dates -ext subjectAltName || true
+echo "::endgroup::"
+
+
 if [[ "${curl_exit}" != 0 || "${status}" != 200 ]]; then
   echo "::error::Public HTTPS smoke check failed; deployment success alone does not mean Cloudflare origin TLS is valid."
   exit 1
