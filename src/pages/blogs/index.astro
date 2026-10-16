@@ -1,0 +1,5 @@
+---
+// Keep one editorial listing at /insights/, but support the /blogs/ entry point.
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+return Astro.redirect(`${baseNoSlash}/insights/`);
+---
