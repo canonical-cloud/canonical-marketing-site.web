@@ -30,4 +30,8 @@ jobs:
         with:
           persist-credentials: false
       - name: Audit DNS, Cloudflare TLS, and GitHub Pages origin
+        # A pre-existing external TLS outage should be visible but must not
+        # block review/merging of a diagnostic PR. After deploy and on the
+        # daily check this is a hard failure so operators are alerted.
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
         run: bash scripts/audit-live-https.sh
