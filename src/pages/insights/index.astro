@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/global.css';
+import '../../styles/marketing-pages.css';
+
+const articleHref = import.meta.env.BASE_URL.replace(/\/+$/, '') + '/insights/cpp26-standardization/';
+---
+<BaseLayout title="Insights" description="Canonical Plus insights about software engineering, standards, security, and how technical decisions become operational practice.">
+  <section class="page-hero section--hero bg-grid bg-radial">
+    <div class="container">
+      <span class="badge">Insights</span>
+      <h1 class="heading">Engineering <span class="gradient-text">insights</span></h1>
+      <p class="intro">Clear explanations of standards, software systems, and the decisions between a proposed technology and production practice.</p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container">
+      <h2 class="section-heading">Latest articles</h2>
+      <div class="article-grid">
+        <article class="article-card">
+          <p class="meta"><time datetime="2026-10-16">October 16, 2026</time> · Standards · C++</p>
+          <h3><a href={articleHref}>How C++26 becomes an ISO standard</a></h3>
+          <p>Learn how a C++ proposal moves through WG21, the ISO/IEC process, ANSI, INCITS/C++, and national ballots. Includes pipeline diagrams, a governance graph, and engineering takeaways.</p>
+          <a class="more" href={articleHref} aria-label="Read How C++26 becomes an ISO standard">Read the article &rarr;</a>
+        </article>
+      </div>
+    </div>
+  </section>
+  <style>
+    .heading{margin-top:1rem;font-size:clamp(2.8rem,6vw,5rem);line-height:1.08}.intro{max-width:720px;font-size:clamp(1.05rem,2vw,1.27rem);color:var(--av-text-secondary);line-height:1.7;margin-top:1.5rem}.section-heading{margin-bottom:1.7rem}.article-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:1.3rem}.article-card{background:var(--av-surface);border:1px solid var(--av-border);border-radius:var(--radius-lg);padding:2rem;max-width:720px}.article-card h3{font-size:clamp(1.35rem,2vw,1.7rem);margin:.8rem 0}.article-card h3 a:hover,.more:hover{color:var(--av-emerald)}.article-card>p:not(.meta){color:var(--av-text-secondary);line-height:1.7}.meta{color:var(--av-teal);font-weight:700;font-size:.81rem}.more{display:inline-block;margin-top:1.5rem;color:var(--av-emerald);font-weight:700}
+  </style>
+</BaseLayout>
