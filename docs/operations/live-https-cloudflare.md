@@ -2,6 +2,9 @@
 
 **Incident observed 2026-10-16:** requesting https://canonical.plus/ returns **Cloudflare HTTP 526 — Invalid SSL certificate**. The Astro article and GitHub Pages deployment had passed CI. Build success is not end-to-end HTTPS verification. Cloudflare 526 indicates failed origin-certificate validation in Full (strict) mode.
 
+**Direct-origin evidence (GitHub Actions, 2026-10-16 17:34 UTC):** all four documented GitHub Pages IPv4 endpoints presented a Let's Encrypt **YR2** certificate whose subjectAltName includes **canonical.plus**, issued **2026-07-14 18:28:22 UTC** and expired **2026-10-12 18:28:21 UTC**. Each direct certificate-validating request failed with curl exit **60**, confirming origin TLS is not healthy. The public Cloudflare-proxied response remained **526**. Cloudflare NS are **maya.ns.cloudflare.com** and **memphis.ns.cloudflare.com**. The actual Cloudflare record target still must be checked in the zone dashboard.
+
+
 ## Diagnose without changing production
 
 1. In **Cloudflare → DNS → Records**, inspect the apex (@) and www records, their target and proxied/DNS-only flags. Also inspect origin rules, Workers, Load Balancers, tunnel routes, and SNI overrides. Cloudflare-proxied A results are Cloudflare edge IPs, not evidence of the origin.
