@@ -22,7 +22,7 @@ done
 echo "::endgroup::"
 
 echo "::group::Live end-to-end HTTPS via Cloudflare"
-status="$(curl --silent --show-error --location --max-redirs 4 --max-time 25 \
+status="$(curl --silent --show-error --location --proto-redir '=https' --max-redirs 4 --max-time 25 \
   --output "${scratch}/public.html" --dump-header "${scratch}/public.headers" \
   --write-out '%{http_code}' "${public_url}")" || curl_exit=$?
 echo "GET ${public_url}: HTTP ${status:-000}, curl exit ${curl_exit}"
@@ -38,7 +38,7 @@ echo "::group::GitHub Pages direct-origin TLS checks (SNI canonical.plus; no --i
 origin_valid=0
 for ip in 185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153; do
   origin_exit=0
-  origin_status="$(curl --silent --show-error --location --max-redirs 3 --max-time 15 \
+  origin_status="$(curl --silent --show-error --location --proto-redir '=https' --max-redirs 3 --max-time 15 \
     --resolve "${host}:443:${ip}" --output "${scratch}/origin.html" \
     --write-out '%{http_code}' "${public_url}" 2>"${scratch}/origin.err")" || origin_exit=$?
   echo "GitHub Pages ${ip}: HTTP ${origin_status:-000}, curl exit ${origin_exit}"
@@ -70,4 +70,18 @@ if ! grep -q 'How C++26 becomes an' "${scratch}/public.html"; then
   echo "::error::Public HTTPS returned 200 but expected C++26 article content is missing."
   exit 1
 fi
-echo "PASS: ${public_url} is reachable with a trusted certificate and expected content."
+
+# A healthy blog does not prove the marketing landing page or insights route
+# is actually served. All redirects must remain HTTPS; status must be 200.
+for route in / /insights/; do
+  route_exit=0
+  route_status="$(curl --silent --show-error --location --proto-redir '=https' \\
+    --max-redirs 4 --max-time 25 --output "${scratch}/route.html" \\
+    --write-out '%{http_code}' "https://${host}${route}")" || route_exit=$?
+  echo "GET https://${host}${route}: HTTP ${route_status:-000}, curl exit ${route_exit}"
+  if [[ "${route_exit}" != 0 || "${route_status}" != 200 ]]; then
+    echo "::error::Public HTTPS route ${route} failed. Do not mark the site healthy based on the blog alone."
+    exit 1
+  fi
+done
+echo "PASS: HTTPS root, insights, and blog routes have trusted TLS and expected status; blog content verified."
