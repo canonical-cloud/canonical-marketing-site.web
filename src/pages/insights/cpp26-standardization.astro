@@ -1,0 +1,5 @@
+---
+// Preserve links shared before consolidation. Astro emits a static meta refresh.
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+return Astro.redirect(`${baseNoSlash}/blogs/1/`);
+---

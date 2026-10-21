@@ -1,0 +1,37 @@
+name: public-https-health
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/public-https-health.yml'
+      - 'scripts/audit-live-https.sh'
+      - 'docs/operations/live-https-cloudflare.md'
+  workflow_dispatch:
+  workflow_run:
+    workflows: [pages]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: '23 13 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  verify-public-https:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Audit DNS, Cloudflare TLS, and GitHub Pages origin
+        # A pre-existing external TLS outage should be visible but must not
+        # block review/merging of a diagnostic PR. After deploy and on the
+        # daily check this is a hard failure so operators are alerted.
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        run: bash scripts/audit-live-https.sh
