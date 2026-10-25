@@ -168,6 +168,191 @@ const faqSections = [
         "answer": "No. Canonical can identify gaps and support remediation and evidence preparation within the agreed scope, but it cannot guarantee an independent party's conclusion. Any estimate or readiness status is preliminary and not a certification or formal assurance result."
       }
     ]
+  },
+  {
+    "id": "getting-started",
+    "heading": "Planning your readiness assessment",
+    "intro": "How to prepare, set boundaries, and involve the right people before work begins.",
+    "items": [
+      {
+        "id": "faq-kickoff-prep",
+        "question": "What should we prepare before a readiness kickoff?",
+        "answer": "A useful starting set includes your target framework or customer requirement, a high-level architecture, system and data inventories, existing policies, and any past findings. You do not need a perfect evidence package before reaching out. The first step is to identify what exists and where the unknowns are."
+      },
+      {
+        "id": "faq-scoping",
+        "question": "How do you decide which applications, environments, and teams are in scope?",
+        "answer": "We start from the objective of the review, then trace the products, data, infrastructure, vendors, and people that support it. The resulting scope map should record boundaries, assumptions, and exclusions for customer review. Final audit or certification scope remains subject to the applicable independent process."
+      },
+      {
+        "id": "faq-stakeholders",
+        "question": "Who should participate in a readiness assessment?",
+        "answer": "Usually a business sponsor, security or compliance owner, engineering or infrastructure leads, and people responsible for HR, vendors, and relevant operations. The exact participants depend on the control environment. Clear decision-makers and owners help prevent findings from becoming unassigned tasks."
+      },
+      {
+        "id": "faq-no-policies",
+        "question": "What if we have no formal security policies or compliance program yet?",
+        "answer": "That is a possible starting point. A baseline review can distinguish practices you already perform from documentation, approvals, or controls that are missing. We prioritize the highest-impact gaps rather than assuming a mature program exists on day one."
+      },
+      {
+        "id": "faq-urgent-deadline",
+        "question": "Can we start if an enterprise customer or auditor has given us a tight deadline?",
+        "answer": "Yes, we can first clarify the deadline, requested evidence, dependencies, and likely blockers. Some gaps can be resolved quickly, while others require operating history or independent review time that cannot be compressed. We will not promise a report or certification by a date we do not control."
+      },
+      {
+        "id": "faq-questionnaire-only",
+        "question": "Do we need a full readiness program to answer one customer's security questionnaire?",
+        "answer": "Not necessarily. If your immediate need is a limited questionnaire or evidence request, a focused gap review may make more sense than a full program. The engagement should match the actual customer obligation, not automatically expand to a broad certification project."
+      }
+    ]
+  },
+  {
+    "id": "framework-details",
+    "heading": "Understanding frameworks and assessments",
+    "intro": "Avoid paying for the wrong review or confusing readiness with a formal assurance result.",
+    "items": [
+      {
+        "id": "faq-soc2-types",
+        "question": "What is the difference between a SOC 2 Type I and a SOC 2 Type II report?",
+        "answer": "A Type I report addresses the design of controls at a specified point in time, while a Type II report also addresses their operating effectiveness over a stated period. The independent CPA firm determines the report conclusions. Canonical can help prepare the applicable controls and evidence, but does not issue either report."
+      },
+      {
+        "id": "faq-iso-vs-soc2",
+        "question": "How is ISO/IEC 27001 certification different from SOC 2?",
+        "answer": "ISO/IEC 27001 concerns an information security management system assessed for certification by an accredited or otherwise qualified certification body, as applicable. SOC 2 is an independent attestation report against the selected Trust Services Criteria. They can share evidence, but the scope, process, and output are not interchangeable."
+      },
+      {
+        "id": "faq-hipaa-gdpr-certs",
+        "question": "Is there one HIPAA or GDPR certificate that proves we are compliant?",
+        "answer": "There is no general U.S. government-issued HIPAA certification that substitutes for compliance with HIPAA obligations. The GDPR provides for certain voluntary certification mechanisms, but participation does not remove an organization's legal responsibilities. Ask qualified counsel which obligations and assurance mechanisms actually apply."
+      },
+      {
+        "id": "faq-cmmc-fedramp",
+        "question": "How do CMMC and FedRAMP readiness differ from standard commercial readiness?",
+        "answer": "They have specific scoping, assessment, and government-program rules that can be more prescriptive than a general customer questionnaire. Decisions about CMMC assessments or certifications and about authorizations under FedRAMP belong to the authorized parties under the applicable program. A readiness plan should reference current official program requirements, not promise eligibility or approval."
+      },
+      {
+        "id": "faq-pci-scope",
+        "question": "Does PCI DSS apply to our entire business if we accept payments?",
+        "answer": "PCI DSS scope is determined by how payment account data is stored, processed, transmitted, or connected to relevant systems. Outsourcing payments may reduce some obligations but does not automatically eliminate all of them. Confirm the validation method and scope with your payment stakeholders and a qualified PCI specialist where required."
+      },
+      {
+        "id": "faq-shared-controls",
+        "question": "Can the same control and evidence support multiple frameworks?",
+        "answer": "Often, yes. Access reviews, change approvals, backup testing, and incident procedures may support several requirements. We can map one well-operated control to multiple frameworks, while recording any extra criteria, periods, or proof each reviewer requires. A mapping is not a substitute for each independent conclusion."
+      }
+    ]
+  },
+  {
+    "id": "engineering-controls",
+    "heading": "Cloud and engineering controls",
+    "intro": "The technical areas that commonly create real remediation work.",
+    "items": [
+      {
+        "id": "faq-identity-controls",
+        "question": "What do you look for in identity, access, and privileged-account controls?",
+        "answer": "Depending on scope, we may examine how accounts are provisioned and removed, MFA adoption, privileged roles, service identities, access approvals, and periodic reviews. We distinguish a control that is configured from evidence that the process has operated as required."
+      },
+      {
+        "id": "faq-cloud-configuration",
+        "question": "Will Canonical scan or change our cloud infrastructure?",
+        "answer": "A scoped review may include cloud configuration and infrastructure evidence. Automated scanning, active testing, or configuration changes are not assumed; each requires an agreed method, permissions, and authorization. Findings should identify the affected systems, impact, remediation owner, and verification approach."
+      },
+      {
+        "id": "faq-cicd-controls",
+        "question": "How do Git repositories, CI/CD, and software change management affect readiness?",
+        "answer": "Relevant controls can include code review, branch protections, deployment approvals, secrets handling, dependency management, change records, and rollback practices. We evaluate what applies to the chosen requirements and systems rather than imposing one development workflow on every team."
+      },
+      {
+        "id": "faq-vendor-risk",
+        "question": "Do third-party vendors and subprocessors need to be included?",
+        "answer": "Often, because vendors can host data or operate controls relevant to your system. A readiness review can consider vendor inventories, due diligence, contractual responsibilities, and available assurance documents within scope. Your organization still owns its vendor decisions and responsibilities."
+      },
+      {
+        "id": "faq-continuity-response",
+        "question": "Do incident response, backups, and disaster recovery count toward readiness?",
+        "answer": "They can, depending on the framework and service commitments. Policies alone may be insufficient: exercises, recovery tests, incident records, or documented decisions may be useful evidence. The objective is to show the relevant process works in practice, not merely that a template exists."
+      },
+      {
+        "id": "faq-encryption-keys",
+        "question": "Can Canonical review encryption and key-management practices?",
+        "answer": "Within the agreed technical scope, a review may consider encryption in transit and at rest, access to keys, rotation procedures, ownership, and supporting configuration evidence. It does not automatically include penetration testing, cryptographic certification, or a warranty of system security."
+      }
+    ]
+  },
+  {
+    "id": "evidence-workflows",
+    "heading": "Evidence, findings, and ongoing readiness",
+    "intro": "How to organize proof and avoid rebuilding the same audit package repeatedly.",
+    "items": [
+      {
+        "id": "faq-good-evidence",
+        "question": "What makes evidence useful to an independent assessor?",
+        "answer": "Evidence should be relevant to the control, identifiable to the right systems and time period, reliable enough to review, and traceable to its source. Whether it is sufficient is ultimately decided by the independent reviewer against the applicable criteria. Canonical helps organize an evidence plan, not pre-approve an auditor's conclusion."
+      },
+      {
+        "id": "faq-existing-artifacts",
+        "question": "Can we use existing tickets, logs, cloud exports, and policy documents?",
+        "answer": "Yes, if they actually demonstrate the relevant control and review period. Existing artifacts are often preferable to new screenshots created solely for an audit. A gap review should flag stale, incomplete, or out-of-scope records and identify the next evidence needed."
+      },
+      {
+        "id": "faq-evidence-automation",
+        "question": "Can evidence collection be automated so we stop taking screenshots?",
+        "answer": "Some collection and freshness checks may be automated when technical access, control design, and agreed integrations permit. Automation should preserve provenance and access boundaries. Canonical does not represent itself as a mature, all-in-one monitoring platform with universal native integrations."
+      },
+      {
+        "id": "faq-refresh-cadence",
+        "question": "How often should controls and evidence be reviewed or refreshed?",
+        "answer": "The right cadence depends on the framework, risk, control design, and review period. Some events need evidence when they happen; others call for periodic review. We can help propose ownership and freshness rules, while the organization remains responsible for operating them."
+      },
+      {
+        "id": "faq-exceptions",
+        "question": "What happens when a control is partially implemented or a risk is accepted?",
+        "answer": "The condition should be visible in the gap register, with its impact, owner, remediation or exception decision, and relevant dates. Risk acceptance does not automatically satisfy a required control. Any formal exception treatment must align with the applicable criteria and independent review process."
+      },
+      {
+        "id": "faq-readiness-decision",
+        "question": "How will we know when we are ready to approach an independent reviewer?",
+        "answer": "A defensible readiness decision considers agreed scope, implemented controls, relevant operating history, accessible evidence, unresolved high-priority gaps, and reviewer dependencies. Canonical can summarize remaining risks and recommend next steps, but only the qualified independent reviewer determines the formal outcome."
+      }
+    ]
+  },
+  {
+    "id": "working-together",
+    "heading": "Working with Canonical Plus",
+    "intro": "Clear answers about focused engagements, responsibilities, deadlines, and handoff.",
+    "items": [
+      {
+        "id": "faq-assessment-only",
+        "question": "Can we hire Canonical for a gap assessment without ongoing remediation?",
+        "answer": "A narrowly scoped assessment can be discussed without committing to a wider program. The proposal and statement of work should make clear whether the engagement includes only findings and a roadmap or also implementation and follow-up support."
+      },
+      {
+        "id": "faq-quote-information",
+        "question": "What details do you need to prepare a preliminary estimate?",
+        "answer": "Useful inputs include your target requirements, systems and cloud footprint, team size, data sensitivity, existing evidence, and desired timeframe. A preliminary quote does not require sending passwords, API keys, production data, or customer secrets."
+      },
+      {
+        "id": "faq-ownership-progress",
+        "question": "Who owns remediation tasks and how do we track progress?",
+        "answer": "A readiness roadmap can assign priorities, accountable owners, dependencies, acceptance criteria, and evidence needed to close each gap. Your company retains decision authority over its systems and risk. Any Canonical implementation responsibilities should be written into the engagement scope."
+      },
+      {
+        "id": "faq-remote-teams",
+        "question": "Can Canonical work with distributed teams and multiple time zones?",
+        "answer": "Coordination can be planned around remote stakeholders, asynchronous document review, and scheduled technical sessions where agreed. Availability, languages, location-specific requirements, and any on-site work need to be confirmed during scoping; they are not universal service guarantees."
+      },
+      {
+        "id": "faq-critical-finding",
+        "question": "What happens if the assessment uncovers a serious security issue?",
+        "answer": "The engagement should establish an escalation contact and procedure before technical access begins. A suspected critical issue would be documented and escalated through that agreed channel so your authorized team can assess containment and response. Continuous incident response or emergency remediation is not included unless specifically contracted."
+      },
+      {
+        "id": "faq-after-engagement",
+        "question": "What happens after Canonical finishes the readiness engagement?",
+        "answer": "The agreed deliverables should support a handoff to your control owners and, when appropriate, your chosen independent reviewer. You can operate the program internally or discuss separately scoped follow-up assistance. No future retainer or product dependency should be assumed unless it is part of your signed agreement."
+      }
+    ]
   }
 ];
 const questionCount = faqSections.reduce((count, section) => count + section.items.length, 0);
