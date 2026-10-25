@@ -219,3 +219,21 @@ test("built FAQ and homepage render real FAQ content and working relative links"
   assert.match(home, /href="\/faq\/#faq-why-preaudit"/);
   assert.match(home, /href="\/faq\/"/);
 });
+
+test("FAQ progressive enhancements preserve static answers and strict script boundaries", async () => {
+  const [faq, faqJs, built] = await Promise.all([
+    readFile(new URL("../src/pages/faq.astro", import.meta.url), "utf8"),
+    readFile(new URL("../public/faq.js", import.meta.url), "utf8"),
+    readFile(new URL("../dist/faq/index.html", import.meta.url), "utf8"),
+  ]);
+  assert.match(faq, /id="faq-search-tools"[^>]*hidden/);
+  assert.match(faq, /id="faq-search-input"/);
+  assert.match(faq, /id="faq-search-status" role="status" aria-live="polite"/);
+  assert.match(faq, /<script type="module" src=\{faqScriptHref\}><\/script>/);
+  assert.match(faqJs, /addEventListener\('hashchange', openHashTarget\)/);
+  assert.match(faqJs, /target\.open = true/);
+  assert.match(faqJs, /status\.textContent = query/);
+  assert.doesNotMatch(faqJs, /\.innerHTML\s*=|\beval\s*\(|new Function\s*\(/);
+  assert.match(built, /\/faq\.js\?v=20261025-search/);
+  assert.equal([...built.matchAll(/<details\b/g)].length, 58);
+});

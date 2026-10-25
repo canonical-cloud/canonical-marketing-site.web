@@ -7,6 +7,7 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const quoteHref = `${baseNoSlash}/quote/`;
 const compareHref = `${baseNoSlash}/compare/`;
 const pricingHref = `${baseNoSlash}/pricing/`;
+const faqScriptHref = `${baseNoSlash}/faq.js?v=20261025-search`;
 const faqSections = [
   {
     "id": "why-readiness",
@@ -380,6 +381,23 @@ const questionCount = faqSections.reduce((count, section) => count + section.ite
 
   <section class="section faq-section" aria-label="Frequently asked questions">
     <div class="container faq-layout">
+      <div class="faq-search" id="faq-search-tools" role="search" aria-label="Search FAQs" hidden>
+        <label for="faq-search-input">Search all {questionCount} questions and answers</label>
+        <div class="faq-search__controls">
+          <input
+            id="faq-search-input"
+            type="search"
+            placeholder="Search topics, questions, or answers"
+            autocomplete="off"
+            maxlength="160"
+          />
+          <button id="faq-search-clear" class="btn btn--secondary" type="button" hidden>Clear search</button>
+        </div>
+        <p id="faq-search-status" role="status" aria-live="polite" aria-atomic="true">
+          Showing all {questionCount} questions
+        </p>
+        <p id="faq-search-empty" hidden>No matching questions. Try a different keyword or clear your search.</p>
+      </div>
       <nav class="faq-categories" aria-label="FAQ topics">
         <h2>Browse by topic</h2>
         {faqSections.map((section, index) => (
@@ -428,6 +446,15 @@ const questionCount = faqSections.reduce((count, section) => count + section.ite
 
   <style>
     .faq-hero { max-width: 950px; }
+    .faq-search { grid-column: 1 / -1; padding: 1.25rem; border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); }
+    .faq-search label { display: block; font-weight: 700; margin-bottom: .75rem; }
+    .faq-search__controls { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .faq-search input { min-width: 0; flex: 1 1 18rem; min-height: 44px; border: 1px solid var(--av-border-active); border-radius: var(--radius-md); background: var(--av-nav-bg-strong); color: var(--av-text-primary); padding: .75rem 1rem; font: inherit; }
+    .faq-search input:focus-visible { outline: 2px solid var(--av-teal); outline-offset: 2px; }
+    .faq-search__controls button { min-height: 44px; }
+    .faq-search #faq-search-status { margin-top: .75rem; color: var(--av-text-secondary); font-size: .9rem; }
+    .faq-search #faq-search-empty { margin-top: .4rem; color: var(--av-text-primary); }
+    .faq-search[hidden], .faq-search__controls button[hidden], .faq-search #faq-search-empty[hidden], .faq-group[hidden], .faq-item[hidden] { display: none !important; }
     .faq-hero__boundary { max-width: 760px; margin-top: 1rem; color: var(--av-text-secondary); font-size: .96rem; line-height: 1.6; }
     .faq-layout { display: grid; grid-template-columns: minmax(200px, 270px) minmax(0, 1fr); align-items: start; gap: clamp(1.5rem, 4vw, 4rem); }
     .faq-categories { position: sticky; top: calc(var(--nav-height) + 2rem); display: grid; gap: .45rem; }
@@ -459,4 +486,5 @@ const questionCount = faqSections.reduce((count, section) => count + section.ite
     }
     @media (prefers-reduced-motion: reduce) { .faq-item__toggle { transition: none; } }
   </style>
+  <script type="module" src={faqScriptHref}></script>
 </BaseLayout>
