@@ -182,7 +182,7 @@ test("comparison page states the competitive baseline without claiming parity", 
 
 test("FAQ page includes 58 distinct customer questions with transparent assurance boundaries", async () => {
   const faq = await readFile(new URL("../src/pages/faq.astro", import.meta.url), "utf8");
-  const ids = [...faq.matchAll(/"id": "faq-([a-z-]+)"/g)].map((match) => match[1]);
+  const ids = [...faq.matchAll(/"id": "faq-([a-z0-9-]+)"/g)].map((match) => match[1]);
   const questions = [...faq.matchAll(/"question":/g)];
   assert.equal(ids.length, 58, "expected 58 FAQ item anchors");
   assert.equal(new Set(ids).size, 58, "FAQ item anchors must be unique");
