@@ -8,8 +8,20 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
+const faqHref = `${baseNoSlash}/faq/`;
 const quoteHref = 'https://app.canonical.plus/u/quote';
 const introHref = 'https://calendly.com/hello-canonical/30min';
+
+const featuredFaqs = [
+  ['faq-why-preaudit', 'Why do I need a readiness assessment or pre-audit?'],
+  ['faq-why-canonical-plus', 'Why choose Canonical instead of another company?'],
+  ['faq-why-not-auditor', 'Why not go straight to an auditor?'],
+  ['faq-vanta-drata', 'How is Canonical different from Vanta or Drata?'],
+  ['faq-fix-issues', 'Will Canonical actually help fix issues?'],
+  ['faq-deliverables', 'What deliverables will we receive?'],
+  ['faq-pricing', 'How much does Canonical cost?'],
+  ['faq-guarantee', 'Can Canonical guarantee an audit result?'],
+];
 
 const featuredFrameworks = [
   ['SOC 2', 'Trust Services Criteria readiness'],
@@ -168,6 +180,27 @@ const featuredFrameworks = [
   <section class="section" id="about"><div class="container"><header class="section-header"><span class="badge animate-fade-in-up">Why Canonical Plus</span><h2 class="animate-fade-in-up stagger-1">Honest boundaries and <span class="gradient-text">technical depth</span></h2></header><div class="why__grid"><article class="why__item animate-fade-in-up stagger-1"><div class="why__number">01</div><h4>Readiness before assurance</h4><p>We separate preparation from the independent decision so buyers know exactly what they are purchasing.</p></article><article class="why__item animate-fade-in-up stagger-2"><div class="why__number">02</div><h4>Engineering-aware remediation</h4><p>Findings become implementation work across cloud, identity, software delivery, data, and operations.</p></article><article class="why__item animate-fade-in-up stagger-3"><div class="why__number">03</div><h4>Reusable control mapping</h4><p>Shared controls and evidence are mapped across frameworks instead of recreated for each new requirement.</p></article><article class="why__item animate-fade-in-up stagger-4"><div class="why__number">04</div><h4>Transparent platform fit</h4><p>We say when a full automation platform, audit firm, certification body, or legal adviser is the better next step.</p></article></div><div class="action-row"><a href={compareHref} class="btn btn--secondary">Compare approaches</a></div></div></section>
 
   <section class="section" id="people" aria-labelledby="team-title"><div class="container"><header class="section-header section-header--center"><span class="badge">Our people</span><h2 id="team-title">The people behind <span class="gradient-text">your readiness</span></h2><p>Engineering, security, infrastructure, business, and legal perspectives on the same team.</p></header><PeopleGrid /></div></section>
+
+
+  <section class="section" id="faq-preview" aria-labelledby="faq-preview-title">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Frequently asked questions</span>
+        <h2 id="faq-preview-title">Answers before you commit to readiness</h2>
+        <p>What does a pre-audit do, why choose Canonical, and what should your team expect? Start with the questions other buyers ask.</p>
+      </header>
+      <div class="card-grid card-grid--two">
+        {featuredFaqs.map(([id, question]) => (
+          <article class="card">
+            <h3><a href={`${faqHref}#${id}`}>{question}</a></h3>
+          </article>
+        ))}
+      </div>
+      <div class="action-row">
+        <a class="btn btn--secondary" href={faqHref} id="all-faqs-link">Read all 28 FAQs</a>
+      </div>
+    </div>
+  </section>
 
   <section class="section" id="contact"><div class="container"><div class="cta-panel animate-fade-in-up"><span class="badge">Start with scope</span><h2>Get a preliminary readiness estimate</h2><p>Tell us the frameworks, systems, data sensitivity, and current program stage. The result is an initial estimate and planning input—not an audit opinion or certification.</p><div class="action-row"><a href={quoteHref} class="btn btn--primary btn--large" id="cta-readiness-btn" data-application-link="quote">Start readiness assessment</a><a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large" id="cta-contact-btn">Discuss your scope</a></div></div></div></section>
 </BaseLayout>
