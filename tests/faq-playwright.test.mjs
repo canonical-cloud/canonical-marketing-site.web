@@ -106,6 +106,8 @@ test("playwright: question deep links open automatically, including after filter
   await page.goto(`${server.url}/faq/#faq-critical-finding`, { waitUntil: "networkidle" });
   assert.equal(await page.locator("#faq-critical-finding").evaluate((e) => e.open), true);
 
+  // Return to the unfragmented URL so the next navigation fires hashchange.
+  await page.goto(`${server.url}/faq/`, { waitUntil: "networkidle" });
   const search = page.getByRole("searchbox", { name: /Search all 58 questions/ });
   await search.fill("privileged roles");
   assert.equal(await page.locator("#faq-critical-finding").isVisible(), false);
