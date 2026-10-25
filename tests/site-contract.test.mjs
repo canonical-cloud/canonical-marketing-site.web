@@ -178,3 +178,40 @@ test("comparison page states the competitive baseline without claiming parity", 
   assert.match(compare, /not positioned as a mature hundreds-of-integrations continuous-monitoring suite/);
   assert.match(compare, /No independent audit opinion, certification, authorization, or legal conclusion/);
 });
+
+
+test("FAQ page includes 28 distinct customer questions with transparent assurance boundaries", async () => {
+  const faq = await readFile(new URL("../src/pages/faq.astro", import.meta.url), "utf8");
+  const ids = [...faq.matchAll(/"id": "faq-([a-z-]+)"/g)].map((match) => match[1]);
+  const questions = [...faq.matchAll(/"question":/g)];
+  assert.equal(ids.length, 28, "expected 28 FAQ item anchors");
+  assert.equal(new Set(ids).size, 28, "FAQ item anchors must be unique");
+  assert.equal(questions.length, 28, "expected 28 customer-facing questions");
+  for (const group of ["why-readiness", "why-canonical", "buying-process"]) {
+    assert.ok(faq.includes('"id": "' + group + '"'), 'missing group ' + group);
+  }
+  for (const boundary of ["We do not issue audit opinions", "independent reviewer", "statement of work"]) {
+    assert.ok(faq.includes(boundary), 'missing FAQ boundary ' + boundary);
+  }
+  assert.match(faq, /<details class="faq-item" id=\{item\.id\}>/);
+  assert.match(faq, /<summary class="faq-item__question">/);
+  assert.match(faq, /const quoteHref =/);
+  assert.match(layout, /const faqHref =/);
+  assert.match(layout, /id="nav-faq">FAQ<\/a>/);
+  assert.match(layout, /href=\{faqHref\} class="footer__link">Frequently asked questions<\/a>/);
+  assert.match(page, /id="faq-preview"/);
+  assert.match(page, /id="all-faqs-link"/);
+});
+
+test("built FAQ and homepage render real FAQ content and working relative links", async () => {
+  const faq = await readFile(new URL("../dist/faq/index.html", import.meta.url), "utf8");
+  const home = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
+  assert.equal([...faq.matchAll(/<details\b/g)].length, 28);
+  assert.match(faq, /id="faq-why-preaudit"/);
+  assert.match(faq, /id="faq-why-canonical-plus"/);
+  assert.match(faq, /id="faq-guarantee"/);
+  assert.match(faq, /<summary\b/);
+  assert.match(faq, /href="\/quote\/"/);
+  assert.match(home, /href="\/faq\/#faq-why-preaudit"/);
+  assert.match(home, /href="\/faq\/"/);
+});
