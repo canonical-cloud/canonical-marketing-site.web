@@ -188,7 +188,7 @@ test("FAQ page includes 28 distinct customer questions with transparent assuranc
   assert.equal(new Set(ids).size, 28, "FAQ item anchors must be unique");
   assert.equal(questions.length, 28, "expected 28 customer-facing questions");
   for (const group of ["why-readiness", "why-canonical", "buying-process"]) {
-    assert.ok(faq.includes('id: "' + group + '"'), 'missing group ' + group);
+    assert.ok(faq.includes('"id": "' + group + '"'), 'missing group ' + group);
   }
   for (const boundary of ["We do not issue audit opinions", "independent reviewer", "statement of work"]) {
     assert.ok(faq.includes(boundary), 'missing FAQ boundary ' + boundary);
