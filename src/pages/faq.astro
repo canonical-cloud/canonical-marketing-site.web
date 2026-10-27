@@ -204,6 +204,16 @@ const faqSections = [
         "id": "faq-questionnaire-only",
         "question": "Do we need a full readiness program to answer one customer's security questionnaire?",
         "answer": "Not necessarily. If your immediate need is a limited questionnaire or evidence request, a focused gap review may make more sense than a full program. The engagement should match the actual customer obligation, not automatically expand to a broad certification project."
+      },
+      {
+        "id": "faq-first-sprint",
+        "question": "What usually happens during the first phase of a readiness engagement?",
+        "answer": "The opening phase generally clarifies the business goal, confirms which systems and controls are in scope, identifies the people who own them, and inventories available evidence. The sequence and duration depend on the engagement. We aim to surface blocking assumptions early rather than promise a fixed timeline before understanding the environment."
+      },
+      {
+        "id": "faq-new-product-scope",
+        "question": "What if we launch a new product or acquire another company during readiness?",
+        "answer": "A new product, legal entity, acquisition, or material infrastructure change can affect the assessment boundary and required evidence. Record what changed, evaluate whether existing controls still apply, and agree any revised priorities and scope before treating the new environment as covered. Formal scope decisions remain with the relevant independent reviewer."
       }
     ]
   },
@@ -241,6 +251,16 @@ const faqSections = [
         "id": "faq-shared-controls",
         "question": "Can the same control and evidence support multiple frameworks?",
         "answer": "Often, yes. Access reviews, change approvals, backup testing, and incident procedures may support several requirements. We can map one well-operated control to multiple frameworks, while recording any extra criteria, periods, or proof each reviewer requires. A mapping is not a substitute for each independent conclusion."
+      },
+      {
+        "id": "faq-cloud-provider-compliance",
+        "question": "Does using a compliant cloud provider make our application compliant?",
+        "answer": "No. A provider's report or certification concerns the provider's stated scope and does not automatically cover your software, configurations, identities, or operating processes. Cloud responsibility is shared differently by service. A readiness review identifies which controls the provider supports and which you must implement and evidence yourself."
+      },
+      {
+        "id": "faq-soc2-bridge-letter",
+        "question": "What is a SOC 2 bridge letter, and does it replace a current report?",
+        "answer": "A bridge letter is typically a management statement addressing the gap between a SOC 2 report's covered period and a later date. It is not a new independent auditor's opinion and does not extend the audited testing period. Ask the report recipient and your independent CPA firm what coverage they require; a letter may not satisfy every request."
       }
     ]
   },
@@ -278,6 +298,16 @@ const faqSections = [
         "id": "faq-encryption-keys",
         "question": "Can Canonical review encryption and key-management practices?",
         "answer": "Within the agreed technical scope, a review may consider encryption in transit and at rest, access to keys, rotation procedures, ownership, and supporting configuration evidence. It does not automatically include penetration testing, cryptographic certification, or a warranty of system security."
+      },
+      {
+        "id": "faq-machine-identities",
+        "question": "How should we handle service accounts, API tokens, and machine identities?",
+        "answer": "Machine credentials deserve defined owners, minimum necessary permissions, secure storage, rotation or expiry practices where appropriate, and a process to revoke unused access. Relevant evidence might include inventory records, configuration, access reviews, and change history. The exact safeguards depend on the systems and obligations in scope."
+      },
+      {
+        "id": "faq-penetration-testing",
+        "question": "Does readiness include penetration testing or vulnerability scanning?",
+        "answer": "Not automatically. Some requirements or customer contracts call for vulnerability management, independent testing, or documented remediation, but readiness and penetration testing are distinct services. We can help identify relevant testing requirements and organize the evidence. Active scanning or testing requires separate agreed scope and explicit authorization."
       }
     ]
   },
@@ -315,6 +345,16 @@ const faqSections = [
         "id": "faq-readiness-decision",
         "question": "How will we know when we are ready to approach an independent reviewer?",
         "answer": "A defensible readiness decision considers agreed scope, implemented controls, relevant operating history, accessible evidence, unresolved high-priority gaps, and reviewer dependencies. Canonical can summarize remaining risks and recommend next steps, but only the qualified independent reviewer determines the formal outcome."
+      },
+      {
+        "id": "faq-control-operating-period",
+        "question": "How do we demonstrate that a control operated throughout the review period?",
+        "answer": "Start with the actual frequency and owner of the control, then preserve dated evidence for each required occurrence or relevant event. Examples may include access-review approvals, deployment records, and backup-test outcomes. Gaps and late-created artifacts should be disclosed rather than backdated; the independent assessor decides whether the evidence is sufficient."
+      },
+      {
+        "id": "faq-sensitive-evidence",
+        "question": "What if our evidence contains employee or customer personal information?",
+        "answer": "Collect only what is needed, limit access by role, use approved transfer and retention methods, and consider redaction or representative samples when the reviewer accepts them. Avoid sending credentials or raw production datasets as a default. The engagement should define access, confidentiality, deletion, and any applicable data-processing responsibilities."
       }
     ]
   },
@@ -352,6 +392,16 @@ const faqSections = [
         "id": "faq-after-engagement",
         "question": "What happens after Canonical finishes the readiness engagement?",
         "answer": "The agreed deliverables should support a handoff to your control owners and, when appropriate, your chosen independent reviewer. You can operate the program internally or discuss separately scoped follow-up assistance. No future retainer or product dependency should be assumed unless it is part of your signed agreement."
+      },
+      {
+        "id": "faq-auditor-coordination",
+        "question": "Can Canonical coordinate with our auditor or certification body?",
+        "answer": "Where agreed, Canonical can help prepare an evidence handoff and track questions or requested clarifications from your chosen independent reviewer. That coordination must preserve the reviewer's independence and does not let Canonical set findings, determine conformity, or guarantee an opinion or certification."
+      },
+      {
+        "id": "faq-pilot-engagement",
+        "question": "Can we start with a small fixed-scope pilot before committing to a larger program?",
+        "answer": "You can request a limited discovery, gap-review, or evidence-readiness scope for a defined product or control area. A proposal should specify assumptions, inclusions, exclusions, deliverables, acceptance criteria, and fees before work starts. A pilot can inform a larger roadmap without obligating you to purchase subsequent phases."
       }
     ]
   }
