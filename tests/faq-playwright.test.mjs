@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { chromium } from "playwright";
 import { chromeExecutablePath, startSite } from "./site-browser-harness.mjs";
 
-test("playwright: 58-question FAQ works with keyboard and mobile layout", async (t) => {
+test("playwright: 68-question FAQ works with keyboard and mobile layout", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await chromium.launch({
@@ -19,7 +19,7 @@ test("playwright: 58-question FAQ works with keyboard and mobile layout", async 
 
   await page.goto(`${server.url}/faq/`, { waitUntil: "networkidle" });
   assert.equal(await page.title(), "Frequently asked questions | canonical.plus");
-  assert.equal(await page.locator(".faq-item").count(), 58);
+  assert.equal(await page.locator(".faq-item").count(), 68);
   assert.equal(await page.locator(".faq-group").count(), 8);
 
   const newQuestion = page.locator("#faq-critical-finding");
@@ -41,7 +41,7 @@ test("playwright: 58-question FAQ works with keyboard and mobile layout", async 
   assert.deepEqual(pageErrors, []);
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
-  const fullFaqs = page.getByRole("link", { name: "Read all 58 FAQs" });
+  const fullFaqs = page.getByRole("link", { name: "Read all 68 FAQs" });
   assert.equal(await fullFaqs.getAttribute("href"), "/faq/");
 });
 
@@ -61,16 +61,16 @@ test("playwright: FAQ search filters answers, shows empty state, and resets safe
   page.on("pageerror", (error) => pageErrors.push(error.message));
   await page.goto(`${server.url}/faq/`, { waitUntil: "networkidle" });
 
-  const search = page.getByRole("searchbox", { name: /Search all 58 questions/ });
+  const search = page.getByRole("searchbox", { name: /Search all 68 questions/ });
   await search.waitFor({ state: "visible" });
-  assert.equal(await page.locator(".faq-item:visible").count(), 58);
+  assert.equal(await page.locator(".faq-item:visible").count(), 68);
 
   // Match answer text, not just question headings.
   await search.fill("privileged roles");
   const visible = await page.locator(".faq-item:visible").count();
-  assert.ok(visible >= 1 && visible < 58);
+  assert.ok(visible >= 1 && visible < 68);
   assert.equal(await page.locator("#faq-identity-controls").isVisible(), true);
-  assert.match(await page.locator("#faq-search-status").innerText(), /matching .* out of 58/);
+  assert.match(await page.locator("#faq-search-status").innerText(), /matching .* out of 68/);
 
   await search.fill("not-a-real-compliance-topic-xyz");
   assert.equal(await page.locator(".faq-item:visible").count(), 0);
@@ -81,7 +81,11 @@ test("playwright: FAQ search filters answers, shows empty state, and resets safe
   assert.equal(await page.locator("#faq-search-empty").isVisible(), true);
   assert.equal(await page.locator("img[src='x']").count(), 0);
   await page.getByRole("button", { name: "Clear search" }).click();
-  assert.equal(await page.locator(".faq-item:visible").count(), 58);
+  assert.equal(await page.locator(".faq-item:visible").count(), 68);
+
+  await search.fill("bridge letter");
+  assert.equal(await page.locator("#faq-soc2-bridge-letter").isVisible(), true);
+  await page.getByRole("button", { name: "Clear search" }).click();
   assert.equal(await page.locator("#faq-search-empty").isVisible(), false);
 
   const sizes = await page.evaluate(() => ({
@@ -108,7 +112,7 @@ test("playwright: question deep links open automatically, including after filter
 
   // Return to the unfragmented URL so the next navigation fires hashchange.
   await page.goto(`${server.url}/faq/`, { waitUntil: "networkidle" });
-  const search = page.getByRole("searchbox", { name: /Search all 58 questions/ });
+  const search = page.getByRole("searchbox", { name: /Search all 68 questions/ });
   await search.fill("privileged roles");
   assert.equal(await page.locator("#faq-critical-finding").isVisible(), false);
   await page.evaluate(() => { location.hash = "#faq-critical-finding"; });
@@ -117,7 +121,7 @@ test("playwright: question deep links open automatically, including after filter
     return element instanceof HTMLDetailsElement && element.open && !element.hidden;
   });
   assert.equal(await search.inputValue(), "");
-  assert.equal(await page.locator(".faq-item:visible").count(), 58);
+  assert.equal(await page.locator(".faq-item:visible").count(), 68);
 
   await search.fill("privileged roles");
   await page.getByRole("link", { name: /Working with Canonical Plus/ }).click();
@@ -137,7 +141,7 @@ test("playwright: FAQ stays readable with JavaScript disabled", async (t) => {
 
   const page = await browser.newPage({ javaScriptEnabled: false });
   await page.goto(`${server.url}/faq/`);
-  assert.equal(await page.locator(".faq-item").count(), 58);
+  assert.equal(await page.locator(".faq-item").count(), 68);
   assert.equal(await page.locator("#faq-search-tools").isVisible(), false);
   const details = page.locator("#faq-why-preaudit");
   await details.locator("summary").focus();
