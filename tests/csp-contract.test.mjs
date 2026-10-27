@@ -46,3 +46,21 @@ test("same-origin executable asset is present in the production build", async ()
   const script = await readFile(new URL("site.js", distUrl), "utf8");
   assert.doesNotMatch(script, /(?:https?:\/\/|wss?:\/\/|blob:|data:)/i);
 });
+
+
+test("static GitHub Pages HTML includes a restrictive meta CSP without pretending to set response-only headers", () => {
+  const meta = html.match(/<meta\b(?=[^>]*http-equiv="Content-Security-Policy")[^>]*>/i)?.[0];
+  assert.ok(meta, "the static HTML must carry a defense-in-depth CSP");
+  for (const directive of [
+    "default-src 'self'",
+    "script-src 'self'",
+    "connect-src 'self' https://*.supabase.co",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'",
+  ]) {
+    assert.ok(meta.includes(directive), `missing meta CSP directive: ${directive}`);
+  }
+  assert.doesNotMatch(meta, /script-src[^;]*'unsafe-inline'/i);
+  assert.doesNotMatch(meta, /frame-ancestors|report-uri|sandbox/i, "response-only CSP directives are not valid as meta fallbacks");
+});
