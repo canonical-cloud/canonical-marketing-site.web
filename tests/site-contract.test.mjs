@@ -180,13 +180,13 @@ test("comparison page states the competitive baseline without claiming parity", 
 });
 
 
-test("FAQ page includes 58 distinct customer questions with transparent assurance boundaries", async () => {
+test("FAQ page includes 68 distinct customer questions with transparent assurance boundaries", async () => {
   const faq = await readFile(new URL("../src/pages/faq.astro", import.meta.url), "utf8");
   const ids = [...faq.matchAll(/"id": "faq-([a-z0-9-]+)"/g)].map((match) => match[1]);
   const questions = [...faq.matchAll(/"question":/g)];
-  assert.equal(ids.length, 58, "expected 58 FAQ item anchors");
-  assert.equal(new Set(ids).size, 58, "FAQ item anchors must be unique");
-  assert.equal(questions.length, 58, "expected 58 customer-facing questions");
+  assert.equal(ids.length, 68, "expected 68 FAQ item anchors");
+  assert.equal(new Set(ids).size, 68, "FAQ item anchors must be unique");
+  assert.equal(questions.length, 68, "expected 68 customer-facing questions");
   for (const group of ["why-readiness", "why-canonical", "buying-process", "getting-started", "framework-details", "engineering-controls", "evidence-workflows", "working-together"]) {
     assert.ok(faq.includes('"id": "' + group + '"'), 'missing group ' + group);
   }
@@ -206,14 +206,17 @@ test("FAQ page includes 58 distinct customer questions with transparent assuranc
 test("built FAQ and homepage render real FAQ content and working relative links", async () => {
   const faq = await readFile(new URL("../dist/faq/index.html", import.meta.url), "utf8");
   const home = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
-  assert.equal([...faq.matchAll(/<details\b/g)].length, 58);
+  assert.equal([...faq.matchAll(/<details\b/g)].length, 68);
   assert.match(faq, /id="faq-why-preaudit"/);
   assert.match(faq, /id="faq-why-canonical-plus"/);
   assert.match(faq, /id="faq-guarantee"/);
   assert.match(faq, /id="faq-critical-finding"/);
   assert.match(faq, /id="faq-soc2-types"/);
   assert.match(faq, /id="faq-evidence-automation"/);
-  assert.match(home, /Read all 58 FAQs/);
+  for (const anchor of ["faq-first-sprint","faq-new-product-scope","faq-cloud-provider-compliance","faq-soc2-bridge-letter","faq-machine-identities","faq-penetration-testing","faq-control-operating-period","faq-sensitive-evidence","faq-auditor-coordination","faq-pilot-engagement"]) {
+    assert.ok(faq.includes(`id="${anchor}"`), `missing built FAQ deep link ${anchor}`);
+  }
+  assert.match(home, /Read all 68 FAQs/);
   assert.match(faq, /<summary\b/);
   assert.match(faq, /href="\/quote\/"/);
   assert.match(home, /href="\/faq\/#faq-why-preaudit"/);
@@ -235,5 +238,5 @@ test("FAQ progressive enhancements preserve static answers and strict script bou
   assert.match(faqJs, /status\.textContent = query/);
   assert.doesNotMatch(faqJs, /\.innerHTML\s*=|\beval\s*\(|new Function\s*\(/);
   assert.match(built, /\/faq\.js\?v=20261025-search/);
-  assert.equal([...built.matchAll(/<details\b/g)].length, 58);
+  assert.equal([...built.matchAll(/<details\b/g)].length, 68);
 });
