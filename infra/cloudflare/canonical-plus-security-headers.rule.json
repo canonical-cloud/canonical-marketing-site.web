@@ -1,0 +1,38 @@
+{
+  "ref": "canonical_plus_public_security_headers",
+  "description": "Add HTTP browser security headers to canonical.plus responses at Cloudflare edge",
+  "expression": "(http.host eq \"canonical.plus\")",
+  "action": "rewrite",
+  "action_parameters": {
+    "headers": {
+      "X-Content-Type-Options": {
+        "operation": "set",
+        "value": "nosniff"
+      },
+      "X-Frame-Options": {
+        "operation": "set",
+        "value": "DENY"
+      },
+      "Referrer-Policy": {
+        "operation": "set",
+        "value": "strict-origin-when-cross-origin"
+      },
+      "Cross-Origin-Opener-Policy": {
+        "operation": "set",
+        "value": "same-origin"
+      },
+      "Permissions-Policy": {
+        "operation": "set",
+        "value": "camera=(), geolocation=(), microphone=(), payment=(), usb=()"
+      },
+      "Content-Security-Policy": {
+        "operation": "set",
+        "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://benefactor.cc; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'"
+      },
+      "Strict-Transport-Security": {
+        "operation": "set",
+        "value": "max-age=86400"
+      }
+    }
+  }
+}
