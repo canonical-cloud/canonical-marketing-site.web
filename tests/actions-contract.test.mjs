@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -81,4 +82,44 @@ test("live browser diagnostics are immutable, failure-only, and short-lived", ()
   assert.match(liveBrowserWorkflow, /if-no-files-found: error/);
   assert.match(liveBrowserWorkflow, /retention-days: 14/);
   assert.doesNotMatch(liveBrowserWorkflow, /include-hidden-files:\s*true/);
+});
+
+test("generated architecture Dockerfiles match the source and keep one runtime entrypoint", async () => {
+  const root = new URL("../", import.meta.url);
+  const dockerfile = await readFile(new URL("Dockerfile", root), "utf8");
+  const digest = createHash("sha256").update(dockerfile).digest("hex").slice(0, 16);
+
+  // Catch structural drift even if both generated variants were edited by hand.
+  assert.equal((dockerfile.match(/^FROM /gm) ?? []).length, 2);
+  assert.equal((dockerfile.match(/^ARG SOPS_ENV=/gm) ?? []).length, 1);
+  assert.equal((dockerfile.match(/^ENTRYPOINT /gm) ?? []).length, 1);
+  assert.equal((dockerfile.match(/^CMD /gm) ?? []).length, 1);
+  assert.match(dockerfile, /^ENTRYPOINT \["\/usr\/local\/bin\/sops-entrypoint\.sh", "\/docker-entrypoint\.sh"\]$/m);
+  assert.match(dockerfile, /^CMD \["nginx", "-g", "daemon off;"\]$/m);
+
+  for (const [architecture, platform] of [
+    ["arm64", "linux/arm64"],
+    ["x86-64", "linux/amd64"],
+  ]) {
+    const filename = `Dockerfile.${architecture}.dkf`;
+    const generated = await readFile(new URL(filename, root), "utf8");
+    // The approved pinned generator prepends this digest and rewrites each
+    // external FROM with an explicit platform, then adds ARG TARGETARCH.
+    // The current source has two external FROMs and no pre-existing platform.
+    const lines = dockerfile.split("\n");
+    let firstFrom = true;
+    const pinned = lines.flatMap((line) => {
+      if (!line.startsWith("FROM ")) return [line];
+      const rewritten = `FROM --platform=${platform} ${line.slice(5)}`;
+      if (firstFrom) {
+        firstFrom = false;
+        return [rewritten, "ARG TARGETARCH"];
+      }
+      return [rewritten];
+    }).join("\n");
+    const expected =
+      `# GENERATED from Dockerfile (sha256:${digest}) by ores-gha-workflows/scripts/render-dkf.mjs — target ${platform}. Do not edit; edit Dockerfile and re-render.\n` +
+      pinned;
+    assert.equal(generated, expected, `${filename} does not match pinned render-dkf output`);
+  }
 });
