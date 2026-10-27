@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Static Astro site image. Base images are digest-pinned so a registry tag move
 # cannot silently change the reviewed build or runtime inputs.
-FROM node:22-slim@sha256:f32b81066cde10a75dbac96646099533316d94bac4150c55da1636e1f0ffdc46 AS build
+FROM node:22.23.4-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS build
 WORKDIR /app
 COPY package*.json ./
 # Playwright and Puppeteer are test-only dependencies. Their install hooks must
