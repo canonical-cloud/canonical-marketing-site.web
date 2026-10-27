@@ -19,7 +19,7 @@ test("Pages-style static serving enforces meta CSP but preserves FAQ and quote s
   const headers = await response.allHeaders();
   assert.equal(headers["content-security-policy"], undefined,
     "test must exercise a static host without a response CSP");
-  assert.equal(await page.locator(".faq-item").count(), 58);
+  assert.equal(await page.locator(".faq-item").count(), 68);
   assert.equal(await page.locator("#faq-search-tools").isVisible(), true);
 
   const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute("content");
@@ -33,10 +33,10 @@ test("Pages-style static serving enforces meta CSP but preserves FAQ and quote s
   assert.equal(await page.evaluate(() => window.__injectedFaqScriptRan), undefined,
     "meta CSP must block injected executable inline code on a headerless static host");
 
-  const search = page.getByRole("searchbox", { name: /Search all 58 questions/ });
+  const search = page.getByRole("searchbox", { name: /Search all 68 questions/ });
   await search.fill("privileged roles");
   assert.equal(await page.locator("#faq-identity-controls").isVisible(), true);
-  assert.ok((await page.locator(".faq-item:visible").count()) < 58);
+  assert.ok((await page.locator(".faq-item:visible").count()) < 68);
 
   const quoteResponse = await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
   assert.equal(quoteResponse.status(), 200);
