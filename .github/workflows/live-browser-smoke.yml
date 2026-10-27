@@ -33,6 +33,11 @@ jobs:
         with:
           node-version: "22"
           cache: npm
+      # Fast read-only summary across every route. Keep Chromium as the strict
+      # release signal, even when this diagnostic reports missing headers.
+      - name: Audit live security headers across routes
+        run: node scripts/audit-live-response-headers.mjs
+        continue-on-error: true
       - name: Install lockfile-pinned dependencies
         run: npm ci
       - name: Install the reviewed Chromium build

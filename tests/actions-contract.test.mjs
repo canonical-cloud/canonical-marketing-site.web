@@ -123,3 +123,17 @@ test("generated architecture Dockerfiles match the source and keep one runtime e
     assert.equal(generated, expected, `${filename} does not match pinned render-dkf output`);
   }
 });
+
+
+test("live response preflight cannot mask the strict Chromium production failure", () => {
+  assert.match(
+    liveBrowserWorkflow,
+    /name: Audit live security headers across routes\s*\n\s*run: node scripts\/audit-live-response-headers\.mjs\s*\n\s*continue-on-error: true/,
+  );
+  assert.match(liveBrowserWorkflow, /name: Execute deployed security policy in Chromium/);
+  assert.doesNotMatch(
+    liveBrowserWorkflow,
+    /name: Execute deployed security policy in Chromium[\s\S]*?continue-on-error: true/,
+  );
+  assert.doesNotMatch(liveBrowserWorkflow, /node scripts\/audit-live-response-headers\.mjs\s*\|\|\s*true/);
+});
