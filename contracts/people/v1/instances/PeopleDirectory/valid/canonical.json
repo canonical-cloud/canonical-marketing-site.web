@@ -10,9 +10,10 @@
     },
     {
       "id": "john-siciliano",
-      "name": "John Siliciano",
+      "name": "John Siciliano",
       "role": "DevOps, Security & Infrastructure Expert",
-      "initials": "JS"
+      "initials": "JS",
+      "photoUrl": "/team/john-siciliano.jpg"
     },
     {
       "id": "jeremy-reynolds",
@@ -86,6 +87,13 @@
       "role": "Infosec Expert",
       "initials": "US",
       "photoUrl": "/team/utkarsh-shukla.webp"
+    },
+    {
+      "id": "casey-myers",
+      "name": "Casey Myers",
+      "role": "Sales Engineer",
+      "initials": "CM",
+      "photoUrl": "/team/casey-myers.jpg"
     }
   ]
 }
