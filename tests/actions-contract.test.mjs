@@ -71,7 +71,7 @@ test("live browser diagnostics are immutable, failure-only, and short-lived", ()
   );
   assert.match(
     liveBrowserWorkflow,
-    /if: failure\(\)\s*\n\s*uses: actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/,
+    /if: failure\(\)\s*\n\s*uses: actions\/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9/,
   );
   assert.doesNotMatch(liveBrowserWorkflow, /if: always\(\)/);
   assert.equal(
