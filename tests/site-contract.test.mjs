@@ -118,10 +118,14 @@ test("nav exposes the readiness-first information architecture", () => {
   }
 });
 
-test("footer presents Canonical Cloud and Canonical Plus as distinct brand lockups", () => {
+test("footer presents Canonical Cloud and Canonical Plus with their real, shared marks", () => {
   assert.match(layout, /const canonicalCloudHref = 'https:\/\/canonical-cloud\.github\.io\/'/);
+  assert.match(layout, /const canonicalCloudMarkHref = `\$\{baseNoSlash\}\/brand\/canonical-cloud\.svg`/);
   assert.match(layout, /aria-label="Canonical Cloud home"/);
-  assert.match(layout, /class="canonical-cloud-mark"/);
+  assert.match(layout, /<img src=\{canonicalCloudMarkHref\} class="canonical-cloud-mark" width="32" height="32" alt="" aria-hidden="true" \/>/);
+  assert.doesNotMatch(layout, /background: linear-gradient\(145deg, #1d4ed8, #7dd3fc\)/);
+  assert.match(layout, /\.canonical-cloud-mark\s*\{[^}]*object-fit: contain;/);
+  assert.match(layout, /@media \(max-width: 480px\)\s*\{[\s\S]*?\.footer__brand-divider\s*\{\s*display: none;/);
   assert.match(layout, /Canonical Cloud provides the operating platform/);
   assert.match(layout, /aria-label="Canonical Plus home"/);
   assert.match(layout, />CANONICAL<\/span><span class="nav__logo-compliance">\.PLUS<\/span>/);
