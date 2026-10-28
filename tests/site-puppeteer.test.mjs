@@ -91,5 +91,51 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   assert.match(await pageText(page), /Canonical supports readiness and pre-audits/);
   assert.match(await pageText(page), /canonical\.plus\. All rights reserved/);
 
+  // Verify the two lockups share the exact same real Cloud mark. A CSS-only
+  // blue-gradient square is not an acceptable substitute for the SVG logo.
+  const logoAssets = await page.evaluate(() => {
+    const head = document.querySelector("#nav-logo .nav__parent-brand-mark");
+    const foot = document.querySelector(".footer__brand-logo--cloud .canonical-cloud-mark");
+    return {
+      headSrc: head?.getAttribute("src"),
+      footSrc: foot?.getAttribute("src"),
+      footTag: foot?.tagName,
+      headLoaded: head instanceof HTMLImageElement && head.complete && head.naturalWidth > 0,
+      footLoaded: foot instanceof HTMLImageElement && foot.complete && foot.naturalWidth > 0,
+    };
+  });
+  assert.equal(logoAssets.footTag, "IMG");
+  assert.ok(logoAssets.headLoaded && logoAssets.footLoaded, "both brand marks must load");
+  assert.equal(new URL(logoAssets.headSrc, server.url).pathname, "/brand/canonical-cloud.svg");
+  assert.equal(new URL(logoAssets.footSrc, server.url).pathname, "/brand/canonical-cloud.svg");
+
+  for (const width of [1440, 900, 375, 320]) {
+    await page.setViewport({ height: 900, width });
+    const geometry = await page.evaluate(() => {
+      const box = (selector) => {
+        const element = document.querySelector(selector);
+        const rect = element?.getBoundingClientRect();
+        return rect ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom } : null;
+      };
+      return {
+        headCloud: box("#nav-logo .nav__parent-brand"),
+        headPlus: box("#nav-logo .nav__plus-brand"),
+        footCloud: box(".footer__brand-logo--cloud"),
+        footPlus: box(".footer__brand-lockups .footer__brand-logo:not(.footer__brand-logo--cloud)"),
+        dividerDisplay: getComputedStyle(document.querySelector(".footer__brand-divider")).display,
+      };
+    });
+    for (const key of ["headCloud", "headPlus", "footCloud", "footPlus"]) {
+      assert.ok(geometry[key], `missing ${key} at ${width}px`);
+    }
+    assert.ok(geometry.headPlus.left > geometry.headCloud.right, `header logos overlap at ${width}px`);
+    if (width <= 480) {
+      assert.equal(geometry.dividerDisplay, "none", `orphan footer divider at ${width}px`);
+      assert.ok(geometry.footPlus.top > geometry.footCloud.bottom, `footer lockups should stack at ${width}px`);
+    } else {
+      assert.ok(geometry.footPlus.left > geometry.footCloud.right, `footer logos overlap at ${width}px`);
+    }
+  }
+
   assert.deepEqual(pageErrors, []);
 });
