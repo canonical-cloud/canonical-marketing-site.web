@@ -5,7 +5,7 @@ import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 
 const expectedPeople = [
   ['Alexander Mills', 'Integrations and DevOps'],
-  ['John Siliciano', 'DevOps, Security & Infrastructure Expert'],
+  ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
   ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
   ['Elijah Gizzarelli', 'Ops & HR'],
@@ -17,9 +17,10 @@ const expectedPeople = [
   ['Bryce Merrson', 'Technical Support'],
   ['Nouman Siddiqui', 'Team'],
   ['Utkarsh Shukla', 'Infosec Expert'],
+  ['Casey Myers', 'Sales Engineer'],
 ];
 
-test('puppeteer: people page renders thirteen cards with responsive 4-to-2-to-1 columns', async (t) => {
+test('puppeteer: people page renders fourteen cards with responsive 4-to-2-to-1 columns', async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
@@ -70,7 +71,7 @@ test('puppeteer: people page renders thirteen cards with responsive 4-to-2-to-1 
   assert.equal(await columnCount(), 1);
 
   const remotePhotos = await page.$$('[data-people-photo]');
-  assert.equal(remotePhotos.length, 8);
+  assert.equal(remotePhotos.length, 10);
   await page.$$eval('[data-people-photo]', (images) => {
     for (const image of images) image.dispatchEvent(new Event('error'));
   });
@@ -82,10 +83,10 @@ test('puppeteer: people page renders thirteen cards with responsive 4-to-2-to-1 
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JR', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'JR', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US', 'CM']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
-  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 13);
+  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 14);
   for (const [width, columns] of [[1440, 4], [1024, 4], [800, 2], [375, 1]]) {
     await page.setViewport({ height: 900, width });
     assert.equal(await columnCount(), columns);
