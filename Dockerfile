@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Static Astro site image. Base images are digest-pinned so a registry tag move
 # cannot silently change the reviewed build or runtime inputs.
-FROM node:22-slim@sha256:f32b81066cde10a75dbac96646099533316d94bac4150c55da1636e1f0ffdc46 AS build
+FROM node:22.23.4-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS build
 WORKDIR /app
 COPY package*.json ./
 # Playwright and Puppeteer are test-only dependencies. Their install hooks must
@@ -35,18 +35,3 @@ ENV SOPS_SECRETS_FILE=/app/secrets/app.env
 # nginx replaces the shell as PID 1 with the decrypted variables exported.
 ENTRYPOINT ["/usr/local/bin/sops-entrypoint.sh", "/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
-
-
-# --- sops: decrypt at `docker run`, never at `docker build` ------------------
-# The image carries only CIPHERTEXT (env/enc/<SOPS_ENV>.env.enc) and the sops
-# binary. The age key arrives at run time (SOPS_AGE_KEY / SOPS_AGE_KEY_FILE);
-# scripts/sops-entrypoint.sh decrypts into the process environment and execs
-# the real command, so no plaintext ever lands in a layer or on disk.
-# See env/README.md.
-ARG SOPS_ENV=prod
-COPY --chmod=0755 --from=ghcr.io/getsops/sops:v3.10.2-alpine /usr/local/bin/sops /usr/local/bin/sops
-COPY --chmod=0755 scripts/sops-entrypoint.sh /usr/local/bin/sops-entrypoint.sh
-COPY --chmod=0644 env/enc/${SOPS_ENV}.env.enc /app/secrets/app.env
-ENV SOPS_SECRETS_FILE=/app/secrets/app.env
-
-ENTRYPOINT ["/usr/local/bin/sops-entrypoint.sh"]

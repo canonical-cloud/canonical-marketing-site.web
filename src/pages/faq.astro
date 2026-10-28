@@ -1,0 +1,540 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const quoteHref = `${baseNoSlash}/quote/`;
+const compareHref = `${baseNoSlash}/compare/`;
+const pricingHref = `${baseNoSlash}/pricing/`;
+const faqScriptHref = `${baseNoSlash}/faq.js?v=20261025-search`;
+const faqSections = [
+  {
+    "id": "why-readiness",
+    "heading": "Why readiness and pre-audits?",
+    "intro": "Understand what a readiness assessment does, when it helps, and when you can skip it.",
+    "items": [
+      {
+        "id": "faq-why-preaudit",
+        "question": "Why do I need a readiness assessment or pre-audit?",
+        "answer": "An independent audit examines evidence against defined criteria; readiness work helps you identify gaps before that review. Canonical Plus can help scope systems and requirements, identify missing controls or proof, and prioritize remediation. A pre-audit is not a universal requirement, but it can reduce avoidable surprises."
+      },
+      {
+        "id": "faq-why-not-auditor",
+        "question": "Why not just go directly to an auditor?",
+        "answer": "You can. If your scope, controls, and evidence are already in good shape, that may be appropriate. If significant gaps remain, discovering them during formal fieldwork can mean extra remediation and a delayed review. Readiness is preparation, not a substitute for the independent reviewer."
+      },
+      {
+        "id": "faq-startups",
+        "question": "Is readiness necessary for a small startup?",
+        "answer": "Not always. It is most useful when prospective customers request security evidence, you enter a regulated market, or you are targeting an independent report or certification. We start by clarifying the business requirement, not by insisting every company needs an assessment."
+      },
+      {
+        "id": "faq-which-framework",
+        "question": "How do I know which compliance framework I need?",
+        "answer": "Consider contractual commitments, customer requests, the data you handle, your jurisdiction, and the systems in scope. Canonical can help map these to an initial framework plan. Legal or regulatory interpretations belong with qualified counsel or the applicable authority."
+      },
+      {
+        "id": "faq-already-certified",
+        "question": "Do I need readiness if I already have SOC 2 or ISO 27001?",
+        "answer": "Maybe. An existing report or certificate does not automatically cover every new product, cloud environment, legal entity, or framework. A targeted gap review can be useful when your scope changes. For unchanged and well-operated systems, a full new readiness engagement may not be necessary."
+      },
+      {
+        "id": "faq-security-enough",
+        "question": "Isn't good cybersecurity enough to pass an audit?",
+        "answer": "Strong security is essential, but evidence, scope, responsibilities, documented processes, and the applicable assessment criteria also matter. A control may work in practice yet lack the evidence needed to demonstrate it. Readiness separates a missing control from missing proof."
+      },
+      {
+        "id": "faq-why-evidence",
+        "question": "Why do auditors care about evidence?",
+        "answer": "Evidence helps an independent reviewer assess whether a control is designed and operating as required for the applicable period and scope. Policies, configurations, logs, tickets, review records, and other artifacts may be relevant depending on the framework. A dashboard score alone is not a formal conclusion."
+      },
+      {
+        "id": "faq-internal-team",
+        "question": "Can't our own engineering or security team handle readiness?",
+        "answer": "Absolutely. An experienced internal team may be the best choice. Canonical is an option when you need extra capacity, technical gap analysis, cross-functional coordination, or a second perspective. Your team remains responsible for its systems and decisions."
+      },
+      {
+        "id": "faq-audit-findings",
+        "question": "What happens if we fail an audit or receive findings?",
+        "answer": "Consequences differ by program and type of engagement. Findings can require remediation, further testing, scope changes, or additional review before an outcome is issued. Canonical can help plan corrective work, but only the qualified independent party can determine the formal result."
+      }
+    ]
+  },
+  {
+    "id": "why-canonical",
+    "heading": "Why choose Canonical Plus?",
+    "intro": "Compare engineering-led readiness with automation platforms, consultants, and independent reviewers.",
+    "items": [
+      {
+        "id": "faq-why-canonical-plus",
+        "question": "If I need readiness, why use Canonical instead of another company?",
+        "answer": "Canonical Plus focuses on connecting requirements to the underlying engineering and operating work: clear scope, control and evidence gaps, prioritized remediation, and an independent-review handoff. We do not claim to replace mature compliance automation suites or qualified independent auditors; the right solution may combine all three."
+      },
+      {
+        "id": "faq-vanta-drata",
+        "question": "How is Canonical different from Vanta, Drata, or Secureframe?",
+        "answer": "Compliance automation platforms are often a strong fit for broad integrations, recurring evidence collection, dashboards, and workflows. Canonical Plus is focused on scoped readiness and engineering-aware remediation. These approaches can complement each other. Vendor capabilities and terms change; review current official documentation and our comparison page before choosing."
+      },
+      {
+        "id": "faq-existing-platform",
+        "question": "Can Canonical work with our existing compliance platform?",
+        "answer": "A readiness engagement can use the reports, exports, control inventories, and evidence your team already has, where access and scope permit. That does not imply a native API integration, partnership, endorsement, or feature parity with a particular vendor."
+      },
+      {
+        "id": "faq-big-consultancy",
+        "question": "Why choose Canonical instead of a large consulting firm?",
+        "answer": "Choose based on the engagement you need. Canonical focuses on software, cloud infrastructure, and turning readiness findings into engineering work. A larger consultancy may be more suitable for a broad multinational transformation or other specialist requirements. We do not promise lower prices, faster completion, or better audit outcomes without evidence."
+      },
+      {
+        "id": "faq-same-auditor",
+        "question": "Why not use the same company for readiness and the audit?",
+        "answer": "Some organizations offer advisory and assurance services subject to applicable independence requirements. Canonical's boundary is straightforward: we help prepare scope, remediation, and evidence; a qualified independent auditor, assessor, certification body, or other appropriate party performs the formal review."
+      },
+      {
+        "id": "faq-deliver-different",
+        "question": "What does Canonical provide beyond a compliance checklist?",
+        "answer": "Depending on the statement of work, outputs can include a system and framework scope map, gap register, assigned remediation roadmap, evidence inventory, acceptance criteria, and a reviewer handoff plan. These connect each finding to practical work rather than merely marking an item complete."
+      },
+      {
+        "id": "faq-fix-issues",
+        "question": "Will Canonical fix problems or only identify them?",
+        "answer": "The level of implementation support depends on the agreed package and statement of work. Technical remediation planning is central to the service; hands-on implementation can be included when explicitly scoped. We distinguish recommendations, customer-owned implementation, and work Canonical is contracted to perform."
+      },
+      {
+        "id": "faq-cloud-providers",
+        "question": "Can Canonical assess AWS, Azure, GCP, Kubernetes, and our CI/CD environment?",
+        "answer": "A scoped technical review can consider cloud accounts, identity, infrastructure, deployment processes, logging, and other relevant controls. Specific platforms, access methods, integrations, and hands-on changes must be confirmed in the engagement. We do not claim blanket coverage or automatic integrations."
+      },
+      {
+        "id": "faq-multicloud",
+        "question": "What if we operate across multiple clouds and regions?",
+        "answer": "Readiness can map the systems and shared responsibilities within the agreed scope: environments, identities, data flows, vendors, and regional boundaries. The goal is to avoid duplicate work where controls genuinely overlap while keeping framework-specific obligations visible."
+      },
+      {
+        "id": "faq-multiple-frameworks",
+        "question": "Can Canonical help with multiple frameworks at once?",
+        "answer": "Yes, when those frameworks are included in scope. Shared controls and evidence can be mapped across requirements, while differences remain explicit. Mapping controls does not create an independent report, certification, or regulatory approval."
+      },
+      {
+        "id": "faq-auditor-choice",
+        "question": "Do we have to use a Canonical-recommended auditor?",
+        "answer": "No. You can select a qualified independent reviewer appropriate for your target program. Canonical can prepare scope and evidence for handoff while avoiding claims that it controls the reviewer's conclusion."
+      },
+      {
+        "id": "faq-who-owns",
+        "question": "Who owns our documentation, mappings, and evidence afterward?",
+        "answer": "Ownership, permitted reuse, export formats, retention periods, and access rights should be specified in your signed agreement. Before starting, ask for clarity on which deliverables you receive and how your team can continue operating the program afterward."
+      },
+      {
+        "id": "faq-when-not-canonical",
+        "question": "When should we choose a competitor or do it ourselves?",
+        "answer": "If you mainly need broad continuous monitoring and hundreds of integrations, a mature automation platform may be more appropriate. If you need a formal opinion or certificate, appoint the qualified independent reviewer. And if your internal team has the capacity and expertise, handling readiness internally may be the sensible option."
+      }
+    ]
+  },
+  {
+    "id": "buying-process",
+    "heading": "Scope, pricing, and next steps",
+    "intro": "Practical answers about deliverables, cost, access, independence, and expectations.",
+    "items": [
+      {
+        "id": "faq-deliverables",
+        "question": "What exactly will we receive at the end of an engagement?",
+        "answer": "Deliverables depend on the scope you approve. Typical readiness outputs may include a scope memo, gap register, prioritized remediation plan, control and evidence map, and independent-review handoff materials. The signed statement of work defines what will actually be provided."
+      },
+      {
+        "id": "faq-pricing",
+        "question": "How much does Canonical cost?",
+        "answer": "Canonical publishes proposed starting assumptions for Foundation Readiness, Managed Readiness, and Assurance Engineering on its pricing page. They are not a binding quote. The signed statement of work controls actual price, scope, duration, allowances, and billing."
+      },
+      {
+        "id": "faq-timeline",
+        "question": "How long does it take to become audit-ready?",
+        "answer": "There is no universal timeline. It depends on the target requirements, the size and maturity of your environment, the availability of evidence, and the work needed to close gaps. An initial assessment can help build a realistic plan, but readiness or audit success is not guaranteed by a fixed date."
+      },
+      {
+        "id": "faq-access",
+        "question": "What system access, source code, or sensitive information will Canonical need?",
+        "answer": "Only the access required for the agreed work. We should define scope, least-privilege permissions, approved evidence-sharing methods, handling and retention requirements, and authorization for any active testing before access is granted. Avoid sharing secrets in public intake forms."
+      },
+      {
+        "id": "faq-formal-audit",
+        "question": "Does Canonical perform the final audit or issue certifications?",
+        "answer": "No. Canonical Plus provides readiness and remediation support. Independent audit opinions, attestations, certifications, authorizations, and legal or regulatory conclusions belong to the qualified party for the relevant program."
+      },
+      {
+        "id": "faq-guarantee",
+        "question": "Can Canonical guarantee that we'll pass the audit?",
+        "answer": "No. Canonical can identify gaps and support remediation and evidence preparation within the agreed scope, but it cannot guarantee an independent party's conclusion. Any estimate or readiness status is preliminary and not a certification or formal assurance result."
+      }
+    ]
+  },
+  {
+    "id": "getting-started",
+    "heading": "Planning your readiness assessment",
+    "intro": "How to prepare, set boundaries, and involve the right people before work begins.",
+    "items": [
+      {
+        "id": "faq-kickoff-prep",
+        "question": "What should we prepare before a readiness kickoff?",
+        "answer": "A useful starting set includes your target framework or customer requirement, a high-level architecture, system and data inventories, existing policies, and any past findings. You do not need a perfect evidence package before reaching out. The first step is to identify what exists and where the unknowns are."
+      },
+      {
+        "id": "faq-scoping",
+        "question": "How do you decide which applications, environments, and teams are in scope?",
+        "answer": "We start from the objective of the review, then trace the products, data, infrastructure, vendors, and people that support it. The resulting scope map should record boundaries, assumptions, and exclusions for customer review. Final audit or certification scope remains subject to the applicable independent process."
+      },
+      {
+        "id": "faq-stakeholders",
+        "question": "Who should participate in a readiness assessment?",
+        "answer": "Usually a business sponsor, security or compliance owner, engineering or infrastructure leads, and people responsible for HR, vendors, and relevant operations. The exact participants depend on the control environment. Clear decision-makers and owners help prevent findings from becoming unassigned tasks."
+      },
+      {
+        "id": "faq-no-policies",
+        "question": "What if we have no formal security policies or compliance program yet?",
+        "answer": "That is a possible starting point. A baseline review can distinguish practices you already perform from documentation, approvals, or controls that are missing. We prioritize the highest-impact gaps rather than assuming a mature program exists on day one."
+      },
+      {
+        "id": "faq-urgent-deadline",
+        "question": "Can we start if an enterprise customer or auditor has given us a tight deadline?",
+        "answer": "Yes, we can first clarify the deadline, requested evidence, dependencies, and likely blockers. Some gaps can be resolved quickly, while others require operating history or independent review time that cannot be compressed. We will not promise a report or certification by a date we do not control."
+      },
+      {
+        "id": "faq-questionnaire-only",
+        "question": "Do we need a full readiness program to answer one customer's security questionnaire?",
+        "answer": "Not necessarily. If your immediate need is a limited questionnaire or evidence request, a focused gap review may make more sense than a full program. The engagement should match the actual customer obligation, not automatically expand to a broad certification project."
+      },
+      {
+        "id": "faq-first-sprint",
+        "question": "What usually happens during the first phase of a readiness engagement?",
+        "answer": "The opening phase generally clarifies the business goal, confirms which systems and controls are in scope, identifies the people who own them, and inventories available evidence. The sequence and duration depend on the engagement. We aim to surface blocking assumptions early rather than promise a fixed timeline before understanding the environment."
+      },
+      {
+        "id": "faq-new-product-scope",
+        "question": "What if we launch a new product or acquire another company during readiness?",
+        "answer": "A new product, legal entity, acquisition, or material infrastructure change can affect the assessment boundary and required evidence. Record what changed, evaluate whether existing controls still apply, and agree any revised priorities and scope before treating the new environment as covered. Formal scope decisions remain with the relevant independent reviewer."
+      }
+    ]
+  },
+  {
+    "id": "framework-details",
+    "heading": "Understanding frameworks and assessments",
+    "intro": "Avoid paying for the wrong review or confusing readiness with a formal assurance result.",
+    "items": [
+      {
+        "id": "faq-soc2-types",
+        "question": "What is the difference between a SOC 2 Type I and a SOC 2 Type II report?",
+        "answer": "A Type I report addresses the design of controls at a specified point in time, while a Type II report also addresses their operating effectiveness over a stated period. The independent CPA firm determines the report conclusions. Canonical can help prepare the applicable controls and evidence, but does not issue either report."
+      },
+      {
+        "id": "faq-iso-vs-soc2",
+        "question": "How is ISO/IEC 27001 certification different from SOC 2?",
+        "answer": "ISO/IEC 27001 concerns an information security management system assessed for certification by an accredited or otherwise qualified certification body, as applicable. SOC 2 is an independent attestation report against the selected Trust Services Criteria. They can share evidence, but the scope, process, and output are not interchangeable."
+      },
+      {
+        "id": "faq-hipaa-gdpr-certs",
+        "question": "Is there one HIPAA or GDPR certificate that proves we are compliant?",
+        "answer": "There is no general U.S. government-issued HIPAA certification that substitutes for compliance with HIPAA obligations. The GDPR provides for certain voluntary certification mechanisms, but participation does not remove an organization's legal responsibilities. Ask qualified counsel which obligations and assurance mechanisms actually apply."
+      },
+      {
+        "id": "faq-cmmc-fedramp",
+        "question": "How do CMMC and FedRAMP readiness differ from standard commercial readiness?",
+        "answer": "They have specific scoping, assessment, and government-program rules that can be more prescriptive than a general customer questionnaire. Decisions about CMMC assessments or certifications and about authorizations under FedRAMP belong to the authorized parties under the applicable program. A readiness plan should reference current official program requirements, not promise eligibility or approval."
+      },
+      {
+        "id": "faq-pci-scope",
+        "question": "Does PCI DSS apply to our entire business if we accept payments?",
+        "answer": "PCI DSS scope is determined by how payment account data is stored, processed, transmitted, or connected to relevant systems. Outsourcing payments may reduce some obligations but does not automatically eliminate all of them. Confirm the validation method and scope with your payment stakeholders and a qualified PCI specialist where required."
+      },
+      {
+        "id": "faq-shared-controls",
+        "question": "Can the same control and evidence support multiple frameworks?",
+        "answer": "Often, yes. Access reviews, change approvals, backup testing, and incident procedures may support several requirements. We can map one well-operated control to multiple frameworks, while recording any extra criteria, periods, or proof each reviewer requires. A mapping is not a substitute for each independent conclusion."
+      },
+      {
+        "id": "faq-cloud-provider-compliance",
+        "question": "Does using a compliant cloud provider make our application compliant?",
+        "answer": "No. A provider's report or certification concerns the provider's stated scope and does not automatically cover your software, configurations, identities, or operating processes. Cloud responsibility is shared differently by service. A readiness review identifies which controls the provider supports and which you must implement and evidence yourself."
+      },
+      {
+        "id": "faq-soc2-bridge-letter",
+        "question": "What is a SOC 2 bridge letter, and does it replace a current report?",
+        "answer": "A bridge letter is typically a management statement addressing the gap between a SOC 2 report's covered period and a later date. It is not a new independent auditor's opinion and does not extend the audited testing period. Ask the report recipient and your independent CPA firm what coverage they require; a letter may not satisfy every request."
+      }
+    ]
+  },
+  {
+    "id": "engineering-controls",
+    "heading": "Cloud and engineering controls",
+    "intro": "The technical areas that commonly create real remediation work.",
+    "items": [
+      {
+        "id": "faq-identity-controls",
+        "question": "What do you look for in identity, access, and privileged-account controls?",
+        "answer": "Depending on scope, we may examine how accounts are provisioned and removed, MFA adoption, privileged roles, service identities, access approvals, and periodic reviews. We distinguish a control that is configured from evidence that the process has operated as required."
+      },
+      {
+        "id": "faq-cloud-configuration",
+        "question": "Will Canonical scan or change our cloud infrastructure?",
+        "answer": "A scoped review may include cloud configuration and infrastructure evidence. Automated scanning, active testing, or configuration changes are not assumed; each requires an agreed method, permissions, and authorization. Findings should identify the affected systems, impact, remediation owner, and verification approach."
+      },
+      {
+        "id": "faq-cicd-controls",
+        "question": "How do Git repositories, CI/CD, and software change management affect readiness?",
+        "answer": "Relevant controls can include code review, branch protections, deployment approvals, secrets handling, dependency management, change records, and rollback practices. We evaluate what applies to the chosen requirements and systems rather than imposing one development workflow on every team."
+      },
+      {
+        "id": "faq-vendor-risk",
+        "question": "Do third-party vendors and subprocessors need to be included?",
+        "answer": "Often, because vendors can host data or operate controls relevant to your system. A readiness review can consider vendor inventories, due diligence, contractual responsibilities, and available assurance documents within scope. Your organization still owns its vendor decisions and responsibilities."
+      },
+      {
+        "id": "faq-continuity-response",
+        "question": "Do incident response, backups, and disaster recovery count toward readiness?",
+        "answer": "They can, depending on the framework and service commitments. Policies alone may be insufficient: exercises, recovery tests, incident records, or documented decisions may be useful evidence. The objective is to show the relevant process works in practice, not merely that a template exists."
+      },
+      {
+        "id": "faq-encryption-keys",
+        "question": "Can Canonical review encryption and key-management practices?",
+        "answer": "Within the agreed technical scope, a review may consider encryption in transit and at rest, access to keys, rotation procedures, ownership, and supporting configuration evidence. It does not automatically include penetration testing, cryptographic certification, or a warranty of system security."
+      },
+      {
+        "id": "faq-machine-identities",
+        "question": "How should we handle service accounts, API tokens, and machine identities?",
+        "answer": "Machine credentials deserve defined owners, minimum necessary permissions, secure storage, rotation or expiry practices where appropriate, and a process to revoke unused access. Relevant evidence might include inventory records, configuration, access reviews, and change history. The exact safeguards depend on the systems and obligations in scope."
+      },
+      {
+        "id": "faq-penetration-testing",
+        "question": "Does readiness include penetration testing or vulnerability scanning?",
+        "answer": "Not automatically. Some requirements or customer contracts call for vulnerability management, independent testing, or documented remediation, but readiness and penetration testing are distinct services. We can help identify relevant testing requirements and organize the evidence. Active scanning or testing requires separate agreed scope and explicit authorization."
+      }
+    ]
+  },
+  {
+    "id": "evidence-workflows",
+    "heading": "Evidence, findings, and ongoing readiness",
+    "intro": "How to organize proof and avoid rebuilding the same audit package repeatedly.",
+    "items": [
+      {
+        "id": "faq-good-evidence",
+        "question": "What makes evidence useful to an independent assessor?",
+        "answer": "Evidence should be relevant to the control, identifiable to the right systems and time period, reliable enough to review, and traceable to its source. Whether it is sufficient is ultimately decided by the independent reviewer against the applicable criteria. Canonical helps organize an evidence plan, not pre-approve an auditor's conclusion."
+      },
+      {
+        "id": "faq-existing-artifacts",
+        "question": "Can we use existing tickets, logs, cloud exports, and policy documents?",
+        "answer": "Yes, if they actually demonstrate the relevant control and review period. Existing artifacts are often preferable to new screenshots created solely for an audit. A gap review should flag stale, incomplete, or out-of-scope records and identify the next evidence needed."
+      },
+      {
+        "id": "faq-evidence-automation",
+        "question": "Can evidence collection be automated so we stop taking screenshots?",
+        "answer": "Some collection and freshness checks may be automated when technical access, control design, and agreed integrations permit. Automation should preserve provenance and access boundaries. Canonical does not represent itself as a mature, all-in-one monitoring platform with universal native integrations."
+      },
+      {
+        "id": "faq-refresh-cadence",
+        "question": "How often should controls and evidence be reviewed or refreshed?",
+        "answer": "The right cadence depends on the framework, risk, control design, and review period. Some events need evidence when they happen; others call for periodic review. We can help propose ownership and freshness rules, while the organization remains responsible for operating them."
+      },
+      {
+        "id": "faq-exceptions",
+        "question": "What happens when a control is partially implemented or a risk is accepted?",
+        "answer": "The condition should be visible in the gap register, with its impact, owner, remediation or exception decision, and relevant dates. Risk acceptance does not automatically satisfy a required control. Any formal exception treatment must align with the applicable criteria and independent review process."
+      },
+      {
+        "id": "faq-readiness-decision",
+        "question": "How will we know when we are ready to approach an independent reviewer?",
+        "answer": "A defensible readiness decision considers agreed scope, implemented controls, relevant operating history, accessible evidence, unresolved high-priority gaps, and reviewer dependencies. Canonical can summarize remaining risks and recommend next steps, but only the qualified independent reviewer determines the formal outcome."
+      },
+      {
+        "id": "faq-control-operating-period",
+        "question": "How do we demonstrate that a control operated throughout the review period?",
+        "answer": "Start with the actual frequency and owner of the control, then preserve dated evidence for each required occurrence or relevant event. Examples may include access-review approvals, deployment records, and backup-test outcomes. Gaps and late-created artifacts should be disclosed rather than backdated; the independent assessor decides whether the evidence is sufficient."
+      },
+      {
+        "id": "faq-sensitive-evidence",
+        "question": "What if our evidence contains employee or customer personal information?",
+        "answer": "Collect only what is needed, limit access by role, use approved transfer and retention methods, and consider redaction or representative samples when the reviewer accepts them. Avoid sending credentials or raw production datasets as a default. The engagement should define access, confidentiality, deletion, and any applicable data-processing responsibilities."
+      }
+    ]
+  },
+  {
+    "id": "working-together",
+    "heading": "Working with Canonical Plus",
+    "intro": "Clear answers about focused engagements, responsibilities, deadlines, and handoff.",
+    "items": [
+      {
+        "id": "faq-assessment-only",
+        "question": "Can we hire Canonical for a gap assessment without ongoing remediation?",
+        "answer": "A narrowly scoped assessment can be discussed without committing to a wider program. The proposal and statement of work should make clear whether the engagement includes only findings and a roadmap or also implementation and follow-up support."
+      },
+      {
+        "id": "faq-quote-information",
+        "question": "What details do you need to prepare a preliminary estimate?",
+        "answer": "Useful inputs include your target requirements, systems and cloud footprint, team size, data sensitivity, existing evidence, and desired timeframe. A preliminary quote does not require sending passwords, API keys, production data, or customer secrets."
+      },
+      {
+        "id": "faq-ownership-progress",
+        "question": "Who owns remediation tasks and how do we track progress?",
+        "answer": "A readiness roadmap can assign priorities, accountable owners, dependencies, acceptance criteria, and evidence needed to close each gap. Your company retains decision authority over its systems and risk. Any Canonical implementation responsibilities should be written into the engagement scope."
+      },
+      {
+        "id": "faq-remote-teams",
+        "question": "Can Canonical work with distributed teams and multiple time zones?",
+        "answer": "Coordination can be planned around remote stakeholders, asynchronous document review, and scheduled technical sessions where agreed. Availability, languages, location-specific requirements, and any on-site work need to be confirmed during scoping; they are not universal service guarantees."
+      },
+      {
+        "id": "faq-critical-finding",
+        "question": "What happens if the assessment uncovers a serious security issue?",
+        "answer": "The engagement should establish an escalation contact and procedure before technical access begins. A suspected critical issue would be documented and escalated through that agreed channel so your authorized team can assess containment and response. Continuous incident response or emergency remediation is not included unless specifically contracted."
+      },
+      {
+        "id": "faq-after-engagement",
+        "question": "What happens after Canonical finishes the readiness engagement?",
+        "answer": "The agreed deliverables should support a handoff to your control owners and, when appropriate, your chosen independent reviewer. You can operate the program internally or discuss separately scoped follow-up assistance. No future retainer or product dependency should be assumed unless it is part of your signed agreement."
+      },
+      {
+        "id": "faq-auditor-coordination",
+        "question": "Can Canonical coordinate with our auditor or certification body?",
+        "answer": "Where agreed, Canonical can help prepare an evidence handoff and track questions or requested clarifications from your chosen independent reviewer. That coordination must preserve the reviewer's independence and does not let Canonical set findings, determine conformity, or guarantee an opinion or certification."
+      },
+      {
+        "id": "faq-pilot-engagement",
+        "question": "Can we start with a small fixed-scope pilot before committing to a larger program?",
+        "answer": "You can request a limited discovery, gap-review, or evidence-readiness scope for a defined product or control area. A proposal should specify assumptions, inclusions, exclusions, deliverables, acceptance criteria, and fees before work starts. A pilot can inform a larger roadmap without obligating you to purchase subsequent phases."
+      }
+    ]
+  }
+];
+const questionCount = faqSections.reduce((count, section) => count + section.items.length, 0);
+---
+
+<BaseLayout
+  title="Frequently asked questions"
+  description="Answers to common questions about compliance readiness, pre-audits, why Canonical Plus, technical remediation, pricing, and independent assurance."
+>
+  <section class="page-hero section--hero bg-grid bg-radial" aria-labelledby="faq-title">
+    <div class="container faq-hero">
+      <span class="badge">Customer questions, clear answers</span>
+      <p class="page-hero__eyebrow">Compliance readiness FAQ</p>
+      <h1 id="faq-title" class="page-hero__title hero__title">Know what you're buying <span class="gradient-text">before you start</span></h1>
+      <p class="page-hero__subtitle">
+        {questionCount} straightforward answers about why readiness matters, what makes Canonical Plus different, and what a scoped engagement actually includes.
+      </p>
+      <p class="faq-hero__boundary">Canonical prepares teams for independent review. We do not issue audit opinions, certifications, authorizations, or legal conclusions.</p>
+      <div class="page-hero__actions">
+        <a class="btn btn--primary btn--large" href={quoteHref}>Get a preliminary quote</a>
+        <a class="btn btn--secondary btn--large" href={compareHref}>Compare approaches</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section faq-section" aria-label="Frequently asked questions">
+    <div class="container faq-layout">
+      <div class="faq-search" id="faq-search-tools" role="search" aria-label="Search FAQs" hidden>
+        <label for="faq-search-input">Search all {questionCount} questions and answers</label>
+        <div class="faq-search__controls">
+          <input
+            id="faq-search-input"
+            type="search"
+            placeholder="Search topics, questions, or answers"
+            autocomplete="off"
+            maxlength="160"
+          />
+          <button id="faq-search-clear" class="btn btn--secondary" type="button" hidden>Clear search</button>
+        </div>
+        <p id="faq-search-status" role="status" aria-live="polite" aria-atomic="true">
+          Showing all {questionCount} questions
+        </p>
+        <p id="faq-search-empty" hidden>No matching questions. Try a different keyword or clear your search.</p>
+      </div>
+      <nav class="faq-categories" aria-label="FAQ topics">
+        <h2>Browse by topic</h2>
+        {faqSections.map((section, index) => (
+          <a href={`#${section.id}`}><span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>{section.heading}</a>
+        ))}
+      </nav>
+      <div class="faq-content">
+        {faqSections.map((section) => (
+          <section class="faq-group" id={section.id} aria-labelledby={`${section.id}-title`}>
+            <header class="faq-group__heading">
+              <h2 id={`${section.id}-title`}>{section.heading}</h2>
+              <p>{section.intro}</p>
+            </header>
+            <div class="faq-list">
+              {section.items.map((item) => (
+                <details class="faq-item" id={item.id}>
+                  <summary class="faq-item__question">
+                    <span>{item.question}</span>
+                    <span class="faq-item__toggle" aria-hidden="true">+</span>
+                  </summary>
+                  <div class="faq-item__answer"><p>{item.answer}</p></div>
+                </details>
+              ))}
+            </div>
+          </section>
+        ))}
+        <p class="faq-caveat">These are general explanations, not legal advice or an assurance opinion. Program requirements, vendor capabilities, timelines, and contract terms vary. Your signed statement of work controls the services and deliverables.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section faq-close" aria-labelledby="faq-next-title">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">Next step</span>
+        <h2 id="faq-next-title">Start with scope, not assumptions</h2>
+        <p>Tell us your target framework, systems, and current program stage. We can discuss a preliminary readiness scope without promising the independent review outcome.</p>
+        <div class="action-row">
+          <a class="btn btn--primary btn--large" href={quoteHref}>Build a quote</a>
+          <a class="btn btn--secondary btn--large" href={pricingHref}>Explore proposed pricing</a>
+          <a class="btn btn--secondary btn--large" href="mailto:hello@canonical.plus">Ask another question</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <style>
+    .faq-hero { max-width: 950px; }
+    .faq-search { grid-column: 1 / -1; padding: 1.25rem; border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); }
+    .faq-search label { display: block; font-weight: 700; margin-bottom: .75rem; }
+    .faq-search__controls { display: flex; flex-wrap: wrap; gap: .75rem; }
+    .faq-search input { min-width: 0; flex: 1 1 18rem; min-height: 44px; border: 1px solid var(--av-border-active); border-radius: var(--radius-md); background: var(--av-nav-bg-strong); color: var(--av-text-primary); padding: .75rem 1rem; font: inherit; }
+    .faq-search input:focus-visible { outline: 2px solid var(--av-teal); outline-offset: 2px; }
+    .faq-search__controls button { min-height: 44px; }
+    .faq-search #faq-search-status { margin-top: .75rem; color: var(--av-text-secondary); font-size: .9rem; }
+    .faq-search #faq-search-empty { margin-top: .4rem; color: var(--av-text-primary); }
+    .faq-search[hidden], .faq-search__controls button[hidden], .faq-search #faq-search-empty[hidden], .faq-group[hidden], .faq-item[hidden] { display: none !important; }
+    .faq-hero__boundary { max-width: 760px; margin-top: 1rem; color: var(--av-text-secondary); font-size: .96rem; line-height: 1.6; }
+    .faq-layout { display: grid; grid-template-columns: minmax(200px, 270px) minmax(0, 1fr); align-items: start; gap: clamp(1.5rem, 4vw, 4rem); }
+    .faq-categories { position: sticky; top: calc(var(--nav-height) + 2rem); display: grid; gap: .45rem; }
+    .faq-categories h2 { font-size: 1rem; margin-bottom: .75rem; color: var(--av-text-secondary); }
+    .faq-categories a { display: flex; gap: .8rem; align-items: baseline; padding: .75rem .8rem; border: 1px solid transparent; border-radius: var(--radius-md); line-height: 1.4; color: var(--av-text-secondary); }
+    .faq-categories a span { font: 700 .8rem var(--font-mono); color: var(--av-teal); }
+    .faq-categories a:hover, .faq-categories a:focus-visible { border-color: var(--av-border-active); color: var(--av-text-primary); background: var(--av-surface); }
+    .faq-content { min-width: 0; }
+    .faq-group { margin-bottom: clamp(2.5rem, 5vw, 4.5rem); scroll-margin-top: calc(var(--nav-height) + 1.5rem); }
+    .faq-group__heading { margin-bottom: 1.4rem; }
+    .faq-group__heading h2 { font-size: clamp(1.55rem, 3vw, 2.15rem); }
+    .faq-group__heading p { margin-top: .6rem; color: var(--av-text-secondary); }
+    .faq-list { border-top: 1px solid var(--av-border); }
+    .faq-item { border-bottom: 1px solid var(--av-border); scroll-margin-top: calc(var(--nav-height) + 1.5rem); }
+    .faq-item__question { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1.2rem .3rem; cursor: pointer; font-weight: 650; line-height: 1.5; list-style: none; }
+    .faq-item__question::-webkit-details-marker { display: none; }
+    .faq-item__question::marker { content: ''; }
+    .faq-item__question:hover, .faq-item__question:focus-visible { color: var(--av-emerald); }
+    .faq-item__toggle { display: inline-flex; flex: 0 0 2rem; align-items: center; justify-content: center; width: 2rem; height: 2rem; border: 1px solid var(--av-border); border-radius: 50%; color: var(--av-teal); font-size: 1.5rem; line-height: 1; transition: transform .2s ease; }
+    .faq-item[open] .faq-item__toggle { transform: rotate(45deg); }
+    .faq-item__answer { max-width: 76ch; padding: 0 2.9rem 1.4rem .3rem; color: var(--av-text-secondary); line-height: 1.75; }
+    .faq-caveat { padding: 1rem 1.2rem; border-left: 3px solid var(--av-warning); background: var(--av-warning-glow); color: var(--av-text-secondary); font-size: .92rem; }
+    @media (max-width: 760px) {
+      .faq-layout { grid-template-columns: minmax(0, 1fr); }
+      .faq-categories { position: static; display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
+      .faq-categories h2 { flex-basis: 100%; margin-bottom: .1rem; }
+      .faq-categories a { font-size: .86rem; padding: .55rem .65rem; background: var(--av-surface); border-color: var(--av-border); }
+      .faq-item__answer { padding-right: .5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { .faq-item__toggle { transition: none; } }
+  </style>
+  <script type="module" src={faqScriptHref}></script>
+</BaseLayout>

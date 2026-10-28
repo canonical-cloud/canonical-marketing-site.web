@@ -88,7 +88,7 @@ test("static image supplies the same defensive headers as the server fallback", 
 test("production image inputs are pinned and test browsers never enter the artifact", async () => {
   const dockerfile = await readFile(new URL("../Dockerfile", import.meta.url), "utf8");
 
-  assert.match(dockerfile, /^FROM node:22-slim@sha256:[0-9a-f]{64} AS build$/m);
+  assert.match(dockerfile, /^FROM node:22\.23\.4-slim@sha256:[0-9a-f]{64} AS build$/m);
   assert.match(dockerfile, /^FROM nginx:1\.27-alpine@sha256:[0-9a-f]{64}$/m);
   assert.match(dockerfile, /PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1/);
   assert.match(dockerfile, /PUPPETEER_SKIP_DOWNLOAD=true/);
@@ -177,4 +177,66 @@ test("comparison page states the competitive baseline without claiming parity", 
   }
   assert.match(compare, /not positioned as a mature hundreds-of-integrations continuous-monitoring suite/);
   assert.match(compare, /No independent audit opinion, certification, authorization, or legal conclusion/);
+});
+
+
+test("FAQ page includes 68 distinct customer questions with transparent assurance boundaries", async () => {
+  const faq = await readFile(new URL("../src/pages/faq.astro", import.meta.url), "utf8");
+  const ids = [...faq.matchAll(/"id": "faq-([a-z0-9-]+)"/g)].map((match) => match[1]);
+  const questions = [...faq.matchAll(/"question":/g)];
+  assert.equal(ids.length, 68, "expected 68 FAQ item anchors");
+  assert.equal(new Set(ids).size, 68, "FAQ item anchors must be unique");
+  assert.equal(questions.length, 68, "expected 68 customer-facing questions");
+  for (const group of ["why-readiness", "why-canonical", "buying-process", "getting-started", "framework-details", "engineering-controls", "evidence-workflows", "working-together"]) {
+    assert.ok(faq.includes('"id": "' + group + '"'), 'missing group ' + group);
+  }
+  for (const boundary of ["We do not issue audit opinions", "independent reviewer", "statement of work"]) {
+    assert.ok(faq.includes(boundary), 'missing FAQ boundary ' + boundary);
+  }
+  assert.match(faq, /<details class="faq-item" id=\{item\.id\}>/);
+  assert.match(faq, /<summary class="faq-item__question">/);
+  assert.match(faq, /const quoteHref =/);
+  assert.match(layout, /const faqHref =/);
+  assert.match(layout, /id="nav-faq">FAQ<\/a>/);
+  assert.match(layout, /href=\{faqHref\} class="footer__link">Frequently asked questions<\/a>/);
+  assert.match(page, /id="faq-preview"/);
+  assert.match(page, /id="all-faqs-link"/);
+});
+
+test("built FAQ and homepage render real FAQ content and working relative links", async () => {
+  const faq = await readFile(new URL("../dist/faq/index.html", import.meta.url), "utf8");
+  const home = await readFile(new URL("../dist/index.html", import.meta.url), "utf8");
+  assert.equal([...faq.matchAll(/<details\b/g)].length, 68);
+  assert.match(faq, /id="faq-why-preaudit"/);
+  assert.match(faq, /id="faq-why-canonical-plus"/);
+  assert.match(faq, /id="faq-guarantee"/);
+  assert.match(faq, /id="faq-critical-finding"/);
+  assert.match(faq, /id="faq-soc2-types"/);
+  assert.match(faq, /id="faq-evidence-automation"/);
+  for (const anchor of ["faq-first-sprint","faq-new-product-scope","faq-cloud-provider-compliance","faq-soc2-bridge-letter","faq-machine-identities","faq-penetration-testing","faq-control-operating-period","faq-sensitive-evidence","faq-auditor-coordination","faq-pilot-engagement"]) {
+    assert.ok(faq.includes(`id="${anchor}"`), `missing built FAQ deep link ${anchor}`);
+  }
+  assert.match(home, /Read all 68 FAQs/);
+  assert.match(faq, /<summary\b/);
+  assert.match(faq, /href="\/quote\/"/);
+  assert.match(home, /href="\/faq\/#faq-why-preaudit"/);
+  assert.match(home, /href="\/faq\/"/);
+});
+
+test("FAQ progressive enhancements preserve static answers and strict script boundaries", async () => {
+  const [faq, faqJs, built] = await Promise.all([
+    readFile(new URL("../src/pages/faq.astro", import.meta.url), "utf8"),
+    readFile(new URL("../public/faq.js", import.meta.url), "utf8"),
+    readFile(new URL("../dist/faq/index.html", import.meta.url), "utf8"),
+  ]);
+  assert.match(faq, /id="faq-search-tools"[^>]*hidden/);
+  assert.match(faq, /id="faq-search-input"/);
+  assert.match(faq, /id="faq-search-status" role="status" aria-live="polite"/);
+  assert.match(faq, /<script type="module" src=\{faqScriptHref\}><\/script>/);
+  assert.match(faqJs, /addEventListener\('hashchange', openHashTarget\)/);
+  assert.match(faqJs, /target\.open = true/);
+  assert.match(faqJs, /status\.textContent = query/);
+  assert.doesNotMatch(faqJs, /\.innerHTML\s*=|\beval\s*\(|new Function\s*\(/);
+  assert.match(built, /\/faq\.js\?v=20261025-search/);
+  assert.equal([...built.matchAll(/<details\b/g)].length, 68);
 });
