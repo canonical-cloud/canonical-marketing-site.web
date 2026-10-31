@@ -46,8 +46,17 @@ if (webAuthority.repository !== 'canonical-cloud/canonical-web-server.rs' || !sh
 if (!webRoutes.includes('.route("/u/quote", get(quote::page).post(quote::submit))')) {
   throw new Error('customer web server does not implement GET+POST /u/quote');
 }
+if (!marketingIndex.includes('const quoteHref = \`${baseNoSlash}/quote/\`')) {
+  throw new Error('public marketing CTA must use the local /quote/ entry point');
+}
+if (marketingIndex.includes('data-application-link="quote"') ||
+    marketingIndex.includes('https://app.canonical.plus/u/quote')) {
+  throw new Error('public marketing CTA must not bypass the public federal quote guard');
+}
+for (const [name, source] of Object.entries({ siteScript, readme })) {
+  if (!source.includes('/u/quote')) throw new Error(`${name} does not pin the approved customer app route`);
+}
 for (const [name, source] of Object.entries({ marketingIndex, siteScript, readme })) {
-  if (!source.includes('/u/quote')) throw new Error(`${name} does not reference /u/quote`);
   if (source.includes('/u/readiness')) throw new Error(`${name} still contains obsolete /u/readiness`);
   if (/(?:access_token|refresh_token|id_token|return_to|[?&](?:token|tenant|subject|session)=)/i.test(source)) {
     throw new Error(`${name} contains credential/identity material in application-link source`);
