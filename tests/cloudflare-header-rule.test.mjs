@@ -17,16 +17,25 @@ test('Cloudflare header change is strictly limited to canonical.plus', () => {
 
 test('single-rule updates retain other rules and fail closed on conflicts', () => {
   assert.equal(decideChange([], rule).kind, 'post');
-  assert.equal(decideChange([{ ...rule, id: 'existing-id' }], rule).kind, 'noop');
+  assert.equal(decideChange([{ ...rule, id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }], rule).kind, 'noop');
   assert.deepEqual(
-    decideChange([{ ...rule, id: 'existing-id', enabled: false }], rule),
-    { kind: 'patch', ruleId: 'existing-id' },
+    decideChange([{ ...rule, id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', enabled: false }], rule),
+    { kind: 'patch', ruleId: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' },
   );
-  assert.throws(() => decideChange([{ ...rule, id: 'a' }, { ...rule, id: 'b' }], rule), /duplicate/);
-  assert.throws(() => decideChange([{ ...rule, expression: 'true', id: 'a' }], rule), /unexpected host/);
+  assert.throws(() => decideChange([{ ...rule, id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }, { ...rule, id: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb' }], rule), /duplicate/);
+  assert.throws(() => decideChange([{ ...rule, expression: 'true', id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }], rule), /unexpected host/);
   assert.throws(() => decideChange([{
     ref: 'different',
     action: 'rewrite',
     action_parameters: { headers: { 'Content-Security-Policy': { operation: 'set', value: "default-src 'self'" } } },
   }], rule), /competing/);
+  assert.throws(() => decideChange([
+    { ...rule, id: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' },
+    {
+      ref: 'legacy-security-rule',
+      action: 'rewrite',
+      action_parameters: { headers: { 'content-security-policy': { operation: 'set', value: 'default-src *' } } },
+    },
+  ], rule), /competing/);
+  assert.throws(() => decideChange([{ ...rule, id: 'not-an-id!' }], rule), /valid id/);
 });
