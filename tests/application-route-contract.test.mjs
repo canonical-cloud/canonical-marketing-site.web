@@ -9,7 +9,7 @@ const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8');
 const supportedTarget = 'https://app.canonical.plus/u/quote';
 
 test('marketing quote CTAs use public estimator; sanctioned customer app route remains separately pinned', () => {
-  assert.match(indexPage, /const quoteHref = \`\\$\\{baseNoSlash\\}\\/quote\\/\`/);
+  assert.match(indexPage, /const quoteHref = `\$\{baseNoSlash\}\/quote\/`/);
   assert.doesNotMatch(indexPage, /data-application-link="quote"/);
   assert.doesNotMatch(indexPage, /https:\/\/app\.canonical\.plus\/u\/quote/);
   assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
