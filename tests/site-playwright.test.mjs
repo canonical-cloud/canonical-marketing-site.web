@@ -48,8 +48,9 @@ test("playwright renders the readiness-first canonical.plus landing page", async
 
   assert.equal(
     await page.locator("#hero-cta-primary").getAttribute("href"),
-    "https://app.canonical.plus/u/quote",
+    "/quote/",
   );
+  assert.equal(await page.locator("#hero-cta-primary").getAttribute("data-application-link"), null);
   await page.locator('a[href="mailto:hello@canonical.plus"]').first().waitFor({ state: "visible" });
   await page.locator("footer").getByText(/Canonical supports readiness and pre-audits/).waitFor({ state: "visible" });
   await page.locator("footer").getByText(/canonical\.plus\. All rights reserved/).waitFor({ state: "visible" });
