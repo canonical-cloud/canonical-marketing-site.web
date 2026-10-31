@@ -11,6 +11,10 @@ on:
         required: true
         default: inspect
         options: [inspect, apply]
+      approved_sha:
+        description: 'Exact reviewed main Git commit SHA (40 lowercase hex)'
+        required: true
+        type: string
       confirmation:
         description: 'For apply only: enter APPLY_CANONICAL_PLUS_HEADERS'
         required: false
@@ -25,6 +29,7 @@ concurrency:
 
 jobs:
   cloudflare:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     environment: cloudflare-production
@@ -34,6 +39,18 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - name: Require exact approved main commit before zone access
+        shell: bash
+        env:
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+        run: |
+          set -euo pipefail
+          [[ "$APPROVED_SHA" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "::error::Expected exact reviewed commit SHA"; exit 1;
+          }
+          test "$(git rev-parse HEAD)" = "$APPROVED_SHA" || {
+            echo "::error::Current main is not the approved revision"; exit 1;
+          }
       - name: Set up Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
