@@ -55,16 +55,16 @@ test("puppeteer: process section lists the four ordered readiness phases", async
   assert.deepEqual(pageErrors, []);
 });
 
-test("puppeteer: hero CTAs target the readiness app and explanatory page", async (t) => {
+test("puppeteer: hero CTAs target the public readiness quote and explanatory page", async (t) => {
   const { page, pageErrors } = await open(t);
 
   assert.equal(
     await page.$eval("#hero-cta-primary", (element) => element.getAttribute("href")),
-    "https://app.canonical.plus/u/quote",
+    "/quote/",
   );
   assert.equal(
     await page.$eval("#hero-cta-primary", (element) => element.getAttribute("data-application-link")),
-    "quote",
+    null,
   );
   assert.equal(
     await page.$eval("#hero-cta-secondary", (element) => element.getAttribute("href")),
