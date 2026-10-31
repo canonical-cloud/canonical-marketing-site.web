@@ -1,4 +1,5 @@
 import { computeQuote } from './quote-engine.mjs';
+import { releaseRevision } from './release-revision.mjs';
 
 const allowedOrigins = new Set([
   'https://canonical.plus',
@@ -127,6 +128,25 @@ const existingSubmission = async (
 Deno.serve(async (request) => {
   const origin = request.headers.get('origin') || '';
 
+  // Side-effect-free release attestation. This is never a quote submission and
+  // must remain available independently of database, rate-limit or email state.
+  // The approved deploy job stamps the reviewed main commit into the bundle;
+  // a manually deployed, unstamped function reports "unreleased" and fails
+  // the external release gate rather than claiming false source provenance.
+  if (request.method === 'HEAD') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'cache-control': 'no-store, max-age=0',
+        'x-content-type-options': 'nosniff',
+        'x-canonical-intake-revision': releaseRevision,
+        'x-canonical-intake-contract': 'fedramp-custom-scope-v1',
+        ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
+        'vary': 'Origin',
+      },
+    });
+  }
+
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: allowedOrigins.has(origin) ? 204 : 403,
@@ -184,7 +204,10 @@ Deno.serve(async (request) => {
   if (kind === 'quote') {
     try {
       quote = computeQuote(payload.selection);
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === 'custom_scope_required') {
+        return json(422, { error: 'custom_scope_required' }, origin);
+      }
       return json(400, { error: 'invalid_quote_selection' }, origin);
     }
   }

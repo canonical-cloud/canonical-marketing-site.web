@@ -9,7 +9,7 @@ const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
 const faqHref = `${baseNoSlash}/faq/`;
-const quoteHref = 'https://app.canonical.plus/u/quote';
+const quoteHref = `${baseNoSlash}/quote/`;
 const introHref = 'https://calendly.com/hello-canonical/30min';
 
 const featuredFaqs = [
@@ -67,7 +67,7 @@ const featuredFrameworks = [
             href={quoteHref}
             class="btn btn--primary btn--large"
             id="hero-cta-primary"
-            data-application-link="quote"
+
           >
             Start readiness assessment
           </a>
@@ -202,7 +202,7 @@ const featuredFrameworks = [
     </div>
   </section>
 
-  <section class="section" id="contact"><div class="container"><div class="cta-panel animate-fade-in-up"><span class="badge">Start with scope</span><h2>Get a preliminary readiness estimate</h2><p>Tell us the frameworks, systems, data sensitivity, and current program stage. The result is an initial estimate and planning input—not an audit opinion or certification.</p><div class="action-row"><a href={quoteHref} class="btn btn--primary btn--large" id="cta-readiness-btn" data-application-link="quote">Start readiness assessment</a><a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large" id="cta-contact-btn">Discuss your scope</a></div></div></div></section>
+  <section class="section" id="contact"><div class="container"><div class="cta-panel animate-fade-in-up"><span class="badge">Start with scope</span><h2>Get a preliminary readiness estimate</h2><p>Tell us the frameworks, systems, data sensitivity, and current program stage. The result is an initial estimate and planning input—not an audit opinion or certification.</p><div class="action-row"><a href={quoteHref} class="btn btn--primary btn--large" id="cta-readiness-btn">Start readiness assessment</a><a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large" id="cta-contact-btn">Discuss your scope</a></div></div></div></section>
 </BaseLayout>
 
 <style>

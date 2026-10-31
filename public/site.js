@@ -63,7 +63,7 @@ const configureHeaderBranding = () => {
 configureHeaderBranding();
 
 const configureApplicationLinks = () => {
-  for (const link of document.querySelectorAll('[data-application-link]')) {
+  for (const link of document.querySelectorAll('[data-application-link="customer-app-quote"]')) {
     if (!(link instanceof HTMLAnchorElement)) {
       continue;
     }

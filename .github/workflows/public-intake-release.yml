@@ -1,0 +1,92 @@
+name: approved public-intake Edge Function release
+
+# Manual only, from reviewed main. Require protection and reviewers on BOTH
+# supabase-staging and supabase-production environments before enabling.
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Approved Supabase environment'
+        required: true
+        type: choice
+        options: [staging, production]
+      approved_sha:
+        description: 'Exact reviewed main Git commit SHA (40 lowercase hex)'
+        type: string
+        required: true
+      confirmation:
+        description: 'DEPLOY_CANONICAL_INTAKE_STAGING or DEPLOY_CANONICAL_INTAKE_PRODUCTION'
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-public-intake-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: ${{ inputs.target == 'production' && 'supabase-production' || 'supabase-staging' }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      CANONICAL_EXPECTED_RELEASE_SHA: ${{ inputs.approved_sha }}
+      DEPLOY_TARGET: ${{ inputs.target }}
+      DEPLOY_CONFIRMATION: ${{ inputs.confirmation }}
+    steps:
+      - name: Checkout reviewed main commit without retained credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Require exact main revision, protected environment and explicit intent
+        shell: bash
+        run: |
+          set -euo pipefail
+          case "$DEPLOY_TARGET:$DEPLOY_CONFIRMATION" in
+            staging:DEPLOY_CANONICAL_INTAKE_STAGING|production:DEPLOY_CANONICAL_INTAKE_PRODUCTION) ;;
+            *) echo "::error::Wrong target-specific manual deployment confirmation"; exit 1 ;;
+          esac
+          [[ "$CANONICAL_EXPECTED_RELEASE_SHA" =~ ^[0-9a-f]{40}$ ]] || {
+            echo "::error::Approved commit is not an exact SHA"; exit 1;
+          }
+          test "$(git rev-parse HEAD)" = "$CANONICAL_EXPECTED_RELEASE_SHA" || {
+            echo "::error::Current main differs from approved SHA"; exit 1;
+          }
+          [[ "$SUPABASE_PROJECT_REF" =~ ^[a-z0-9]{20}$ ]] || {
+            echo "::error::Protected environment must contain exact Supabase project reference"; exit 1;
+          }
+          test -n "$SUPABASE_ACCESS_TOKEN" || {
+            echo "::error::Supabase deployment token unavailable"; exit 1;
+          }
+          git diff --check
+      - name: Set up Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22.23.4'
+      - name: Verify server denial, ordinary quote computation and no-side-effect attestation
+        run: |
+          node --test tests/public-intake-security-contract.test.mjs tests/public-intake-release-gate.test.mjs
+          node --experimental-strip-types --test tests/public-intake-edge-execution.test.mjs
+      - name: Stamp reviewed source revision into deployable bundle
+        run: |
+          set -euo pipefail
+          node scripts/stamp-public-intake-release.mjs "$CANONICAL_EXPECTED_RELEASE_SHA"
+          node --input-type=module -e "import { releaseRevision } from './supabase/functions/public-intake/release-revision.mjs'; if (releaseRevision !== process.env.CANONICAL_EXPECTED_RELEASE_SHA) process.exit(1)"
+          git diff --check -- supabase/functions/public-intake/release-revision.mjs
+      - name: Set up reviewed Supabase CLI action
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
+        with:
+          version: latest
+      - name: Record deployed CLI version without tokens
+        run: supabase --version
+      - name: Deploy only the reviewed public-intake function
+        run: supabase functions deploy public-intake --project-ref "$SUPABASE_PROJECT_REF" --use-api
+      - name: Verify live release with HEAD and OPTIONS only (never sends email)
+        run: node scripts/verify-intake-release.mjs

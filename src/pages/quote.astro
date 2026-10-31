@@ -59,7 +59,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <li>Environment complexity, company stage, and employee scale</li>
           <li>Business sector captured for scoping context</li>
         </ul>
-        <p>Planning ranges are non-binding. A reviewed statement of work controls final scope, deliverables, pricing, and deadlines.</p>
+        <p>Planning ranges estimate an individual readiness project, not monthly services or external audit fees. A reviewed statement of work controls final scope, deliverables, pricing, and deadlines.</p>
       </aside>
     </div>
   </section>
@@ -102,6 +102,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
                 <label class="quote-check"><input type="checkbox" name="quote_standard" value={item.id} data-label={item.label} data-amount={item.amountUsd} checked={estimator.defaults.standardIds.includes(item.id)} /><span>{item.label}</span></label>
               ))}
             </div>
+            <p class="quote-control-note" data-custom-federal-note>FedRAMP readiness is custom-scoped. This instant estimator does not price a FedRAMP program, independent 3PAO assessment, agency authorization, or related federal review. If FedRAMP is selected, the instant range and email-quote action are disabled; contact <a href="mailto:hello@canonical.plus">hello@canonical.plus</a> for a separately reviewed proposal.</p>
             <p class="quote-validation" data-standard-error role="alert" hidden>Please select at least one framework.</p>
           </section>
 
@@ -177,7 +178,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
               <li>Map control and evidence gaps to proposed owners and priorities.</li>
               <li>Plan remediation and prepare an evidence handoff.</li>
             </ul>
-            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, or third-party assessor fees. The signed SOW determines the actual deliverables, timelines, and fees.</p>
+            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, third-party assessor fees, penetration testing, recurring platform subscriptions, customer internal labor, or taxes. The project estimate is not a monthly subscription quote. The signed SOW determines the actual deliverables, timelines, and fees.</p>
             <a href={introHref} class="btn btn--secondary" id="quote-estimate-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
           </div>
           <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Email my quote</button>

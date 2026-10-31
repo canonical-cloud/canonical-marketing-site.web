@@ -38,9 +38,14 @@ tests/
   *-puppeteer.test.mjs
 ```
 
-The authenticated assessment/quote entry point currently supported by the
-customer web server is exactly `https://app.canonical.plus/u/quote`. Marketing
-pages must not invent an unimplemented readiness path or place tokens, identity
+The public no-login preliminary estimator at `/quote/` is the sole marketing
+quote CTA entry point. It is being hardened with a custom-federal-scope guard in the browser;
+the proposed Supabase quote engine also rejects these selections server-side.
+Neither change is operational until the reviewed code is deployed and the
+public endpoint is verified. A separate authenticated customer application route,
+`https://app.canonical.plus/u/quote`, is supported by the customer web server
+but is **not** used by marketing CTAs until its quoting semantics and deployment
+are independently reviewed. Do not place tokens, identity
 assertions, tenant identifiers, return destinations, or other credentials in
 that URL. A future dedicated readiness workspace route must first land in the
 shared route authority and customer web server before marketing links change.

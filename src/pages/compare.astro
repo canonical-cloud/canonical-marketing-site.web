@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const quoteHref = `${baseNoSlash}/quote/`;
 
 const approaches = [
   {
@@ -71,7 +72,7 @@ const sources = [
           evidence design, and a clean handoff to the qualified reviewer you select.
         </p>
         <div class="page-hero__actions animate-fade-in-up stagger-3">
-          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          <a href={quoteHref} class="btn btn--primary btn--large">
             Assess your readiness
           </a>
           <a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large">
@@ -196,7 +197,7 @@ const sources = [
           <p>Track unresolved issues and supporting artifacts so the qualified independent auditor, assessor, or certification body can decide what to test.</p>
         </article>
       </div>
-      <p class="source-note">Vanta, Drata, and Secureframe are independent vendors. Canonical Plus makes no claim of partnership, endorsement, API integration, or guaranteed results with their products.</p>
+      <p class="source-note">Vanta, Drata, and Secureframe are independent vendors. Canonical Plus makes no claim of partnership, endorsement, API integration, or guaranteed results with their products. Evidence imported from any platform must retain source, observation period, coverage, and exception context; receipt or mapping does not itself prove control effectiveness or independent auditor acceptance.</p>
     </div>
   </section>
 
@@ -220,7 +221,7 @@ const sources = [
         ))}
       </ul>
       <p class="source-note">
-        Vanta and Drata source spot-check refreshed October 2, 2026. The other listed vendors are
+        Official Vanta, Drata, and Secureframe source spot-check refreshed October 30, 2026. The other listed vendors are
         category examples; product pages, packaging, and claims are controlled by their respective
         vendors and should be rechecked before relying on time-sensitive comparisons.
       </p>
@@ -238,7 +239,7 @@ const sources = [
           The responsibilities should be written down before work begins.
         </p>
         <div class="action-row">
-          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          <a href={quoteHref} class="btn btn--primary btn--large">
             Start readiness assessment
           </a>
         </div>
