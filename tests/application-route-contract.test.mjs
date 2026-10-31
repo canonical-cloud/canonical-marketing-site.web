@@ -32,11 +32,21 @@ test('application-link navigation never carries credential or return-target mate
 });
 
 test('every public marketing quote CTA uses the guarded local estimator', async () => {
-  const paths = ['index.astro', 'readiness.astro', 'pricing.astro', 'prices.astro', 'compare.astro'];
+  const paths = ['index.astro', 'readiness.astro', 'pricing.astro', 'prices.astro', 'compare.astro', 'frameworks.astro', 'security.astro'];
   for (const path of paths) {
     const source = await readFile(new URL(`../src/pages/${path}`, import.meta.url), 'utf8');
     assert.match(source, /const quoteHref = `\$\{baseNoSlash\}\/quote\/`/, path);
     assert.doesNotMatch(source, /data-application-link="quote"/, path);
     assert.doesNotMatch(source, /https:\/\/app\.canonical\.plus\/u\/(?:readiness|quote)/, path);
+  }
+});
+
+test('host-specific registration pages return to the guarded canonical.plus public quote origin', async () => {
+  const paths = ['interest/index.astro', 'pre-interest.astro', 'submit-application.astro', 'registration-received.astro'];
+  for (const path of paths) {
+    const source = await readFile(new URL(`../src/pages/${path}`, import.meta.url), 'utf8');
+    assert.match(source, /const quoteHref = 'https:\/\/canonical\.plus\/quote\/'/, path);
+    assert.doesNotMatch(source, /data-application-link="quote"/, path);
+    assert.doesNotMatch(source, /https:\/\/(?:app|user)\.canonical\.plus\/u\/quote/, path);
   }
 });
