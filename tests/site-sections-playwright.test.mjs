@@ -59,7 +59,7 @@ test("playwright: the differentiators state readiness and independence boundarie
   assert.deepEqual(pageErrors, []);
 });
 
-test("playwright: contact CTA preserves the application and email boundaries", async (t) => {
+test("playwright: contact CTA preserves the guarded public quote and email boundaries", async (t) => {
   const { page, pageErrors } = await open(t);
 
   const contact = page.locator("#contact");
@@ -67,7 +67,7 @@ test("playwright: contact CTA preserves the application and email boundaries", a
   await contact.getByRole("link", { name: /Start readiness assessment/ }).waitFor({ state: "visible" });
   assert.equal(
     await page.locator("#cta-readiness-btn").getAttribute("href"),
-    "https://app.canonical.plus/u/quote",
+    "/quote/",
   );
   assert.equal(
     await page.locator("#cta-contact-btn").getAttribute("href"),
