@@ -30,3 +30,13 @@ test('application-link navigation never carries credential or return-target mate
   assert.doesNotMatch(combined, /access_token|refresh_token|id_token|return_to|authorization=/i);
   assert.doesNotMatch(combined, /[?&](?:token|tenant|subject|session)=/i);
 });
+
+test('every public marketing quote CTA uses the guarded local estimator', async () => {
+  const paths = ['index.astro', 'readiness.astro', 'pricing.astro', 'prices.astro', 'compare.astro'];
+  for (const path of paths) {
+    const source = await readFile(new URL(`../src/pages/${path}`, import.meta.url), 'utf8');
+    assert.match(source, /const quoteHref = `\$\{baseNoSlash\}\/quote\/`/, path);
+    assert.doesNotMatch(source, /data-application-link="quote"/, path);
+    assert.doesNotMatch(source, /https:\/\/app\.canonical\.plus\/u\/(?:readiness|quote)/, path);
+  }
+});
