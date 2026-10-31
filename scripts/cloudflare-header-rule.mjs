@@ -38,20 +38,25 @@ const comparable = (rule) => JSON.stringify({
 });
 
 export const decideChange = (rules, desired) => {
+  if (!Array.isArray(rules)) throw new Error('malformed response-header phase');
   const matching = rules.filter((r) => r.ref === desired.ref);
   if (matching.length > 1) throw new Error('duplicate managed rule refs; manual reconciliation required');
+  // Inspect competitors even when the managed rule already exists: a later
+  // broader rule could override or duplicate a protected header. Header names
+  // are case-insensitive, including when the Cloudflare API normalizes them.
+  const protectedNames = new Set(REQUIRED_HEADERS.map((name) => name.toLowerCase()));
+  if (rules.some((r) => r.ref !== desired.ref && r.action === 'rewrite' &&
+      Object.keys(r.action_parameters?.headers || {}).some((key) => protectedNames.has(key.toLowerCase())))) {
+    throw new Error('potential competing response-header rule; manual reconciliation required');
+  }
   if (matching.length === 1) {
     if (matching[0].expression !== desired.expression) {
       throw new Error('existing managed rule has unexpected host matcher; manual review required');
     }
+    if (typeof matching[0].id !== 'string' || !/^[0-9a-f-]{10,}$/i.test(matching[0].id)) {
+      throw new Error('existing managed rule lacks a valid id; manual review required');
+    }
     return { kind: comparable(matching[0]) === comparable(desired) ? 'noop' : 'patch', ruleId: matching[0].id };
-  }
-  // Another rule can override our headers depending on ordering. Do not
-  // automate changes when competing scopes are visible; inspect the entire
-  // phase in the Cloudflare dashboard.
-  if (rules.some((r) => r.action === 'rewrite' &&
-      Object.keys(r.action_parameters?.headers || {}).some((k) => REQUIRED_HEADERS.includes(k)))) {
-    throw new Error('potential competing response-header rule; manual reconciliation required');
   }
   return { kind: 'post' };
 };
