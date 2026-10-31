@@ -39,9 +39,10 @@ tests/
 ```
 
 The public no-login preliminary estimator at `/quote/` is the sole marketing
-quote CTA entry point. It implements the approved custom-federal-scope guard
-in the browser; the corresponding Supabase quote engine also rejects these
-selections server-side. A separate authenticated customer application route,
+quote CTA entry point. It is being hardened with a custom-federal-scope guard in the browser;
+the proposed Supabase quote engine also rejects these selections server-side.
+Neither change is operational until the reviewed code is deployed and the
+public endpoint is verified. A separate authenticated customer application route,
 `https://app.canonical.plus/u/quote`, is supported by the customer web server
 but is **not** used by marketing CTAs until its quoting semantics and deployment
 are independently reviewed. Do not place tokens, identity
