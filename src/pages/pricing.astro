@@ -7,7 +7,7 @@ import catalog from '../data/service-tiers.json';
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const trainingHref = `${baseNoSlash}/training/`;
 const readinessHref = `${baseNoSlash}/readiness/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
 const money = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: catalog.source.currency,
@@ -34,7 +34,7 @@ const money = new Intl.NumberFormat('en-US', {
           certification bodies, regulators, and legal counsel make formal determinations.
         </p>
         <div class="page-hero__actions">
-          <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--primary btn--large" href={quoteHref}>Start readiness assessment</a>
           <a class="btn btn--secondary btn--large" href={trainingHref}>Try the compliance training</a>
         </div>
       </div>
@@ -115,7 +115,7 @@ const money = new Intl.NumberFormat('en-US', {
           The public prices are starting assumptions. Final commercial terms belong in a reviewed and signed statement of work after scope, dependencies, environments, and timeline are known. Qualifying engagements may use milestone-based payment plans, and larger full-program readiness engagements may qualify for scoped discounts. Independent auditor, certification-body, 3PAO, penetration-testing, and customer internal-labor costs are excluded unless expressly itemized in the signed agreement.
         </p>
         <div class="action-row">
-          <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--primary btn--large" href={quoteHref}>Start readiness assessment</a>
           <a class="btn btn--secondary btn--large" href="mailto:hello@canonical.plus">Discuss a package</a>
         </div>
       </div>
