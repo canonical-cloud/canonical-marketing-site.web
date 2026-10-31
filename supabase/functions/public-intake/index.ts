@@ -184,7 +184,10 @@ Deno.serve(async (request) => {
   if (kind === 'quote') {
     try {
       quote = computeQuote(payload.selection);
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === 'custom_scope_required') {
+        return json(422, { error: 'custom_scope_required' }, origin);
+      }
       return json(400, { error: 'invalid_quote_selection' }, origin);
     }
   }
