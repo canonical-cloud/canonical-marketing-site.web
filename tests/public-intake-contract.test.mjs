@@ -24,20 +24,22 @@ test("marketing chooser routes to the two standard hosts without accepting a for
   assert.match(chooser, /data-public-intake-chooser="standard-hosts"/);
   assert.match(chooser, /https:\/\/user\.canonical\.plus\/pre-interest/);
   assert.match(chooser, /https:\/\/org\.canonical\.plus\/submit-application/);
-  assert.match(chooser, /https:\/\/user\.canonical\.plus\/u\/quote/);
+  assert.match(chooser, /https:\/\/canonical\.plus\/quote\//);
+  assert.doesNotMatch(chooser, /data-application-link="quote"/);
   assert.doesNotMatch(chooser, /<form/);
   assert.doesNotMatch(chooser, /\/forms\/pre-interest/);
   assert.doesNotMatch(chooser, /https:\/\/(?:auth|admin|api-admin)\.canonical\.plus/);
 });
 
-test("public intake pages use the standard user and organization host contract", () => {
+test("public intake registration host contract is separate from the public quote origin", () => {
   assert.match(individual, /data-required-host="user\.canonical\.plus"/);
   assert.match(organization, /data-required-host="org\.canonical\.plus"/);
   assert.match(individual, /https:\/\/org\.canonical\.plus\/submit-application/);
   assert.match(organization, /https:\/\/user\.canonical\.plus\/pre-interest/);
   for (const page of [...pages, receipt, chooser]) {
-    assert.match(page, /https:\/\/user\.canonical\.plus\/u\/quote/);
+    assert.match(page, /https:\/\/canonical\.plus\/quote\//);
     assert.doesNotMatch(page, /https:\/\/app\.canonical\.plus\/u\/readiness/);
+    assert.doesNotMatch(page, /data-application-link="quote"/);
   }
 });
 
@@ -93,7 +95,7 @@ test("accepted receipt is enumeration resistant and never implies quote creation
   assert.match(receipt, /same confirmation for new, repeated, and previously known/i);
   assert.match(receipt, /does not reveal whether an address already existed/i);
   assert.match(receipt, /No account, role, entitlement, quote, audit, certification, or authorization was created/);
-  assert.match(receipt, /https:\/\/user\.canonical\.plus\/u\/quote/);
+  assert.match(receipt, /https:\/\/canonical\.plus\/quote\//);
 });
 
 test("pages never embed credentials, tokens, or database connection material", () => {
