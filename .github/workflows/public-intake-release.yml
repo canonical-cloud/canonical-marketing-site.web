@@ -71,7 +71,9 @@ jobs:
         with:
           node-version: '22.23.4'
       - name: Verify server denial, ordinary quote computation and no-side-effect attestation
-        run: node --test tests/public-intake-security-contract.test.mjs tests/public-intake-release-gate.test.mjs
+        run: |
+          node --test tests/public-intake-security-contract.test.mjs tests/public-intake-release-gate.test.mjs
+          node --experimental-strip-types --test tests/public-intake-edge-execution.test.mjs
       - name: Stamp reviewed source revision into deployable bundle
         run: |
           set -euo pipefail
