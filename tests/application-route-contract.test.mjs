@@ -14,6 +14,8 @@ test('marketing quote CTAs use public estimator; sanctioned customer app route r
   assert.doesNotMatch(indexPage, /https:\/\/app\.canonical\.plus\/u\/quote/);
   assert.match(siteScript, /const QUOTE_PATH = '\/u\/quote'/);
   assert.match(siteScript, /new URL\(QUOTE_PATH, APP_ORIGIN\)/);
+  assert.match(siteScript, /data-application-link="customer-app-quote"/);
+  assert.doesNotMatch(siteScript, /querySelectorAll\('\[data-application-link\]'\)/);
   assert.match(readme, /`https:\/\/app\.canonical\.plus\/u\/quote`/);
 
   for (const source of [indexPage, siteScript, readme]) {
