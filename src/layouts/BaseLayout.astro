@@ -26,12 +26,13 @@ const legalHref = `${baseNoSlash}/legal/`;
 const publicQuoteHref = `${baseNoSlash}/quote/`;
 const processHref = `${homeHref}#process`;
 const faviconHref = `${baseNoSlash}/favicon.svg`;
-const themeInitScriptHref = `${baseNoSlash}/theme-init.js?v=20261010-clean-logo`;
-const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
+const canonicalCloudMarkHref = `${baseNoSlash}/brand/canonical-cloud.svg`;
+const themeInitScriptHref = `${baseNoSlash}/theme-init.js?v=20261102-lmd-theme`;
+const siteScriptHref = `${baseNoSlash}/site.js?v=20261102-lmd-theme`;
 ---
 
 <!doctype html>
-<html lang="en" data-theme="dark" data-theme-preference="auto">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -60,23 +61,27 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
 
     <nav class="nav" id="main-nav" aria-label="Primary navigation">
       <div class="nav__inner container">
-        <a href={homeHref} class="nav__logo" id="nav-logo" aria-label="Canonical Plus home">
-          <svg class="nav__logo-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-            <g class="brand-mark__primary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
-              <path d="M8.55 25.36A21.5 21.5 0 0 1 22.36 11.55"/>
-              <path d="M35.64 11.55A21.5 21.5 0 0 1 44.98 17.62"/>
-            </g>
-            <g class="brand-mark__secondary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
-              <path d="M44.98 46.38A21.5 21.5 0 0 1 35.64 52.45"/>
-              <path d="M22.36 52.45A21.5 21.5 0 0 1 8.55 38.64"/>
-            </g>
-            <g class="brand-mark__primary" fill="currentColor">
-              <rect x="40.5" y="28.25" width="18" height="7.5" rx="2.5"/>
-              <rect x="45.75" y="23" width="7.5" height="18" rx="2.5"/>
-            </g>
-          </svg>
-          <span class="nav__logo-text">
-            <span class="nav__logo-aardvark">CANONICAL</span><span class="nav__logo-compliance">.PLUS</span>
+        <a href={homeHref} class="nav__logo nav__brand-lockup" id="nav-logo" aria-label="Canonical Plus by Canonical Cloud — home">
+          <span class="nav__parent-brand">
+            <img class="nav__parent-brand-mark" src={canonicalCloudMarkHref} alt="" aria-hidden="true" width="38" height="38" />
+            <span class="nav__parent-brand-name">CANONICAL CLOUD</span>
+          </span>
+          <span class="nav__plus-brand">
+            <svg class="nav__logo-icon nav__plus-brand-mark" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+              <g class="brand-mark__primary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
+                <path d="M8.55 25.36A21.5 21.5 0 0 1 22.36 11.55"/>
+                <path d="M35.64 11.55A21.5 21.5 0 0 1 44.98 17.62"/>
+              </g>
+              <g class="brand-mark__secondary" stroke="currentColor" stroke-width="9.5" stroke-linecap="round">
+                <path d="M44.98 46.38A21.5 21.5 0 0 1 35.64 52.45"/>
+                <path d="M22.36 52.45A21.5 21.5 0 0 1 8.55 38.64"/>
+              </g>
+              <g class="brand-mark__primary" fill="currentColor">
+                <rect x="40.5" y="28.25" width="18" height="7.5" rx="2.5"/>
+                <rect x="45.75" y="23" width="7.5" height="18" rx="2.5"/>
+              </g>
+            </svg>
+            <span class="nav__logo-text nav__plus-brand-name">canonical.plus</span>
           </span>
         </a>
 
@@ -94,7 +99,6 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
           <div class="theme-switcher theme-switcher--header" data-theme-switcher>
             <span class="sr-only">Appearance</span>
             <div class="theme-switcher__options" role="group" aria-label="Choose color theme">
-              <button type="button" class="theme-switcher__option" data-theme-choice="auto" aria-label="Use local time theme" title="Auto · follows your local time">A</button>
               <button type="button" class="theme-switcher__option" data-theme-choice="light" aria-label="Use light theme" title="Light theme">L</button>
               <button type="button" class="theme-switcher__option" data-theme-choice="medium" aria-label="Use medium theme" title="Medium theme">M</button>
               <button type="button" class="theme-switcher__option" data-theme-choice="dark" aria-label="Use dark theme" title="Dark theme">D</button>
@@ -135,8 +139,8 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
           <div class="footer__brand">
             <div class="footer__brand-lockups" aria-label="Canonical Cloud and Canonical Plus">
               <a href={canonicalCloudHref} class="footer__brand-logo footer__brand-logo--cloud" aria-label="Canonical Cloud home">
-                <span class="canonical-cloud-mark" aria-hidden="true"></span>
-                <span class="canonical-cloud-wordmark">Canonical Cloud</span>
+                <img class="canonical-cloud-mark" src={canonicalCloudMarkHref} alt="" aria-hidden="true" width="38" height="38" />
+                <span class="canonical-cloud-wordmark">CANONICAL CLOUD</span>
               </a>
               <span class="footer__brand-divider" aria-hidden="true"></span>
               <a href={homeHref} class="nav__logo footer__brand-logo" aria-label="Canonical Plus home">
@@ -160,7 +164,7 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
               </a>
             </div>
             <p class="footer__tagline">
-              Canonical Cloud provides the operating platform. Canonical Plus provides compliance readiness and technical remediation planning for software and cloud teams.
+              Canonical Plus is a Canonical Cloud product. It provides compliance readiness and technical remediation planning for software and cloud teams.
             </p>
           </div>
 
@@ -199,12 +203,10 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
           <div>
             <p class="footer__theme-title">Choose your viewing mode</p>
             <p class="footer__theme-copy">
-              Auto follows your browser's local time: light by day, medium around dawn and dusk, and dark at night.
-              <span data-theme-status aria-live="polite">Auto · local time</span>
+              Light, medium, or dark. Your choice is remembered on this device.
             </p>
           </div>
           <div class="theme-switcher__options theme-switcher__options--labeled" role="group" aria-label="Choose footer color theme">
-            <button type="button" class="theme-switcher__option" data-theme-choice="auto">Auto</button>
             <button type="button" class="theme-switcher__option" data-theme-choice="light">Light</button>
             <button type="button" class="theme-switcher__option" data-theme-choice="medium">Medium</button>
             <button type="button" class="theme-switcher__option" data-theme-choice="dark">Dark</button>
@@ -212,7 +214,7 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
         </div>
 
         <div class="footer__bottom">
-          <p class="footer__copy">&copy; {new Date().getFullYear()} canonical.plus. All rights reserved.</p>
+          <p class="footer__copy">&copy; {new Date().getFullYear()} Canonical Cloud. Canonical Plus is a Canonical Cloud product. All rights reserved.</p>
           <p class="footer__copy">No audit opinion, certification, authorization, or legal conclusion is promised by this site.</p>
         </div>
       </div>
@@ -290,6 +292,12 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
         display: flex;
         align-items: center;
         gap: 10px;
+      }
+
+      /* The lockup keeps its natural width; nav links give way instead of overlapping it. */
+      .nav__inner > .nav__logo {
+        flex: 0 0 auto;
+        margin-right: var(--space-lg);
       }
 
       .nav__logo-icon {
@@ -461,9 +469,9 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
 
       .footer__brand-lockups {
         display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--space-md);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
       }
 
       .footer__brand-logo {
@@ -480,24 +488,24 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
       }
 
       .canonical-cloud-mark {
-        width: 32px;
-        height: 32px;
-        flex: 0 0 auto;
-        border-radius: 0.65rem;
-        background: linear-gradient(145deg, #1d4ed8, #7dd3fc);
-        box-shadow:
-          inset 0 0 0 1px rgb(255 255 255 / 40%),
-          0 8px 22px rgb(29 78 216 / 22%);
+        width: 38px;
+        height: 38px;
+        flex: 0 0 38px;
+        object-fit: contain;
       }
 
       .canonical-cloud-wordmark {
-        font-size: 0.95rem;
-        letter-spacing: 0.01em;
+        font-size: 0.9rem;
+        font-weight: 850;
+        letter-spacing: 0.09em;
+        line-height: 1;
+        white-space: nowrap;
       }
 
       .footer__brand-divider {
-        width: 1px;
-        height: 32px;
+        width: 2.5rem;
+        height: 1px;
+        margin-left: 4px;
         background: var(--av-border-hover);
       }
 
@@ -566,11 +574,6 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
         margin-top: 0.2rem;
         color: var(--av-text-muted);
         font-size: 0.8rem;
-      }
-
-      .footer__theme-copy [data-theme-status] {
-        color: var(--av-teal);
-        white-space: nowrap;
       }
 
       .theme-switcher__options--labeled .theme-switcher__option {
@@ -659,10 +662,6 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261010-clean-logo`;
       }
 
       @media (max-width: 480px) {
-        .nav > .nav__inner > .nav__logo .nav__logo-text {
-          display: none;
-        }
-
         .nav__actions {
           margin-left: 0;
         }

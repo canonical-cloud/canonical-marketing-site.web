@@ -57,10 +57,14 @@ const runThemeInitializer = ({ hour, storedPreference = null }) => {
   return { ...context, themeColor, values };
 };
 
-test('header and footer expose synchronized auto, light, medium, and dark controls', () => {
+test('header and footer expose synchronized light, medium, and dark controls only', () => {
   assert.equal((layout.match(/data-theme-switcher/g) ?? []).length, 2);
+  assert.equal(layout.includes('data-theme-choice="auto"'), false, 'there is no auto choice');
+  assert.match(layout, /data-theme-choice="light"[^>]*>L</);
+  assert.match(layout, /data-theme-choice="medium"[^>]*>M</);
+  assert.match(layout, /data-theme-choice="dark"[^>]*>D</);
 
-  for (const choice of ['auto', 'light', 'medium', 'dark']) {
+  for (const choice of ['light', 'medium', 'dark']) {
     assert.equal(
       (layout.match(new RegExp(`data-theme-choice="${choice}"`, 'g')) ?? []).length,
       2,
@@ -109,10 +113,10 @@ test('magenta is a decorative brand accent while functional readiness colors sta
   assert.match(globalCss, /--av-success:/);
 });
 
-test('automatic theme resolves against browser-local time', () => {
+test('first-visit default theme resolves against browser-local time', () => {
   const morning = runThemeInitializer({ hour: 9 });
   assert.equal(morning.document.documentElement.dataset.theme, 'light');
-  assert.equal(morning.document.documentElement.dataset.themePreference, 'auto');
+  assert.equal(morning.values.has('canonical-theme'), false, 'the default is not persisted');
   assert.equal(morning.themeColor.content, '#f3f7f5');
 
   const dusk = runThemeInitializer({ hour: 18 });
@@ -124,24 +128,20 @@ test('automatic theme resolves against browser-local time', () => {
   assert.equal(night.themeColor.content, '#0a0f1a');
 });
 
-test('manual preference wins until the user returns to automatic mode', () => {
+test('a chosen theme persists and wins over local time', () => {
   const context = runThemeInitializer({ hour: 10, storedPreference: 'dark' });
   const root = context.document.documentElement;
 
   assert.equal(root.dataset.theme, 'dark');
-  assert.equal(root.dataset.themePreference, 'dark');
 
   context.window.canonicalTheme.apply('medium', { persist: true });
   assert.equal(root.dataset.theme, 'medium');
   assert.equal(context.values.get('canonical-theme'), 'medium');
-
-  context.window.canonicalTheme.apply('auto', { persist: true });
-  assert.equal(root.dataset.theme, 'light');
-  assert.equal(context.values.has('canonical-theme'), false);
 });
 
-test('invalid stored preferences fail closed to local-time automatic mode', () => {
-  const context = runThemeInitializer({ hour: 7, storedPreference: 'neon' });
-  assert.equal(context.document.documentElement.dataset.themePreference, 'auto');
-  assert.equal(context.document.documentElement.dataset.theme, 'medium');
+test('invalid or legacy "auto" stored values fall back to the local-time default', () => {
+  for (const storedPreference of ['neon', 'auto']) {
+    const context = runThemeInitializer({ hour: 7, storedPreference });
+    assert.equal(context.document.documentElement.dataset.theme, 'medium');
+  }
 });

@@ -11,56 +11,12 @@ const configureBrandStyles = () => {
 
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
-  stylesheet.href = new URL('./brand-overrides.css?v=20261010-clean-logo', import.meta.url).href;
+  stylesheet.href = new URL('./brand-overrides.css?v=20261102-lmd-theme', import.meta.url).href;
   stylesheet.dataset.canonicalBrandStyles = 'true';
   document.head.append(stylesheet);
 };
 
 configureBrandStyles();
-
-const configureHeaderBranding = () => {
-  const brand = document.getElementById('nav-logo');
-  if (!(brand instanceof HTMLAnchorElement) || brand.dataset.brandLockup === 'true') {
-    return;
-  }
-
-  const plusMark = brand.querySelector('.nav__logo-icon');
-  const plusName = brand.querySelector('.nav__logo-text');
-  if (!(plusMark instanceof SVGElement) || !(plusName instanceof HTMLElement)) {
-    return;
-  }
-
-  brand.dataset.brandLockup = 'true';
-  brand.classList.add('nav__brand-lockup');
-  brand.setAttribute('aria-label', 'Canonical Cloud — canonical.plus home');
-
-  const parentBrand = document.createElement('span');
-  parentBrand.className = 'nav__parent-brand';
-
-  const parentMark = document.createElement('img');
-  parentMark.className = 'nav__parent-brand-mark';
-  parentMark.src = new URL('./brand/canonical-cloud.svg', import.meta.url).href;
-  parentMark.alt = '';
-  parentMark.setAttribute('aria-hidden', 'true');
-  parentMark.width = 38;
-  parentMark.height = 38;
-
-  const parentName = document.createElement('span');
-  parentName.className = 'nav__parent-brand-name';
-  parentName.textContent = 'CANONICAL CLOUD';
-
-  parentBrand.append(parentMark, parentName);
-
-  const plusBrand = document.createElement('span');
-  plusBrand.className = 'nav__plus-brand';
-  plusMark.classList.add('nav__plus-brand-mark');
-  plusName.classList.add('nav__plus-brand-name');
-  plusBrand.append(plusMark, plusName);
-
-  brand.replaceChildren(parentBrand, plusBrand);
-};
-
-configureHeaderBranding();
 
 const configureApplicationLinks = () => {
   for (const link of document.querySelectorAll('[data-application-link]')) {
@@ -116,26 +72,17 @@ const themeController = window.canonicalTheme;
 
 if (themeController) {
   const themeButtons = document.querySelectorAll('[data-theme-choice]');
-  const themeStatuses = document.querySelectorAll('[data-theme-status]');
 
   const synchronizeThemeControls = () => {
-    const { theme, themePreference } = document.documentElement.dataset;
+    const { theme } = document.documentElement.dataset;
 
     for (const button of themeButtons) {
       if (!(button instanceof HTMLButtonElement)) {
         continue;
       }
 
-      const selected = button.dataset.themeChoice === themePreference;
+      const selected = button.dataset.themeChoice === theme;
       button.setAttribute('aria-pressed', String(selected));
-    }
-
-    const status = themePreference === 'auto'
-      ? `Auto · ${theme} from local time`
-      : `${theme[0].toUpperCase()}${theme.slice(1)} · manual`;
-
-    for (const node of themeStatuses) {
-      node.textContent = status;
     }
   };
 
@@ -152,20 +99,6 @@ if (themeController) {
       synchronizeThemeControls();
     }
   });
-
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && document.documentElement.dataset.themePreference === 'auto') {
-      themeController.apply('auto');
-      synchronizeThemeControls();
-    }
-  });
-
-  window.setInterval(() => {
-    if (document.documentElement.dataset.themePreference === 'auto') {
-      themeController.apply('auto');
-      synchronizeThemeControls();
-    }
-  }, 60_000);
 
   synchronizeThemeControls();
 }

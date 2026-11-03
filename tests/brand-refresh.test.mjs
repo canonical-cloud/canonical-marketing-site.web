@@ -7,6 +7,7 @@ const brandCss = await read('../public/brand-overrides.css');
 const siteScript = await read('../public/site.js');
 const themeInit = await read('../public/theme-init.js');
 const cloudLogo = await read('../public/brand/canonical-cloud.svg');
+const layout = await read('../src/layouts/BaseLayout.astro');
 
 const themes = ['dark', 'medium', 'light'];
 
@@ -34,17 +35,18 @@ test('brand stylesheet starts loading in the head and has a module fallback', ()
   assert.match(siteScript, /data-canonical-brand-styles/);
 });
 
-test('header lockup pairs Canonical Cloud and Canonical Plus without a product badge', () => {
-  assert.match(siteScript, /Canonical Cloud — canonical\.plus home/);
-  assert.match(siteScript, /parentName\.textContent = 'CANONICAL CLOUD'/);
-  assert.match(siteScript, /canonical-cloud\.svg/);
-  assert.match(siteScript, /nav__plus-brand-name/);
+test('header lockup pairs Canonical Cloud and Canonical Plus statically, without a product badge', () => {
+  assert.match(layout, /id="nav-logo" aria-label="Canonical Plus by Canonical Cloud — home"/);
+  assert.match(layout, /<span class="nav__parent-brand">\s*<img class="nav__parent-brand-mark" src=\{canonicalCloudMarkHref\}/);
+  assert.match(layout, /<span class="nav__parent-brand-name">CANONICAL CLOUD<\/span>/);
+  assert.match(layout, /class="nav__logo-text nav__plus-brand-name">canonical\.plus</);
+  // The lockup is server-rendered; no runtime DOM rewrite or ::before stand-in.
+  assert.equal(siteScript.includes('configureHeaderBranding'), false);
+  assert.equal(brandCss.includes('::before'), false);
   assert.equal(siteScript.includes('canonical.plus product'), false);
   assert.equal(siteScript.includes('nav__product-brand'), false);
   assert.equal(brandCss.includes("content: 'product'"), false);
   assert.equal(brandCss.includes('nav__product-brand'), false);
-  assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*CANONICAL CLOUD/);
-  assert.match(brandCss, /#nav-logo:not\(\[data-brand-lockup='true'\]\)::before[\s\S]*canonical-cloud\.svg/);
   assert.match(brandCss, /\.nav__parent-brand-name[\s\S]*font-size:\s*0\.9rem/);
   assert.match(brandCss, /\.nav__plus-brand-name[\s\S]*font-size:\s*0\.72rem/);
   assert.match(cloudLogo, /Canonical Cloud layered C/);

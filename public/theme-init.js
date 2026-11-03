@@ -5,20 +5,22 @@
     if (!existingBrandStyles) {
       const stylesheet = document.createElement('link');
       stylesheet.rel = 'stylesheet';
-      stylesheet.href = new URL('./brand-overrides.css?v=20261010-clean-logo', currentScriptSrc).href;
+      stylesheet.href = new URL('./brand-overrides.css?v=20261102-lmd-theme', currentScriptSrc).href;
       stylesheet.dataset.canonicalBrandStyles = 'true';
       document.head.append(stylesheet);
     }
   }
 
   const STORAGE_KEY = 'canonical-theme';
-  const PREFERENCES = new Set(['auto', 'light', 'medium', 'dark']);
+  const THEMES = new Set(['light', 'medium', 'dark']);
   const THEME_COLORS = {
     light: '#f3f7f5',
     medium: '#172033',
     dark: '#0a0f1a',
   };
 
+  // First-visit default only: until the visitor picks light, medium, or dark,
+  // the initial theme follows browser-local time. There is no "auto" choice.
   const localTimeTheme = (date = new Date()) => {
     const hour = date.getHours();
 
@@ -36,32 +38,26 @@
   const readPreference = () => {
     try {
       const value = window.localStorage.getItem(STORAGE_KEY);
-      return PREFERENCES.has(value) ? value : 'auto';
+      return THEMES.has(value) ? value : localTimeTheme();
     } catch {
-      return 'auto';
+      return localTimeTheme();
     }
   };
 
-  const persistPreference = (preference) => {
+  const persistPreference = (theme) => {
     try {
-      if (preference === 'auto') {
-        window.localStorage.removeItem(STORAGE_KEY);
-      } else {
-        window.localStorage.setItem(STORAGE_KEY, preference);
-      }
+      window.localStorage.setItem(STORAGE_KEY, theme);
     } catch {
       // Storage can be unavailable in privacy-restricted contexts. The theme
       // still applies for the current page without weakening that boundary.
     }
   };
 
-  const apply = (requestedPreference, options = {}) => {
-    const preference = PREFERENCES.has(requestedPreference) ? requestedPreference : 'auto';
-    const theme = preference === 'auto' ? localTimeTheme() : preference;
+  const apply = (requestedTheme, options = {}) => {
+    const theme = THEMES.has(requestedTheme) ? requestedTheme : localTimeTheme();
     const root = document.documentElement;
 
     root.dataset.theme = theme;
-    root.dataset.themePreference = preference;
     root.style.colorScheme = theme === 'light' ? 'light' : 'dark';
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
@@ -70,10 +66,10 @@
     }
 
     if (options.persist === true) {
-      persistPreference(preference);
+      persistPreference(theme);
     }
 
-    return { preference, theme };
+    return { theme };
   };
 
   window.canonicalTheme = Object.freeze({

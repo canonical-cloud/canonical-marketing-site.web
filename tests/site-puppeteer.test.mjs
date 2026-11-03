@@ -32,7 +32,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   const brand = await page.$eval(".nav__logo-text", (element) =>
     (element.textContent ?? "").replace(/\s+/g, "").trim(),
   );
-  assert.ok(brand.includes("CANONICAL.PLUS"));
+  assert.ok(brand.toUpperCase().includes("CANONICAL.PLUS"));
 
   // The live DOM and computed CSS must never insert a Product badge,
   // including via the ::before pseudo-element or a redundant ARIA label.
@@ -50,7 +50,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   assert.match(logo.text, /CANONICAL CLOUD/);
   assert.ok(logo.text.toUpperCase().replace(/\s+/g, "").includes("CANONICAL.PLUS"));
   assert.equal(logo.text.toLowerCase().includes("product"), false);
-  assert.equal(logo.aria, "Canonical Cloud — canonical.plus home");
+  assert.equal(logo.aria, "Canonical Plus by Canonical Cloud — home");
   assert.equal(logo.innerAria, null);
   assert.equal(logo.legacyBadgeCount, 0);
   assert.equal(logo.className.includes("nav__plus-brand-name"), true);
@@ -89,7 +89,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
     true,
   );
   assert.match(await pageText(page), /Canonical supports readiness and pre-audits/);
-  assert.match(await pageText(page), /canonical\.plus\. All rights reserved/);
+  assert.match(await pageText(page), /© \d{4} Canonical Cloud\. Canonical Plus is a Canonical Cloud product\. All rights reserved/);
 
   assert.deepEqual(pageErrors, []);
 });

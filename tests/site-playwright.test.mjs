@@ -52,7 +52,7 @@ test("playwright renders the readiness-first canonical.plus landing page", async
   );
   await page.locator('a[href="mailto:hello@canonical.plus"]').first().waitFor({ state: "visible" });
   await page.locator("footer").getByText(/Canonical supports readiness and pre-audits/).waitFor({ state: "visible" });
-  await page.locator("footer").getByText(/canonical\.plus\. All rights reserved/).waitFor({ state: "visible" });
+  await page.locator("footer").getByText(/© \d{4} Canonical Cloud\. Canonical Plus is a Canonical Cloud product\. All rights reserved/).waitFor({ state: "visible" });
 
   assert.deepEqual(pageErrors, []);
 });
@@ -67,36 +67,48 @@ test("playwright exercises every header and footer theme control", async (t) => 
 
   assert.equal(await page.evaluate(() => typeof window.canonicalTheme?.apply), "function");
 
+  assert.equal(await page.locator('[data-theme-choice="auto"]').count(), 0, "there is no auto choice");
+
   for (const theme of ["light", "medium", "dark"]) {
     const header = page.locator(`[data-theme-switcher].theme-switcher--header [data-theme-choice="${theme}"]`);
     await header.click();
-    assert.deepEqual(
-      await page.evaluate(() => ({
-        preference: document.documentElement.dataset.themePreference,
-        theme: document.documentElement.dataset.theme,
-      })),
-      { preference: theme, theme },
-    );
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), theme);
+    assert.equal(await page.evaluate(() => localStorage.getItem("canonical-theme")), theme);
     assert.equal(await header.getAttribute("aria-pressed"), "true");
     assert.equal(
       await page.locator(`footer [data-theme-choice="${theme}"]`).getAttribute("aria-pressed"),
       "true",
     );
-    await page.locator("[data-theme-status]").getByText(new RegExp(`^${theme} · manual$`, "i")).waitFor();
   }
+});
 
-  await page.locator('footer [data-theme-choice="auto"]').click();
-  const automatic = await page.evaluate(() => ({
-    preference: document.documentElement.dataset.themePreference,
-    theme: document.documentElement.dataset.theme,
-  }));
-  assert.equal(automatic.preference, "auto");
-  assert.ok(["light", "medium", "dark"].includes(automatic.theme));
-  assert.equal(
-    await page.locator('[data-theme-switcher].theme-switcher--header [data-theme-choice="auto"]').getAttribute("aria-pressed"),
-    "true",
-  );
-  await page.locator("[data-theme-status]").getByText(new RegExp(`^Auto · ${automatic.theme} from local time$`)).waitFor();
+test("playwright header lockup never overlaps the navigation", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+
+  for (const width of [1440, 1280, 1200, 1100, 1024, 900, 800, 390]) {
+    const page = await browser.newPage({ viewport: { height: 600, width } });
+    await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
+
+    const boxes = await page.evaluate(() => {
+      const rect = (el) => el.getBoundingClientRect();
+      const visible = (el) => { const r = rect(el); return r.width > 0 && r.height > 0; };
+      const parts = [...document.querySelectorAll("#nav-logo > span, #nav-logo > span > *")].filter(visible).map(rect);
+      const others = [...document.querySelectorAll("#nav-links > *, .nav__actions")].filter(visible).map(rect);
+      return { parts, others };
+    });
+    const intersects = (a, b) => a.left < b.right - 0.5 && b.left < a.right - 0.5 && a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5;
+
+    for (const part of boxes.parts) {
+      for (const other of boxes.others) {
+        assert.equal(intersects(part, other), false, `header lockup overlaps nav at ${width}px`);
+      }
+    }
+    const [parent, plus] = await page.locator("#nav-logo > span").evaluateAll((els) => els.map((el) => el.getBoundingClientRect().toJSON()));
+    assert.ok(parent.right <= plus.left, `Canonical Cloud and Canonical Plus marks overlap at ${width}px`);
+    await page.close();
+  }
 });
 
 test("playwright keeps mobile navigation operable by keyboard and touch", async (t) => {
