@@ -123,11 +123,22 @@ jobs:
 
           // Check served JS and CSS, not only server HTML: CSS ::before introduced
           // the original visible Product badge that previous HTML checks missed.
-          assert.ok(homepage.includes('site.js?v=20261010-clean-logo'), 'live HTML must load revised header JS');
-          const liveBrandCss = await fetchPage('https://canonical.plus/brand-overrides.css?v=20261010-clean-logo');
-          const liveBrandJs = await fetchPage('https://canonical.plus/site.js?v=20261010-clean-logo');
-          assert.ok(liveBrandCss.includes('.nav__plus-brand-name'), 'served CSS must style the new header classes');
-          assert.ok(liveBrandJs.includes('nav__plus-brand-name'), 'served JS must create the new header classes');
+          // The Cloud | Plus lockup is server-rendered; script and stylesheet versions are
+          // read from the live page so a cache-bust bump does not break this check.
+          assert.match(homepage, /class="nav__parent-brand-name"[^>]*>CANONICAL CLOUD</, 'live HTML must server-render the Canonical Cloud lockup');
+          assert.match(homepage, /class="[^"]*nav__plus-brand-name/, 'live HTML must server-render the Canonical Plus mark');
+          const siteJsPath = homepage.match(/\/site\.js\?v=[a-z0-9-]+/)?.[0];
+          const themeInitPath = homepage.match(/\/theme-init\.js\?v=[a-z0-9-]+/)?.[0];
+          assert.ok(siteJsPath, 'live HTML must load a versioned site.js');
+          assert.ok(themeInitPath, 'live HTML must load a versioned theme-init.js');
+          const liveThemeInit = await fetchPage(`https://canonical.plus${themeInitPath}`);
+          const brandCssPath = liveThemeInit.match(/brand-overrides\.css\?v=[a-z0-9-]+/)?.[0];
+          assert.ok(brandCssPath, 'theme-init.js must load a versioned brand stylesheet');
+          const liveBrandCss = await fetchPage(`https://canonical.plus/${brandCssPath}`);
+          const liveBrandJs = await fetchPage(`https://canonical.plus${siteJsPath}`);
+          assert.ok(liveBrandCss.includes('.nav__plus-brand-name'), 'served CSS must style the header lockup');
+          assert.equal(liveBrandJs.includes('configureHeaderBranding'), false, 'served JS must not rewrite the header at runtime');
+          assert.equal(liveBrandCss.includes('::before'), false, 'served CSS must not inject header content');
           assert.equal(liveBrandCss.includes("content: 'product'"), false, 'served CSS must not inject Product');
           assert.equal(liveBrandCss.includes('nav__product-brand'), false, 'served CSS has no old Product selectors');
           assert.equal(liveBrandJs.includes('canonical.plus product'), false, 'served JS has no Product aria label');
