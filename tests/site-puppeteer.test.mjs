@@ -91,5 +91,47 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   assert.match(await pageText(page), /Canonical supports readiness and pre-audits/);
   assert.match(await pageText(page), /© \d{4} Canonical Cloud\. Canonical Plus is a Canonical Cloud product\. All rights reserved/);
 
+  // Carried over from PR #145: header and footer must load the same real Cloud
+  // SVG (a CSS gradient square is not a substitute), and the lockups must not
+  // collide down to 320px. The footer stacks its two lockups at every width.
+  const logoAssets = await page.evaluate(() => {
+    const head = document.querySelector("#nav-logo .nav__parent-brand-mark");
+    const foot = document.querySelector(".footer__brand-logo--cloud .canonical-cloud-mark");
+    return {
+      headSrc: head?.getAttribute("src"),
+      footSrc: foot?.getAttribute("src"),
+      footTag: foot?.tagName,
+      headLoaded: head instanceof HTMLImageElement && head.complete && head.naturalWidth > 0,
+      footLoaded: foot instanceof HTMLImageElement && foot.complete && foot.naturalWidth > 0,
+    };
+  });
+  assert.equal(logoAssets.footTag, "IMG");
+  assert.ok(logoAssets.headLoaded && logoAssets.footLoaded, "both Cloud marks must load");
+  assert.equal(new URL(logoAssets.headSrc, server.url).pathname, "/brand/canonical-cloud.svg");
+  assert.equal(new URL(logoAssets.footSrc, server.url).pathname, "/brand/canonical-cloud.svg");
+
+  for (const width of [1440, 900, 375, 320]) {
+    await page.setViewport({ height: 900, width });
+    const geometry = await page.evaluate(() => {
+      const box = (selector) => {
+        const rect = document.querySelector(selector)?.getBoundingClientRect();
+        return rect ? { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom } : null;
+      };
+      return {
+        headCloud: box("#nav-logo .nav__parent-brand"),
+        headPlus: box("#nav-logo .nav__plus-brand"),
+        footCloud: box(".footer__brand-logo--cloud"),
+        footPlus: box(".footer__brand-lockups .footer__brand-logo:not(.footer__brand-logo--cloud)"),
+        pageWidth: document.documentElement.scrollWidth,
+      };
+    });
+    for (const key of ["headCloud", "headPlus", "footCloud", "footPlus"]) {
+      assert.ok(geometry[key], `missing ${key} at ${width}px`);
+    }
+    assert.ok(geometry.headPlus.left >= geometry.headCloud.right, `header logos overlap at ${width}px`);
+    assert.ok(geometry.footPlus.top >= geometry.footCloud.bottom, `footer lockups must stack at ${width}px`);
+    assert.ok(geometry.pageWidth <= width, `horizontal page scroll at ${width}px`);
+  }
+
   assert.deepEqual(pageErrors, []);
 });
