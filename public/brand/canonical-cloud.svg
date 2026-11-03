@@ -1,17 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title description">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="246 249 750 750" fill="none" role="img" aria-labelledby="title description">
   <title id="title">Canonical Cloud layered C</title>
-  <desc id="description">A layered green and cyan letter C with a floating upper terminal.</desc>
+  <desc id="description">A letter C of three concentric rings, green above and cyan below, mirrored across a central gap, with the inner rings ending in horizontal bars.</desc>
 
-  <g stroke="#66f29a" stroke-width="4" stroke-linecap="round">
-    <path d="M7.62 29.65A22.5 22.5 0 0 1 47.73 18.15"/>
-    <path d="M12.89 30.20A17.2 17.2 0 0 1 42.78 20.49"/>
-    <path d="M18.17 30.76A11.9 11.9 0 0 1 37.65 22.88"/>
-    <path d="M42.5 24H55"/>
-  </g>
+  <defs>
+    <!-- Outer and middle rings end in a horizontal cut level with the bar gap. -->
+    <clipPath id="ring-cut" clipPathUnits="userSpaceOnUse">
+      <path d="M0 0H1254V452H641V617H0Z"/>
+    </clipPath>
+    <!-- Upper half; the lower half is the same shape mirrored across y = 624. -->
+    <g id="half" stroke-width="50">
+      <g clip-path="url(#ring-cut)">
+        <path d="M291.07 617A350 350 0 0 1 969.9 504.3"/>
+        <path d="M357.09 617A284 284 0 0 1 907.9 526.9"/>
+      </g>
+      <path d="M423.11 617A218 218 0 0 1 814.4 492"/>
+      <path d="M814.4 492H950" stroke-linecap="round"/>
+    </g>
+  </defs>
 
-  <g stroke="#00a7c7" stroke-width="4" stroke-linecap="round">
-    <path d="M7.62 34.35A22.5 22.5 0 0 0 47.73 45.85"/>
-    <path d="M12.89 33.80A17.2 17.2 0 0 0 44.26 41.62"/>
-    <path d="M18.17 33.24A11.9 11.9 0 0 0 37.65 39.65H54.5"/>
-  </g>
+  <use href="#half" xlink:href="#half" stroke="#5ade90"/>
+  <use href="#half" xlink:href="#half" stroke="#10b1c8" transform="matrix(1 0 0 -1 0 1248)"/>
 </svg>
