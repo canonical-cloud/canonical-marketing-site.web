@@ -8,7 +8,7 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
 const pricingHref = `${baseNoSlash}/pricing/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
 const money = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: catalog.source.currency,
@@ -44,7 +44,7 @@ const deliverables = [
           performed by a qualified party under its own rules.
         </p>
         <div class="page-hero__actions animate-fade-in-up stagger-3">
-          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          <a href={quoteHref} class="btn btn--primary btn--large">
             Start readiness assessment
           </a>
           <a href={pricingHref} class="btn btn--secondary btn--large">View pricing</a>
@@ -71,7 +71,7 @@ const deliverables = [
         <h2 id="readiness-pricing-title">Three levels of readiness support</h2>
         <p>
           These are <strong>{catalog.source.publicationStatus}</strong> starting assumptions in
-          {catalog.source.currency}, current as of {catalog.source.asOf}. Final scope, price,
+          {catalog.source.currency}, current as of {catalog.source.asOf}. These proposed monthly service tiers are separate from fixed-fee project packages and the public one-time estimator. Final scope, price,
           allowances, dependencies, term, and billing are controlled by the signed statement of work.
         </p>
       </header>
@@ -96,7 +96,7 @@ const deliverables = [
 
       <div class="action-row readiness-pricing-actions">
         <a href={pricingHref} class="btn btn--secondary btn--large">Full pricing details</a>
-        <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+        <a href={quoteHref} class="btn btn--primary btn--large">
           Scope a readiness engagement
         </a>
       </div>
@@ -268,7 +268,7 @@ const deliverables = [
         </p>
         <div class="action-row">
           <a href={compareHref} class="btn btn--secondary btn--large">Compare approaches</a>
-          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          <a href={quoteHref} class="btn btn--primary btn--large">
             Start readiness assessment
           </a>
         </div>

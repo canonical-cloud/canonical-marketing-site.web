@@ -6,6 +6,34 @@
 
 The scheduled `live browser smoke` job tested the public HTTPS response and failed with missing `X-Content-Type-Options: nosniff`. Its actual deployed-origin check is distinct from the local container test and the GitHub Pages HTTPS health check. A rerun on October 27, 2026 reproduced the missing header. Preserve the live Chromium test; do not downgrade it to a markup check.
 
+## Approval-gated GitHub workflow (not executed)
+
+A new [manual workflow](../../.github/workflows/cloudflare-security-headers.yml)
+uses the scoped [rule file](../../infra/cloudflare/canonical-plus-security-headers.rule.json)
+and [single-rule API script](../../scripts/cloudflare-header-rule.mjs).
+It is **not** enabled as an automatic production deployment.
+
+Before using it, the authorized infrastructure owner must configure the
+`cloudflare-production` GitHub environment with **required reviewers**, a
+restricted deployment branch, and secrets `CANONICAL_CF_ZONE_ID` and
+`CANONICAL_CF_API_TOKEN` (scoped to the canonical.plus zone with only needed
+Transform Rules access). No token or zone identifier is committed. Review the
+existing rules and confirm DNS proxy/TLS state first.
+
+Run the workflow in `inspect` mode to read the existing zone phase and
+report whether a single scoped rule would be added, patched, or unchanged.
+The script fails closed when a competing response-header rule is detected,
+an existing managed rule has a different matcher, or the phase entry point
+does not exist. To apply, a human must separately select `apply` and enter
+`APPLY_CANONICAL_PLUS_HEADERS`; the protected environment must approve.
+The script uses only Cloudflare single-rule POST or PATCH, never a full-ruleset
+PUT. It reads the rule back and then runs a live HTTP header audit.
+
+**Deployment acceptance is still the scheduled/manual `live browser smoke`
+with executed Chromium steps against the actual `https://canonical.plus/`
+response.** Never mark issue #139 fixed based only on this script, a GitHub
+green build, a Cloudflare API acknowledgment, or local container headers.
+
 ## Deploy the scoped response-header rule
 
 The **rule fragment** in [`infra/cloudflare/canonical-plus-security-headers.rule.json`](../../infra/cloudflare/canonical-plus-security-headers.rule.json) is ready to add to the zone's **existing** `http_response_headers_transform` ruleset. Its match expression is `(http.host eq "canonical.plus")` and its action is `rewrite`. It sets CSP, `nosniff`, frame denial, referrer policy, opener policy, permissions policy, and a **short, host-only** HSTS lifetime of one day.

@@ -6,7 +6,7 @@ import '../../styles/public-intake.css';
 
 const individualHref = 'https://user.canonical.plus/pre-interest';
 const organizationHref = 'https://org.canonical.plus/submit-application';
-const quoteHref = 'https://user.canonical.plus/u/quote';
+const quoteHref = 'https://canonical.plus/quote/';
 ---
 
 <BaseLayout
@@ -62,8 +62,8 @@ const quoteHref = 'https://user.canonical.plus/u/quote';
           The authenticated quote is a separate explicit action. Pre-interest
           registration never creates or submits one automatically.
         </p>
-        <a class="btn btn--secondary" href={quoteHref} data-application-link="quote">
-          Open the existing quote flow
+        <a class="btn btn--secondary" href={quoteHref}>
+          Open the public readiness estimator
         </a>
       </aside>
     </div>

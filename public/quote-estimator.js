@@ -169,16 +169,27 @@ if (root instanceof HTMLElement) {
           labelOf(selectedSector),
         ].filter(Boolean).join(' · ');
 
-        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, midpoint, lower, upper, summary };
+        // FedRAMP authorization and substantial federal readiness are custom-scoped.
+        // A nominal framework increment cannot price the observation population,
+        // sponsor/agency dependencies, assessor work or regulated-system boundary.
+        const requiresCustomScoping = standards.some((input) => input.value === 'fedramp');
+        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, midpoint, lower, upper, summary, requiresCustomScoping };
       };
 
       const render = () => {
         const quote = calculate();
         speedSlider.setAttribute('aria-valuetext', quote.speed.label);
-        rangeNode.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
-        summaryNode.textContent = quote.summary;
+        rangeNode.textContent = quote.requiresCustomScoping
+          ? 'Custom scoping required'
+          : `${money.format(quote.lower)}–${money.format(quote.upper)}`;
+        summaryNode.textContent = quote.requiresCustomScoping
+          ? `${quote.summary} · Federal readiness requires a separate scoped proposal`
+          : quote.summary;
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
-        meterNode.style.width = `${clamp(percentage, 4, 100)}%`;
+        meterNode.style.width = quote.requiresCustomScoping ? '0%' : `${clamp(percentage, 4, 100)}%`;
+        // Never send a misleading calculated quote for a custom federal engagement.
+        root.dataset.quoteRuntime = quote.requiresCustomScoping ? 'custom-scope' : 'ready';
+        completeButton.disabled = quote.requiresCustomScoping;
         if (quote.standards.length > 0 && standardError instanceof HTMLElement) {
           standardError.hidden = true;
           standardGroup?.removeAttribute('aria-invalid');
@@ -204,6 +215,10 @@ if (root instanceof HTMLElement) {
 
       completeButton.addEventListener('click', async () => {
         const quote = render();
+        if (quote.requiresCustomScoping) {
+          setStatus('FedRAMP readiness and authorization-related work require a custom scoped proposal. Email hello@canonical.plus.', true);
+          return;
+        }
         if (quote.standards.length === 0) {
           standardGroup?.setAttribute('aria-invalid', 'true');
           if (standardError instanceof HTMLElement) standardError.hidden = false;
@@ -273,7 +288,7 @@ if (root instanceof HTMLElement) {
         } catch {
           setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
         } finally {
-          completeButton.disabled = false;
+          completeButton.disabled = calculate().requiresCustomScoping;
         }
       });
 

@@ -3,7 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
 
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const quoteHref = `${baseNoSlash}/quote/`;
 
 const assuranceTargets = [
   {
@@ -183,7 +184,7 @@ const sections = [
           legal, and regulatory paths required for each program.
         </p>
         <div class="page-hero__actions animate-fade-in-up stagger-3">
-          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          <a href={quoteHref} class="btn btn--primary btn--large">
             Scope your framework mix
           </a>
           <a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large">
@@ -290,7 +291,7 @@ const sections = [
           kept explicit.
         </p>
         <div class="action-row">
-          <a href={quoteHref} class="btn btn--primary btn--large" data-application-link="quote">
+          <a href={quoteHref} class="btn btn--primary btn--large">
             Start readiness assessment
           </a>
         </div>
