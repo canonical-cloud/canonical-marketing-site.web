@@ -12,10 +12,10 @@ const expectedPeople = [
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
   ['Tom Mensch', 'Software & Legal'],
-  ['Rebecca Toni', 'Team'],
-  ['Georgiana Fabrecce', 'Team'],
+  ['Rebecca Toni', 'Marketing & Communications'],
+  ['Georgiana Fabrecce', 'Client Operations'],
   ['Bryce Merrson', 'Technical Support'],
-  ['Nouman Siddiqui', 'Team'],
+  ['Nouman Siddiqui', 'Software Engineering'],
   ['Utkarsh Shukla', 'Infosec Expert'],
   ['Casey Myers', 'Sales Engineer'],
 ];

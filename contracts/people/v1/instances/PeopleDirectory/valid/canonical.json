@@ -57,14 +57,14 @@
     {
       "id": "rebecca-toni",
       "name": "Rebecca Toni",
-      "role": "Team",
+      "role": "Marketing & Communications",
       "initials": "RT",
       "photoUrl": "/team/rebecca-toni.jpg"
     },
     {
       "id": "georgiana-fabrecce",
       "name": "Georgiana Fabrecce",
-      "role": "Team",
+      "role": "Client Operations",
       "initials": "GF"
     },
     {
@@ -77,7 +77,7 @@
     {
       "id": "nouman-siddiqui",
       "name": "Nouman Siddiqui",
-      "role": "Team",
+      "role": "Software Engineering",
       "initials": "NS",
       "photoUrl": "/team/nouman-siddiqui.jpg"
     },

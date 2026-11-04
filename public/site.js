@@ -11,7 +11,7 @@ const configureBrandStyles = () => {
 
   const stylesheet = document.createElement('link');
   stylesheet.rel = 'stylesheet';
-  stylesheet.href = new URL('./brand-overrides.css?v=20261010-clean-logo', import.meta.url).href;
+  stylesheet.href = new URL('./brand-overrides.css?v=20261025-brand-spacing', import.meta.url).href;
   stylesheet.dataset.canonicalBrandStyles = 'true';
   document.head.append(stylesheet);
 };
@@ -74,28 +74,6 @@ const configureApplicationLinks = () => {
 };
 
 configureApplicationLinks();
-
-const configurePeopleNavigation = () => {
-  const readinessLink = document.getElementById('nav-services');
-  const quoteLink = document.getElementById('nav-quote');
-
-  if (!(readinessLink instanceof HTMLAnchorElement) || !(quoteLink instanceof HTMLAnchorElement)) {
-    return;
-  }
-
-  if (document.getElementById('nav-people')) {
-    return;
-  }
-
-  const peopleLink = document.createElement('a');
-  peopleLink.id = 'nav-people';
-  peopleLink.className = 'nav__link';
-  peopleLink.textContent = 'People';
-  peopleLink.href = new URL('../people/', readinessLink.href).href;
-  quoteLink.before(peopleLink);
-};
-
-configurePeopleNavigation();
 
 const nav = document.getElementById('main-nav');
 
@@ -181,7 +159,7 @@ if (skipLink instanceof HTMLAnchorElement && mainContent instanceof HTMLElement)
 
 const toggle = document.getElementById('nav-toggle');
 const links = document.getElementById('nav-links');
-const mobileNavigation = window.matchMedia('(max-width: 768px)');
+const mobileNavigation = window.matchMedia('(max-width: 1280px)');
 
 if (toggle && links) {
   toggle.type = 'button';

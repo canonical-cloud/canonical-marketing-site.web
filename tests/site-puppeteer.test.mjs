@@ -56,12 +56,29 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   assert.equal(logo.className.includes("nav__plus-brand-name"), true);
   assert.ok(["none", "normal", '""'].includes(logo.beforeContent), `unexpected generated header label: ${logo.beforeContent}`);
 
+  assert.equal(await page.$eval('.canonical-cloud-mark', (image) =>
+    image.src === document.querySelector('.nav__parent-brand-mark').src && image.complete && image.naturalWidth > 0,
+  ), true, 'footer must load the same Canonical Cloud mark as the header');
+
+  for (const width of [1440, 1281, 1280, 1200, 1040, 900, 800, 375, 320]) {
+    await page.setViewport({ height: 900, width });
+    const bounds = await page.$eval('.nav__inner', (nav) => {
+      const parent = nav.querySelector('.nav__parent-brand').getBoundingClientRect();
+      const plus = nav.querySelector('.nav__plus-brand').getBoundingClientRect();
+      const actions = nav.querySelector('.nav__actions').getBoundingClientRect();
+      return { left: parent.left, gap: plus.left - parent.right, right: actions.right };
+    });
+    assert.ok(bounds.left >= 0 && bounds.right <= width, `header controls must fit at ${width}px`);
+    assert.ok(bounds.gap >= 12, `brand marks need separation at ${width}px`);
+  }
+  await page.setViewport({ height: 900, width: 1440 });
+
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "FAQ", "Insights", "People"]);
+  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "FAQ", "Insights"]);
   assert.equal(
-    await page.$eval("#nav-people", (element) => new URL(element.href).pathname),
+    await page.$eval(".footer__link[href$='/people/']", (element) => new URL(element.href).pathname),
     "/people/",
   );
   assert.equal(await page.$("#nav-sign-in"), null);

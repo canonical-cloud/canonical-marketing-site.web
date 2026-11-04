@@ -23,10 +23,10 @@ const roster = [
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
   ['Tom Mensch', 'Software & Legal'],
-  ['Rebecca Toni', 'Team'],
-  ['Georgiana Fabrecce', 'Team'],
+  ['Rebecca Toni', 'Marketing & Communications'],
+  ['Georgiana Fabrecce', 'Client Operations'],
   ['Bryce Merrson', 'Technical Support'],
-  ['Nouman Siddiqui', 'Team'],
+  ['Nouman Siddiqui', 'Software Engineering'],
   ['Utkarsh Shukla', 'Infosec Expert'],
   ['Casey Myers', 'Sales Engineer'],
 ];
@@ -93,12 +93,11 @@ test('team portraits are served locally and remain base-aware', async () => {
   assert.match(nginx, /img-src 'self' data: https:\/\/benefactor\.cc;/);
 });
 
-test('people navigation is base-aware and inserted before the quote action', () => {
-  assert.match(siteScript, /id = 'nav-people'/);
-  assert.match(siteScript, /textContent = 'People'/);
-  assert.match(siteScript, /new URL\('\.\.\/people\/', readinessLink\.href\)/);
-  assert.match(siteScript, /quoteLink\.before\(peopleLink\)/);
-  assert.doesNotMatch(siteScript, /nav-sign-in|signInLink/);
+test('people navigation belongs only in the base-aware footer', async () => {
+  const layout = await read('../src/layouts/BaseLayout.astro');
+  assert.doesNotMatch(siteScript, /nav-people|configurePeopleNavigation/);
+  assert.match(layout, /const peopleHref = `\$\{baseNoSlash\}\/people\/`/);
+  assert.match(layout, /<a href=\{peopleHref\} class="footer__link">People<\/a>/);
 });
 
 test('failed remote portraits fall back without inline handlers', () => {

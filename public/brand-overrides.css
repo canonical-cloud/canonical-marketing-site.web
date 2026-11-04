@@ -102,8 +102,9 @@ html:root[data-theme='light'] {
  * header, so there is no single-brand flash or regression if that upgrade is delayed.
  */
 #nav-logo:not([data-brand-lockup='true']) {
-  gap: 0.75rem;
+  gap: 1.25rem;
   min-width: 0;
+  padding-block: 0.5rem;
 }
 
 #nav-logo:not([data-brand-lockup='true'])::before {
@@ -112,7 +113,7 @@ html:root[data-theme='light'] {
   align-items: center;
   min-height: 38px;
   padding-left: 46px;
-  padding-right: 0.75rem;
+  padding-right: 1.25rem;
   border-right: 1px solid var(--av-border-hover);
   background: url('./brand/canonical-cloud.svg') no-repeat left center / 38px 38px;
   color: var(--av-text-primary);
@@ -145,8 +146,10 @@ html:root[data-theme='light'] {
 }
 
 .nav__brand-lockup {
-  gap: 0.75rem !important;
+  gap: 1.25rem !important;
   min-width: 0;
+  flex-shrink: 0;
+  padding-block: 0.5rem;
 }
 
 .nav__parent-brand,
@@ -157,8 +160,8 @@ html:root[data-theme='light'] {
 }
 
 .nav__parent-brand {
-  gap: 0.55rem;
-  padding-right: 0.75rem;
+  gap: 0.75rem;
+  padding-right: 1.25rem;
   border-right: 1px solid var(--av-border-hover);
 }
 
@@ -179,7 +182,7 @@ html:root[data-theme='light'] {
 }
 
 .nav__plus-brand {
-  gap: 0.45rem;
+  gap: 0.65rem;
 }
 
 .nav__plus-brand-mark {
@@ -204,12 +207,12 @@ html:root[data-theme='light'] {
 @media (max-width: 1040px) {
   .nav__brand-lockup,
   #nav-logo:not([data-brand-lockup='true']) {
-    gap: 0.55rem !important;
+    gap: 0.75rem !important;
   }
 
   .nav__parent-brand {
     gap: 0.4rem;
-    padding-right: 0.55rem;
+    padding-right: 0.75rem;
   }
 
   .nav__parent-brand-name,

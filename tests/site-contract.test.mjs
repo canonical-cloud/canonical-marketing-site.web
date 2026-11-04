@@ -155,7 +155,7 @@ test("mobile navigation has a real open state and synchronized accessibility sta
   assert.match(siteScript, /Close navigation/);
   assert.match(siteScript, /event\.key === 'Escape'/);
   assert.match(siteScript, /restoreFocus:\s*true/);
-  assert.match(siteScript, /matchMedia\('\(max-width: 768px\)'\)/);
+  assert.match(siteScript, /matchMedia\('\(max-width: 1280px\)'\)/);
 });
 
 test("quote links use the supported customer quote boundary and sign-in stays hidden until supported", () => {
