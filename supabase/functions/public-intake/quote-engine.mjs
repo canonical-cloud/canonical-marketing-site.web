@@ -57,6 +57,13 @@ export const computeQuote = (raw) => {
     throw new Error('invalid_quote_selection');
   }
 
+  // A general-range quote cannot represent federal authorization readiness,
+  // independent assessment and agency dependencies. Reject even when clients
+  // bypass the browser; do not silently price the FedRAMP increment as full scope.
+  if (uniqueStandardIds.includes('fedramp')) {
+    throw new Error('custom_scope_required');
+  }
+
   const additive =
     speed.baseUsd +
     standards.reduce((sum, item) => sum + item.amountUsd, 0) +

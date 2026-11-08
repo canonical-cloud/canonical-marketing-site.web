@@ -20,7 +20,7 @@ const url = new URL(target);
 const sha40 = /^[0-9a-f]{40}$/;
 
 if (url.protocol !== 'https:' || url.host !== 'app.canonical.plus' || url.pathname !== '/u/quote' || url.search || url.hash) {
-  throw new Error('canonical CTA target must be exact credential-free https://app.canonical.plus/u/quote');
+  throw new Error('pinned customer application route must be exact credential-free https://app.canonical.plus/u/quote');
 }
 
 // canonical-docs is private, while this repository is public. A pull-request
@@ -46,8 +46,17 @@ if (webAuthority.repository !== 'canonical-cloud/canonical-web-server.rs' || !sh
 if (!webRoutes.includes('.route("/u/quote", get(quote::page).post(quote::submit))')) {
   throw new Error('customer web server does not implement GET+POST /u/quote');
 }
+if (!marketingIndex.includes('const quoteHref = `${baseNoSlash}/quote/`')) {
+  throw new Error('public marketing CTA must use the local /quote/ entry point');
+}
+if (marketingIndex.includes('data-application-link="quote"') ||
+    marketingIndex.includes('https://app.canonical.plus/u/quote')) {
+  throw new Error('public marketing CTA must not bypass the public federal quote guard');
+}
+for (const [name, source] of Object.entries({ siteScript, readme })) {
+  if (!source.includes('/u/quote')) throw new Error(`${name} does not pin the approved customer app route`);
+}
 for (const [name, source] of Object.entries({ marketingIndex, siteScript, readme })) {
-  if (!source.includes('/u/quote')) throw new Error(`${name} does not reference /u/quote`);
   if (source.includes('/u/readiness')) throw new Error(`${name} still contains obsolete /u/readiness`);
   if (/(?:access_token|refresh_token|id_token|return_to|[?&](?:token|tenant|subject|session)=)/i.test(source)) {
     throw new Error(`${name} contains credential/identity material in application-link source`);

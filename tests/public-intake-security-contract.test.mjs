@@ -156,3 +156,27 @@ test("Pages publishes content with explicit offline intake fallback, but rejects
   assert.ok(contactPage.includes("disabled={!supabaseUrl}"));
   assert.ok(contactRuntime.includes("if (!supabaseUrl)"));
 });
+
+test("server rejects custom federal scope before quoting, storage, or email", () => {
+  const valid = {
+    speedWeeks: 5,
+    standardIds: ["soc2"],
+    deliveryDepthId: "managed",
+    complexityId: "growing",
+    companyStageId: "business",
+    employeeBandId: "11-50",
+    sectorId: "technology",
+  };
+  for (const standardIds of [["fedramp"], ["soc2", "fedramp"], ["fedramp", "iso27001"]]) {
+    assert.throws(
+      () => quoteEngineModule.computeQuote({ ...valid, standardIds }),
+      /custom_scope_required/,
+    );
+  }
+  assert.deepEqual(
+    quoteEngineModule.computeQuote(valid).selection.standardIds,
+    ["soc2"],
+  );
+  assert.match(edge, /error\.message === 'custom_scope_required'/);
+  assert.match(edge, /json\(422, \{ error: 'custom_scope_required' \}, origin\)/);
+});

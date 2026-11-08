@@ -4,7 +4,7 @@ import '../styles/global.css';
 import '../styles/marketing-pages.css';
 import '../styles/public-intake.css';
 
-const quoteHref = 'https://user.canonical.plus/u/quote';
+const quoteHref = 'https://canonical.plus/quote/';
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const homeHref = `${baseNoSlash}/`;
 ---
@@ -25,8 +25,8 @@ const homeHref = `${baseNoSlash}/`;
         No account, role, entitlement, quote, audit, certification, or authorization was created.
       </p>
       <div class="action-row">
-        <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">
-          Continue to the existing quote flow
+        <a class="btn btn--primary btn--large" href={quoteHref}>
+          Continue to the public readiness estimator
         </a>
         <a class="btn btn--secondary btn--large" href={homeHref}>Return to Canonical Plus</a>
       </div>

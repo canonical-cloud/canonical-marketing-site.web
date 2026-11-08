@@ -7,7 +7,7 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const pricingHref = `${baseNoSlash}/pricing/`;
-const quoteHref = 'https://app.canonical.plus/u/readiness';
+const quoteHref = `${baseNoSlash}/quote/`;
 ---
 
 <BaseLayout
@@ -29,7 +29,7 @@ const quoteHref = 'https://app.canonical.plus/u/readiness';
           replace your auditor, assessor, regulator, certification body, or legal counsel.
         </p>
         <div class="page-hero__actions">
-          <a class="btn btn--primary btn--large" href={quoteHref} data-application-link="quote">Start readiness assessment</a>
+          <a class="btn btn--primary btn--large" href={quoteHref}>Start readiness assessment</a>
           <a class="btn btn--secondary btn--large" href={frameworksHref}>Browse frameworks</a>
         </div>
       </div>
