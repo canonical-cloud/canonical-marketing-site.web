@@ -2,6 +2,9 @@
   {
     "id": "channelmeter",
     "company": "ChannelMeter",
+    "logoSourceUrl": "https://channelmeter.com/img/logo-color-25ccee0e11d204599c7ae19d4572abff.svg",
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -11,6 +14,9 @@
   {
     "id": "vultr",
     "company": "Vultr",
+    "logoSourceUrl": "https://www.vultr.com/media/logo_ondark.svg",
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -20,6 +26,9 @@
   {
     "id": "trinity-labs",
     "company": "Trinity Labs",
+    "logoSourceUrl": null,
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -29,6 +38,9 @@
   {
     "id": "interos-ai",
     "company": "Interos.ai",
+    "logoSourceUrl": "https://www.interos.ai/images/logos/interos/interos-white-blue-logo.png",
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -38,6 +50,9 @@
   {
     "id": "luma-health",
     "company": "Luma Health",
+    "logoSourceUrl": "https://www.lumahealth.io/hubfs/Luma%20Aug%202026/Images/luma-logo.svg",
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -47,6 +62,9 @@
   {
     "id": "benefactor-cc",
     "company": "Benefactor.cc",
+    "logoSourceUrl": "https://benefactor.cc/benefactor-logo.png",
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -56,6 +74,9 @@
   {
     "id": "polka",
     "company": "Polka",
+    "logoSourceUrl": null,
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,
@@ -65,6 +86,9 @@
   {
     "id": "bose-audio",
     "company": "Bose Audio",
+    "logoSourceUrl": "https://www.bose.com/on/demandware.static/Sites-Bose_US-Site/-/default/dwa75c202d/images/logo.svg",
+    "logoAssetPath": null,
+    "logoUseConsent": null,
     "quote": null,
     "attribution": null,
     "relationshipEvidence": null,

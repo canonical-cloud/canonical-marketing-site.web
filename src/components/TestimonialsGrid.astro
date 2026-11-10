@@ -4,8 +4,15 @@ import candidates from '../data/testimonial-candidates.json';
 // Fail closed: names supplied for a proposed testimonial are not proof of a
 // customer relationship, permission, or an authentic attributable quotation.
 // Do not render even a partial wall until all eight records have been reviewed.
+const isLocalLogo = (path) => typeof path === 'string' &&
+  /^\/brand\/testimonials\/[a-z0-9-]+\.(svg|png|webp)$/.test(path);
+
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+
 const isApproved = (entry) =>
   entry.approvedForPublication === true &&
+  isLocalLogo(entry.logoAssetPath) &&
+  typeof entry.logoUseConsent === 'string' && entry.logoUseConsent.trim().length > 0 &&
   typeof entry.relationshipEvidence === 'string' && entry.relationshipEvidence.trim().length > 0 &&
   typeof entry.publicationConsent === 'string' && entry.publicationConsent.trim().length > 0 &&
   typeof entry.quote === 'string' && entry.quote.trim().length > 0 &&
@@ -24,8 +31,9 @@ const publish = candidates.length === 8 && approved.length === 8;
         <p>Feedback shared by customers with permission.</p>
       </header>
       <div class="testimonial-grid" data-testimonial-grid>
-        {approved.map(({ id, company, quote, attribution }) => (
+        {approved.map(({ id, company, quote, attribution, logoAssetPath }) => (
           <figure class="testimonial-card" data-testimonial-id={id}>
+            <img class="testimonial-card__logo" src={`${baseNoSlash}${logoAssetPath}`} alt="" width="190" height="64" loading="lazy" decoding="async" />
             <blockquote class="testimonial-card__quote">{quote}</blockquote>
             <figcaption class="testimonial-card__attribution">
               <span class="testimonial-card__company">{company}</span>
@@ -59,6 +67,14 @@ const publish = candidates.length === 8 && approved.length === 8;
     border-radius: var(--radius-lg);
     background: linear-gradient(155deg, var(--av-surface-elevated), var(--av-surface));
     box-shadow: var(--shadow-sm);
+  }
+
+  .testimonial-card__logo {
+    display: block;
+    width: min(100%, 190px);
+    height: 64px;
+    object-fit: contain;
+    object-position: left center;
   }
 
   .testimonial-card__quote {

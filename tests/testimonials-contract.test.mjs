@@ -10,8 +10,9 @@ const homeSource = await load('src/pages/index.astro');
 
 const approved = (entry) =>
   entry.approvedForPublication === true &&
-  ['relationshipEvidence', 'publicationConsent', 'quote', 'attribution']
-    .every((field) => typeof entry[field] === 'string' && entry[field].trim().length > 0);
+  ['relationshipEvidence', 'publicationConsent', 'logoUseConsent', 'quote', 'attribution', 'logoAssetPath']
+    .every((field) => typeof entry[field] === 'string' && entry[field].trim().length > 0) &&
+  /^\/brand\/testimonials\/[a-z0-9-]+\.(svg|png|webp)$/.test(entry.logoAssetPath);
 
 test('eight testimonial candidates preserve requested 2×4 order', () => {
   assert.deepEqual(candidates.map((entry) => entry.company), [
@@ -23,6 +24,10 @@ test('eight testimonial candidates preserve requested 2×4 order', () => {
   assert.match(component, /max-width: 1024px/);
   assert.match(component, /max-width: 640px/);
   assert.match(homeSource, /<TestimonialsGrid \/>/);
+  assert.match(component, /class="testimonial-card__logo"/);
+  assert.match(component, /baseNoSlash/);
+  assert.match(component, /isLocalLogo\(entry\.logoAssetPath\)/);
+  assert.match(component, /entry\.logoUseConsent/);
 });
 
 test('publication is fail-closed: all eight need evidence, consent, and authentic quotes', async () => {
@@ -38,6 +43,11 @@ test('publication is fail-closed: all eight need evidence, consent, and authenti
   } else {
     assert.match(home, /id="testimonials"/);
     assert.equal((home.match(/data-testimonial-id=/g) || []).length, 8);
+    assert.equal((home.match(/class="testimonial-card__logo"/g) || []).length, 8);
+    for (const { logoAssetPath } of candidates) {
+      const logo = await load(`public${logoAssetPath}`);
+      assert.ok(logo.length > 0, `missing local logo: ${logoAssetPath}`);
+    }
     for (const { company } of candidates) assert.ok(home.includes(company));
   }
 });
