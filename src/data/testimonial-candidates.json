@@ -1,0 +1,74 @@
+[
+  {
+    "id": "channelmeter",
+    "company": "ChannelMeter",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "vultr",
+    "company": "Vultr",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "trinity-labs",
+    "company": "Trinity Labs",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "interos-ai",
+    "company": "Interos.ai",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "luma-health",
+    "company": "Luma Health",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "benefactor-cc",
+    "company": "Benefactor.cc",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "polka",
+    "company": "Polka",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  },
+  {
+    "id": "bose-audio",
+    "company": "Bose Audio",
+    "quote": null,
+    "attribution": null,
+    "relationshipEvidence": null,
+    "publicationConsent": null,
+    "approvedForPublication": false
+  }
+]

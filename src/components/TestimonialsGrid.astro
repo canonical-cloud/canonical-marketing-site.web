@@ -1,0 +1,114 @@
+---
+import candidates from '../data/testimonial-candidates.json';
+
+// Fail closed: names supplied for a proposed testimonial are not proof of a
+// customer relationship, permission, or an authentic attributable quotation.
+// Do not render even a partial wall until all eight records have been reviewed.
+const isApproved = (entry) =>
+  entry.approvedForPublication === true &&
+  typeof entry.relationshipEvidence === 'string' && entry.relationshipEvidence.trim().length > 0 &&
+  typeof entry.publicationConsent === 'string' && entry.publicationConsent.trim().length > 0 &&
+  typeof entry.quote === 'string' && entry.quote.trim().length > 0 &&
+  typeof entry.attribution === 'string' && entry.attribution.trim().length > 0;
+
+const approved = candidates.filter(isApproved);
+const publish = candidates.length === 8 && approved.length === 8;
+---
+
+{publish && (
+  <section class="section testimonials" id="testimonials" aria-labelledby="testimonials-title">
+    <div class="container">
+      <header class="section-header section-header--center">
+        <span class="badge">Testimonials</span>
+        <h2 id="testimonials-title">In their own words</h2>
+        <p>Feedback shared by customers with permission.</p>
+      </header>
+      <div class="testimonial-grid" data-testimonial-grid>
+        {approved.map(({ id, company, quote, attribution }) => (
+          <figure class="testimonial-card" data-testimonial-id={id}>
+            <blockquote class="testimonial-card__quote">{quote}</blockquote>
+            <figcaption class="testimonial-card__attribution">
+              <span class="testimonial-card__company">{company}</span>
+              <span class="testimonial-card__person">{attribution}</span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .testimonial-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-lg);
+    align-items: stretch;
+  }
+
+  .testimonial-card {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-xl);
+    margin: 0;
+    padding: clamp(1.25rem, 2vw, 2rem);
+    border: 1px solid var(--av-border);
+    border-radius: var(--radius-lg);
+    background: linear-gradient(155deg, var(--av-surface-elevated), var(--av-surface));
+    box-shadow: var(--shadow-sm);
+  }
+
+  .testimonial-card__quote {
+    margin: 0;
+    color: var(--av-text-primary);
+    font-size: 1.05rem;
+    font-weight: 500;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  .testimonial-card__quote::before {
+    content: '“';
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--av-emerald);
+    font-family: Georgia, serif;
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .testimonial-card__attribution {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--av-border-active);
+  }
+
+  .testimonial-card__company {
+    color: var(--av-text-primary);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    overflow-wrap: anywhere;
+  }
+
+  .testimonial-card__person {
+    color: var(--av-text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 1024px) {
+    .testimonial-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 640px) {
+    .testimonial-grid { grid-template-columns: 1fr; }
+  }
+</style>
