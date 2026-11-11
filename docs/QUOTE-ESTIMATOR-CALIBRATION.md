@@ -26,7 +26,7 @@ The 0.90–1.12 factors are **heuristic planning bounds, not empirical percentil
 
 ## Qualification versus pricing
 
-`quote-scope.json`, `public/quote-scope.mjs`, and `supabase/functions/public-intake/quote-scope.mjs` contain five identical scoping dimensions:
+`quote-scope.json`, `public/quote-scope.js`, and `supabase/functions/public-intake/quote-scope.mjs` contain five identical scoping dimensions:
 
 - cloud accounts / production environments;
 - existing control-evidence maturity;
