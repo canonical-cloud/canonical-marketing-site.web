@@ -1,3 +1,5 @@
+import { scopeSchema, validateScope, scopeLabels, customScopeReason } from './quote-scope.mjs';
+
 const root = document.querySelector('[data-quote-estimator]');
 
 if (root instanceof HTMLElement) {
@@ -9,6 +11,8 @@ if (root instanceof HTMLElement) {
   const meterNode = root.querySelector('[data-quote-meter]');
   const statusNode = root.querySelector('[data-quote-status]');
   const standardGroup = root.querySelector('[data-standards-group]');
+  const scopeDetailNode = root.querySelector('[data-quote-scope-details]');
+  const customReasonNode = root.querySelector('[data-quote-custom-reason]');
   const standardError = root.querySelector('[data-standard-error]');
   const completedPanel = document.querySelector('[data-quote-complete]');
   const completedRange = document.querySelector('[data-completed-range]');
@@ -42,6 +46,7 @@ if (root instanceof HTMLElement) {
   const companyStage = root.querySelector('select[name="quote_company_stage"]');
   const employeeBand = root.querySelector('select[name="quote_employee_band"]');
   const sector = root.querySelector('select[name="quote_sector"]');
+  const scopeSelects = scopeSchema.fields.map((field) => ({ field, input: root.querySelector(`select[name="${field.name}"]`) }));
   const emailInput = root.querySelector('input[name="quote_email"]');
   const companyInput = root.querySelector('input[name="quote_company"]');
   const websiteInput = root.querySelector('input[name="quote_website"]');
@@ -92,6 +97,17 @@ if (root instanceof HTMLElement) {
     selectOptionsValid(companyStage, 'multiplier') &&
     selectOptionsValid(employeeBand, 'amount') &&
     selectOptionsValid(sector, 'amount') &&
+    Number(root.dataset.scopeSchemaVersion) === scopeSchema.scopeSchemaVersion &&
+    scopeSelects.every(({ field, input }) =>
+      input instanceof HTMLSelectElement &&
+      input.dataset.quoteScopeField === field.key &&
+      input.options.length === field.options.length &&
+      field.options.every((option, index) =>
+        input.options[index]?.value === option.id &&
+        input.options[index]?.dataset.label === option.label
+      )
+    ) &&
+    scopeDetailNode instanceof HTMLElement && customReasonNode instanceof HTMLElement &&
     emailInput instanceof HTMLInputElement &&
     companyInput instanceof HTMLInputElement &&
     websiteInput instanceof HTMLInputElement &&
@@ -148,6 +164,7 @@ if (root instanceof HTMLElement) {
         const employees = selectedOption('quote_employee_band');
         const selectedSector = selectedOption('quote_sector');
         const stageMultiplier = Number(stage?.dataset?.multiplier || 1);
+        const scope = validateScope(Object.fromEntries(scopeSelects.map(({ field, input }) => [field.key, input.value])));
 
         const additive =
           speed.amount +
@@ -156,7 +173,8 @@ if (root instanceof HTMLElement) {
           valueOf(complexity) +
           valueOf(employees) +
           valueOf(selectedSector);
-        const midpoint = clamp(additive * stageMultiplier, midpointFloor, midpointCeiling);
+        const rawMidpoint = additive * stageMultiplier;
+        const midpoint = clamp(rawMidpoint, midpointFloor, midpointCeiling);
         const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
         const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
         const summary = [
@@ -169,16 +187,34 @@ if (root instanceof HTMLElement) {
           labelOf(selectedSector),
         ].filter(Boolean).join(' · ');
 
-        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, midpoint, lower, upper, summary };
+        const selection = {
+          speedWeeks: Number(speed.id),
+          standardIds: standards.map((item) => item.value),
+          deliveryDepthId: depth?.value || '',
+          complexityId: complexity?.value || '',
+          companyStageId: stage?.value || '',
+          employeeBandId: employees?.value || '',
+          sectorId: selectedSector?.value || '',
+          scope,
+        };
+        const customReason = customScopeReason(selection, rawMidpoint, {
+          midpointCeilingUsd: midpointCeiling, estimateCeilingUsd: ceiling, upperFactor,
+        });
+        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, scope, selection, midpoint, lower, upper, summary, customReason, requiresCustomScoping: Boolean(customReason) };
       };
 
       const render = () => {
         const quote = calculate();
         speedSlider.setAttribute('aria-valuetext', quote.speed.label);
-        rangeNode.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
+        rangeNode.textContent = quote.requiresCustomScoping ? 'Custom scoping required' : `${money.format(quote.lower)}–${money.format(quote.upper)}`;
         summaryNode.textContent = quote.summary;
+        scopeDetailNode.textContent = scopeLabels(quote.scope).map(({ name, value }) => `${name}: ${value}`).join(' · ');
+        customReasonNode.textContent = quote.customReason;
+        customReasonNode.hidden = !quote.requiresCustomScoping;
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
-        meterNode.style.width = `${clamp(percentage, 4, 100)}%`;
+        meterNode.style.width = quote.requiresCustomScoping ? '0%' : `${clamp(percentage, 4, 100)}%`;
+        root.dataset.quoteRuntime = quote.requiresCustomScoping ? 'custom-scope' : 'ready';
+        completeButton.disabled = quote.requiresCustomScoping;
         if (quote.standards.length > 0 && standardError instanceof HTMLElement) {
           standardError.hidden = true;
           standardGroup?.removeAttribute('aria-invalid');
@@ -204,6 +240,10 @@ if (root instanceof HTMLElement) {
 
       completeButton.addEventListener('click', async () => {
         const quote = render();
+        if (quote.requiresCustomScoping) {
+          setStatus(quote.customReason + ' Contact hello@canonical.plus for a reviewed proposal.', true);
+          return;
+        }
         if (quote.standards.length === 0) {
           standardGroup?.setAttribute('aria-invalid', 'true');
           if (standardError instanceof HTMLElement) standardError.hidden = false;
@@ -225,15 +265,7 @@ if (root instanceof HTMLElement) {
           company: companyInput.value.trim(),
           idempotencyKey: submissionKey,
           website: websiteInput.value.trim(),
-          selection: {
-            speedWeeks: Number(quote.speed.id),
-            standardIds: quote.standards.map((item) => item.value),
-            deliveryDepthId: quote.depth?.value || '',
-            complexityId: quote.complexity?.value || '',
-            companyStageId: quote.stage?.value || '',
-            employeeBandId: quote.employees?.value || '',
-            sectorId: quote.sector?.value || '',
-          },
+          selection: quote.selection,
           source: 'canonical.plus/quote',
         };
 
@@ -248,7 +280,13 @@ if (root instanceof HTMLElement) {
             body: JSON.stringify(payload),
           });
           const result = await response.json().catch(() => ({}));
-          if (!response.ok) throw new Error(`quote delivery failed: ${response.status}`);
+          if (!response.ok) {
+            if (response.status === 422 && result?.error === 'custom_scope_required') {
+              setStatus('The server requires a reviewed proposal for this scope. Contact hello@canonical.plus.', true);
+              return;
+            }
+            throw new Error(`quote delivery failed: ${response.status}`);
+          }
           const serverRange = result?.quote?.range;
           const serverSummary = result?.quote?.summary;
           if (
@@ -273,7 +311,7 @@ if (root instanceof HTMLElement) {
         } catch {
           setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
         } finally {
-          completeButton.disabled = false;
+          completeButton.disabled = calculate().requiresCustomScoping;
         }
       });
 
