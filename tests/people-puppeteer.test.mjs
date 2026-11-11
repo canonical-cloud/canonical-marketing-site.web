@@ -4,11 +4,11 @@ import puppeteer from 'puppeteer';
 import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 
 const expectedPeople = [
-  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
-  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
+  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
+  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
@@ -71,7 +71,7 @@ test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 c
     ]),
   );
   assert.deepEqual(firstRow.map(([name]) => name), [
-    'Jessica Adinolfi', 'Alexander Mills', 'John Siciliano', 'Jeremy Reynolds',
+    'Alexander Mills', 'John Siciliano', 'Vikkie Pandey', 'Jessica Adinolfi',
   ]);
   assert.equal(new Set(firstRow.map(([, top]) => top)).size, 1, 'the first four profiles share the first row');
 
@@ -94,7 +94,7 @@ test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 c
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['JA', 'AM', 'JS', 'JR', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US', 'CM']);
+  assert.deepEqual(placeholders, ['AM', 'JS', 'VP', 'JA', 'JR', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US', 'CM']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
   assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 15);
