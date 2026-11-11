@@ -46,7 +46,7 @@ jobs:
           node-version: "22.23.4"
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Browser e2e (Playwright + Puppeteer)
         run: npm run test:browser
 
@@ -65,7 +65,7 @@ jobs:
           node-version: "22.23.4"
           cache: npm
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install chromium
       - name: Build deployable image
         run: docker build --tag canonical-marketing-site:ci .
       - name: Browser security contract against deployable image
