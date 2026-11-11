@@ -77,3 +77,13 @@ test('the public edge rejects unsupported scope and cannot be bypassed with clie
   assert.doesNotMatch(edge, /payload\.range/);
   assert.match(edge, /quote\.scope\.labels\.dataExposure/);
 });
+
+test('browser quote submission is revision-fenced against stale async completion', async () => {
+  const browserRuntime = await readFile(new URL('../public/quote-estimator.js', import.meta.url), 'utf8');
+  assert.match(browserRuntime, /let selectionRevision = 0/);
+  assert.match(browserRuntime, /selectionRevision \+= 1/);
+  assert.match(browserRuntime, /const submittedRevision = selectionRevision/);
+  assert.match(browserRuntime, /if \(submittedRevision !== selectionRevision\)/);
+  assert.match(browserRuntime, /completeButton\.disabled = calculate\(\)\.requiresCustomScoping/);
+  assert.doesNotMatch(browserRuntime, /range:\s*\{\s*lowerUsd:/);
+});
