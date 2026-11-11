@@ -26,6 +26,30 @@
       ]
     },
     {
+      "key": "productionSystems",
+      "name": "quote_production_systems",
+      "label": "Production systems in scope",
+      "defaultId": "2-5",
+      "options": [
+        {
+          "id": "one",
+          "label": "One production system"
+        },
+        {
+          "id": "2-5",
+          "label": "2–5 production systems"
+        },
+        {
+          "id": "6-plus",
+          "label": "6 or more production systems"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
       "key": "evidenceMaturity",
       "name": "quote_evidence_maturity",
       "label": "Current control evidence",
@@ -90,6 +114,30 @@
         {
           "id": "multi-regulated",
           "label": "Several regulated entities / jurisdictions"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
+      "key": "dataExposure",
+      "name": "quote_data_exposure",
+      "label": "Production data classification",
+      "defaultId": "business",
+      "options": [
+        {
+          "id": "business",
+          "label": "Standard business data"
+        },
+        {
+          "id": "sensitive",
+          "label": "Personal / sensitive data"
+        },
+        {
+          "id": "regulated",
+          "label": "Regulated data in production"
         },
         {
           "id": "unknown",
