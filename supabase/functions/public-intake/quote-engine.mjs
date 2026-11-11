@@ -1,4 +1,5 @@
 import quoteConfig from './quote-estimator.v2.mjs';
+import { validateScope, scopeLabels, customScopeReason } from './quote-scope.mjs';
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const roundMoney = (value) => Math.round(value / quoteConfig.roundToUsd) * quoteConfig.roundToUsd;
@@ -19,6 +20,7 @@ export const computeQuote = (raw) => {
     'companyStageId',
     'employeeBandId',
     'sectorId',
+    'scope',
   ]);
   if (Object.keys(scope).some((key) => !allowedKeys.has(key))) {
     throw new Error('invalid_quote_selection');
@@ -34,6 +36,7 @@ export const computeQuote = (raw) => {
   const stage = itemById(quoteConfig.companyStages, scope.companyStageId);
   const employees = itemById(quoteConfig.employeeBands, scope.employeeBandId);
   const sector = itemById(quoteConfig.sectors, scope.sectorId);
+  const qualifiedScope = validateScope(scope.scope);
 
   if (
     !Array.isArray(scope.standardIds) ||
@@ -65,11 +68,15 @@ export const computeQuote = (raw) => {
     employees.amountUsd +
     sector.amountUsd;
 
-  const midpoint = clamp(
-    additive * stage.multiplier,
-    quoteConfig.midpointFloorUsd,
-    quoteConfig.midpointCeilingUsd,
-  );
+  const rawMidpoint = additive * stage.multiplier;
+  const reason = customScopeReason({
+    standardIds: uniqueStandardIds,
+    speedWeeks, deliveryDepthId: depth.id, complexityId: complexity.id,
+    employeeBandId: employees.id, scope: qualifiedScope,
+  }, rawMidpoint, quoteConfig);
+  if (reason) throw new Error('custom_scope_required');
+
+  const midpoint = clamp(rawMidpoint, quoteConfig.midpointFloorUsd, quoteConfig.midpointCeilingUsd);
   const lowerUsd = clamp(
     roundMoney(midpoint * quoteConfig.lowerFactor),
     quoteConfig.estimateFloorUsd,
@@ -89,6 +96,7 @@ export const computeQuote = (raw) => {
     companyStage: stage.label,
     employeeBand: employees.label,
     sector: sector.label,
+    scoping: scopeLabels(qualifiedScope),
   };
 
   return {
@@ -100,8 +108,10 @@ export const computeQuote = (raw) => {
       companyStageId: stage.id,
       employeeBandId: employees.id,
       sectorId: sector.id,
+      ...(qualifiedScope ? { scope: qualifiedScope } : {}),
     },
     labels,
+    scopeSchemaVersion: qualifiedScope ? 1 : null,
     range: { lowerUsd, upperUsd, currency: quoteConfig.currency },
     summary: [
       labels.deliverySpeed,
