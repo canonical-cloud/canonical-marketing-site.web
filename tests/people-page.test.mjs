@@ -15,6 +15,7 @@ const invalidMissingRole = JSON.parse(await read('../contracts/people/v1/instanc
 const workflow = await read('../.github/workflows/people-contract.yml');
 
 const roster = [
+  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
   ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
@@ -31,12 +32,13 @@ const roster = [
   ['Casey Myers', 'Sales Engineer'],
 ];
 
-test('people directory has exactly fourteen named roles in the requested order', () => {
+test('people directory has exactly fifteen named roles in the requested order', () => {
   assert.equal(directory.schemaVersion, 'canonical-cloud.people/v1');
   assert.deepEqual(directory.people.map(({ name, role }) => [name, role]), roster);
-  assert.equal(directory.people.length, 14);
-  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 14, 'person ids must be unique');
-  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 14, 'initials must be unique');
+  assert.equal(directory.people[0].id, 'jessica-adinolfi', 'Jessica must appear in the first row');
+  assert.equal(directory.people.length, 15);
+  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 15, 'person ids must be unique');
+  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 15, 'initials must be unique');
 });
 
 test('homepage and people page share the validated directory', () => {
@@ -44,7 +46,7 @@ test('homepage and people page share the validated directory', () => {
   assert.match(grid, /const people = directory\.people/);
   assert.match(grid, /people\.map\(\(person\)/);
   assert.match(grid, /data-person-id=\{person\.id\}/);
-  assert.match(source, /Fourteen people, one readiness platform/);
+  assert.match(source, /Fifteen people, one readiness platform/);
   for (const page of [source, home]) assert.match(page, /<PeopleGrid\s*\/>/);
 });
 
@@ -59,6 +61,7 @@ test('desktop layout has four columns with tablet and mobile layouts', () => {
 test('local team headshots are used and unresolved identities stay neutral', () => {
   const photos = directory.people.filter(({ photoUrl }) => photoUrl).map(({ photoUrl }) => photoUrl);
   assert.deepEqual(photos, [
+    '/team/jessica-adinolfi.webp',
     '/team/alex-mills.jpg',
     '/team/john-siciliano.jpg',
     '/team/vinayak-pandey.png',

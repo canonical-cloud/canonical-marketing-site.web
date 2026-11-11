@@ -4,6 +4,7 @@ import puppeteer from 'puppeteer';
 import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 
 const expectedPeople = [
+  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
   ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
@@ -20,7 +21,7 @@ const expectedPeople = [
   ['Casey Myers', 'Sales Engineer'],
 ];
 
-test('puppeteer: people page renders fourteen cards with responsive 4-to-2-to-1 columns', async (t) => {
+test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 columns', async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
 
@@ -63,6 +64,16 @@ test('puppeteer: people page renders fourteen cards with responsive 4-to-2-to-1 
     new Set(cards.map((card) => Math.round(card.getBoundingClientRect().top))).size,
   );
   assert.equal(rows, 4);
+  const firstRow = await page.$eval('[data-person-card]', (cards) =>
+    cards.slice(0, 4).map((card) => [
+      card.querySelector('h3')?.textContent?.trim(),
+      Math.round(card.getBoundingClientRect().top),
+    ]),
+  );
+  assert.deepEqual(firstRow.map(([name]) => name), [
+    'Jessica Adinolfi', 'Alexander Mills', 'John Siciliano', 'Jeremy Reynolds',
+  ]);
+  assert.equal(new Set(firstRow.map(([, top]) => top)).size, 1, 'the first four profiles share the first row');
 
   await page.setViewport({ height: 900, width: 800 });
   assert.equal(await columnCount(), 2);
@@ -71,7 +82,7 @@ test('puppeteer: people page renders fourteen cards with responsive 4-to-2-to-1 
   assert.equal(await columnCount(), 1);
 
   const remotePhotos = await page.$$('[data-people-photo]');
-  assert.equal(remotePhotos.length, 10);
+  assert.equal(remotePhotos.length, 11);
   await page.$$eval('[data-people-photo]', (images) => {
     for (const image of images) image.dispatchEvent(new Event('error'));
   });
@@ -83,10 +94,10 @@ test('puppeteer: people page renders fourteen cards with responsive 4-to-2-to-1 
   const placeholders = await page.$$eval('.person-card__fallback span', (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(placeholders, ['AM', 'JS', 'JR', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US', 'CM']);
+  assert.deepEqual(placeholders, ['JA', 'AM', 'JS', 'JR', 'VP', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US', 'CM']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
-  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 14);
+  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 15);
   for (const [width, columns] of [[1440, 4], [1024, 4], [800, 2], [375, 1]]) {
     await page.setViewport({ height: 900, width });
     assert.equal(await columnCount(), columns);

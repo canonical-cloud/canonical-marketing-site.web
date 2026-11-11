@@ -2,6 +2,13 @@
   "schemaVersion": "canonical-cloud.people/v1",
   "people": [
     {
+      "id": "jessica-adinolfi",
+      "name": "Jessica Adinolfi",
+      "role": "Compliance Expert (ISO and NIST)",
+      "initials": "JA",
+      "photoUrl": "/team/jessica-adinolfi.webp"
+    },
+    {
       "id": "alexander-mills",
       "name": "Alexander Mills",
       "role": "Integrations and DevOps",
