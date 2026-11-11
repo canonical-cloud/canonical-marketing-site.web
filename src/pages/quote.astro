@@ -4,6 +4,7 @@ import '../styles/global.css';
 import '../styles/marketing-pages.css';
 import catalog from '../data/service-tiers.json';
 import estimator from '../data/quote-estimator.json';
+import scopeSchema from '../data/quote-scope.json';
 
 const EXPECTED_ESTIMATOR_SCHEMA_VERSION = 2;
 const pricedItemsAreValid = (items: Array<{ id: string; label: string; amountUsd: number }>) =>
@@ -58,6 +59,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <li>Advisory, managed readiness, or hands-on remediation</li>
           <li>Environment complexity, company stage, and employee scale</li>
           <li>Business sector captured for scoping context</li>
+          <li>Cloud footprint, control ownership, evidence maturity, and remediation effort qualify whether an instant range is appropriate</li>
         </ul>
         <p>Planning ranges are non-binding. A reviewed statement of work controls final scope, deliverables, pricing, and deadlines.</p>
       </aside>
@@ -76,6 +78,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
         class="quote-estimator"
         data-quote-estimator
         data-schema-version={estimator.schemaVersion}
+        data-scope-schema-version={scopeSchema.scopeSchemaVersion}
         data-currency={estimator.currency}
         data-floor={estimator.estimateFloorUsd}
         data-ceiling={estimator.estimateCeilingUsd}
@@ -144,8 +147,22 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
             </div>
           </section>
 
+          <section class="quote-control-card" role="group" aria-labelledby="quote-scope-detail-title">
+            <h3 id="quote-scope-detail-title">6. Delivery scope and readiness</h3>
+            <p class="quote-control-note">Verify these starting assumptions before relying on the range. They do not add arbitrary dollar surcharges; unusually broad or uncertain scopes require a reviewed proposal instead.</p>
+            <div class="quote-profile-grid">
+              {scopeSchema.fields.map((field) => (
+                <label>{field.label}
+                  <select name={field.name} data-quote-scope-field={field.key}>
+                    {field.options.map((option) => <option value={option.id} data-label={option.label} selected={option.id === field.defaultId}>{option.label}</option>)}
+                  </select>
+                </label>
+              ))}
+            </div>
+          </section>
+
           <section class="quote-control-card" aria-labelledby="quote-recipient-title">
-            <h3 id="quote-recipient-title">6. Email this quote</h3>
+            <h3 id="quote-recipient-title">7. Email this quote</h3>
             <div class="quote-profile-grid">
               <label>Work email
                 <input type="email" name="quote_email" autocomplete="email" maxlength="320" required placeholder="you@company.com" />
@@ -167,8 +184,11 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <p class="quote-estimator__eyebrow">Estimated project range</p>
           <p class="quote-estimator__price"><strong data-quote-range>{money.format(10000)}–{money.format(12500)}</strong></p>
           <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS</p>
+          <p class="quote-control-note" data-quote-scope-details>Assumes 1–2 cloud environments, partial existing evidence, 1–5 control owners, one primary jurisdiction and moderate remediation.</p>
+          <p class="quote-validation" data-quote-custom-reason role="status" hidden></p>
+          <p class="quote-estimator__boundary" data-quote-price-basis>Range components: delivery timeline, frameworks, service depth, environment complexity, employee band and company-stage factor. Industry and additional scoping answers do not apply automatic surcharges.</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
-          <p class="quote-estimator__boundary">Typical estimator range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Final pricing depends on validated scope.</p>
+          <p class="quote-estimator__boundary">Typical estimator range for qualifying projects: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Values at the model limit do not imply a price cap. Final pricing depends on validated scope.</p>
           <div class="quote-scope" id="quote-scope-summary" aria-labelledby="quote-scope-title">
             <h3 id="quote-scope-title">What this estimate is for</h3>
             <p>Typical proposed readiness work, subject to the agreed scope:</p>
@@ -177,7 +197,8 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
               <li>Map control and evidence gaps to proposed owners and priorities.</li>
               <li>Plan remediation and prepare an evidence handoff.</li>
             </ul>
-            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, or third-party assessor fees. The signed SOW determines the actual deliverables, timelines, and fees.</p>
+            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, third-party assessor fees, penetration testing, subscriptions, and customer internal labor. The signed SOW determines actual deliverables, timelines, and fees.</p>
+            <p>FedRAMP readiness is custom-scoped; this instant estimator does not price a FedRAMP authorization program. This is a one-time project estimate, not a recurring monthly subscription quote.</p>
             <a href={introHref} class="btn btn--secondary" id="quote-estimate-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
           </div>
           <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Email my quote</button>
