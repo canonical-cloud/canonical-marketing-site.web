@@ -242,7 +242,9 @@ if (root instanceof HTMLElement) {
       };
 
       let submissionKey = '';
+      let selectionRevision = 0;
       const invalidate = () => {
+        selectionRevision += 1;
         submissionKey = '';
         if (completedPanel instanceof HTMLElement) completedPanel.hidden = true;
         setStatus('');
@@ -291,6 +293,7 @@ if (root instanceof HTMLElement) {
           source: 'canonical.plus/quote',
         };
 
+        const submittedRevision = selectionRevision;
         completeButton.disabled = true;
         setStatus('Sending your quote…');
         try {
@@ -312,6 +315,10 @@ if (root instanceof HTMLElement) {
             typeof serverSummary !== 'string'
           ) throw new Error('quote response was missing canonical server pricing');
 
+          if (submittedRevision !== selectionRevision) {
+            setStatus('The previous quote was submitted, but your selections have changed. Check your email for that earlier estimate or submit the current scope.', true);
+            return;
+          }
           const canonicalRange = `${money.format(Number(serverRange.lowerUsd))}–${money.format(Number(serverRange.upperUsd))}`;
           rangeNode.textContent = canonicalRange;
           summaryNode.textContent = serverSummary;
