@@ -1,0 +1,125 @@
+{
+  "scopeSchemaVersion": 1,
+  "fields": [
+    {
+      "key": "cloudAccountBand",
+      "name": "quote_cloud_account_band",
+      "label": "Cloud accounts / production environments",
+      "defaultId": "1-2",
+      "options": [
+        {
+          "id": "1-2",
+          "label": "1–2"
+        },
+        {
+          "id": "3-10",
+          "label": "3–10"
+        },
+        {
+          "id": "11-plus",
+          "label": "11 or more"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
+      "key": "evidenceMaturity",
+      "name": "quote_evidence_maturity",
+      "label": "Current control evidence",
+      "defaultId": "partial",
+      "options": [
+        {
+          "id": "organized",
+          "label": "Mostly organized and current"
+        },
+        {
+          "id": "partial",
+          "label": "Some organized; gaps remain"
+        },
+        {
+          "id": "early",
+          "label": "Mostly missing / starting from scratch"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
+      "key": "controlOwnerBand",
+      "name": "quote_control_owner_band",
+      "label": "Control owners / stakeholders",
+      "defaultId": "1-5",
+      "options": [
+        {
+          "id": "1-5",
+          "label": "1–5"
+        },
+        {
+          "id": "6-20",
+          "label": "6–20"
+        },
+        {
+          "id": "21-plus",
+          "label": "21 or more"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
+      "key": "dataFootprint",
+      "name": "quote_data_footprint",
+      "label": "Regulatory / jurisdiction footprint",
+      "defaultId": "single",
+      "options": [
+        {
+          "id": "single",
+          "label": "One primary jurisdiction / entity"
+        },
+        {
+          "id": "multi",
+          "label": "Several regions, one legal entity"
+        },
+        {
+          "id": "multi-regulated",
+          "label": "Several regulated entities / jurisdictions"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
+      "key": "remediationLoad",
+      "name": "quote_remediation_load",
+      "label": "Expected technical remediation",
+      "defaultId": "moderate",
+      "options": [
+        {
+          "id": "light",
+          "label": "Advisory / minor fixes"
+        },
+        {
+          "id": "moderate",
+          "label": "Some implementation work"
+        },
+        {
+          "id": "heavy",
+          "label": "Substantial implementation / overhaul"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    }
+  ]
+}
