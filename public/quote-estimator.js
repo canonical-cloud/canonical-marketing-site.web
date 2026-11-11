@@ -12,6 +12,7 @@ if (root instanceof HTMLElement) {
   const statusNode = root.querySelector('[data-quote-status]');
   const standardGroup = root.querySelector('[data-standards-group]');
   const scopeDetailNode = root.querySelector('[data-quote-scope-details]');
+  const priceBasisNode = root.querySelector('[data-quote-price-basis]');
   const customReasonNode = root.querySelector('[data-quote-custom-reason]');
   const standardError = root.querySelector('[data-standard-error]');
   const completedPanel = document.querySelector('[data-quote-complete]');
@@ -107,7 +108,7 @@ if (root instanceof HTMLElement) {
         input.options[index]?.dataset.label === option.label
       )
     ) &&
-    scopeDetailNode instanceof HTMLElement && customReasonNode instanceof HTMLElement &&
+    scopeDetailNode instanceof HTMLElement && priceBasisNode instanceof HTMLElement && customReasonNode instanceof HTMLElement &&
     emailInput instanceof HTMLInputElement &&
     companyInput instanceof HTMLInputElement &&
     websiteInput instanceof HTMLInputElement &&
@@ -174,6 +175,7 @@ if (root instanceof HTMLElement) {
           valueOf(employees) +
           valueOf(selectedSector);
         const rawMidpoint = additive * stageMultiplier;
+        const frameworkUsd = standards.reduce((sum, item) => sum + valueOf(item), 0);
         const midpoint = clamp(rawMidpoint, midpointFloor, midpointCeiling);
         const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
         const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
@@ -200,7 +202,7 @@ if (root instanceof HTMLElement) {
         const customReason = customScopeReason(selection, rawMidpoint, {
           midpointCeilingUsd: midpointCeiling, estimateCeilingUsd: ceiling, upperFactor,
         });
-        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, scope, selection, midpoint, lower, upper, summary, customReason, requiresCustomScoping: Boolean(customReason) };
+        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, scope, selection, midpoint, lower, upper, summary, customReason, requiresCustomScoping: Boolean(customReason), frameworkUsd, additive, stageMultiplier };
       };
 
       const render = () => {
@@ -209,6 +211,7 @@ if (root instanceof HTMLElement) {
         rangeNode.textContent = quote.requiresCustomScoping ? 'Custom scoping required' : `${money.format(quote.lower)}–${money.format(quote.upper)}`;
         summaryNode.textContent = quote.summary;
         scopeDetailNode.textContent = scopeLabels(quote.scope).map(({ name, value }) => `${name}: ${value}`).join(' · ');
+        priceBasisNode.textContent = `Modeled basis: base ${money.format(quote.speed.amount)} + framework overlap ${money.format(quote.frameworkUsd)} + service depth ${money.format(valueOf(quote.depth))} + complexity ${money.format(valueOf(quote.complexity))} + employee scale ${money.format(valueOf(quote.employees))}; company-stage factor ×${quote.stageMultiplier.toFixed(2)}. Sector and additional scope details have no automatic surcharge. This is not a labor-hours or third-party-fee quote.`;
         customReasonNode.textContent = quote.customReason;
         customReasonNode.hidden = !quote.requiresCustomScoping;
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
