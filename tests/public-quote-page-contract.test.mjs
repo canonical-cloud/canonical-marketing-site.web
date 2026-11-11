@@ -35,7 +35,7 @@ test("estimate remains bounded by the shared authority", () => {
   assert.equal(estimator.estimateCeilingUsd, 25000);
   assert.equal(estimator.midpointFloorUsd, 5500);
   assert.equal(estimator.midpointCeilingUsd, 22000);
-  assert.match(runtime, /clamp\(additive \* stageMultiplier, midpointFloor, midpointCeiling\)/);
+  assert.match(runtime, /clamp\(uncappedMidpoint, midpointFloor, midpointCeiling\)/);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
 });
 
@@ -74,7 +74,20 @@ test("public quote form includes an offscreen bot trap without exposing secrets"
 
 
 test("quote copy distinguishes priced organization factors from sector context", () => {
-  assert.match(page, /company stage, and employee count\. Business sector is captured as scoping context/i);
+  assert.match(page, /company stage, employee count, production-system scope, readiness maturity, and data classification\. Business sector is captured as scoping context/i);
   assert.match(page, /Business sector captured for scoping context/i);
   assert.ok(estimator.sectors.every((item) => item.amountUsd === 0));
+});
+
+test("scope qualifiers do not alter the pinned v2 price factors", () => {
+  for (const name of ["quote_systems_in_scope", "quote_readiness_baseline", "quote_data_exposure"]) {
+    assert.match(page, new RegExp(`name="${name}"`));
+  }
+  assert.match(page, /they do not add unverified dollar surcharges/i);
+  assert.match(runtime, /const cappedPrice = uncappedMidpoint > midpointCeiling/);
+  assert.match(runtime, /Custom scoping required/);
+  assert.match(runtime, /scopeContext: quote\.scopeContext/);
+  assert.match(runtime, /completeButton\.disabled = quote\.requiresCustomScoping/);
+  assert.match(page, /not a maximum engagement fee/i);
+  assert.match(page, /separate from the recurring monthly service tiers below/i);
 });
