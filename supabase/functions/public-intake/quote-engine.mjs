@@ -57,6 +57,11 @@ export const computeQuote = (raw) => {
     throw new Error('invalid_quote_selection');
   }
 
+  // High-variance federal engagements cannot be priced as one v2 add-on.
+  if (uniqueStandardIds.includes('fedramp')) {
+    throw new Error('custom_scope_required');
+  }
+
   const additive =
     speed.baseUsd +
     standards.reduce((sum, item) => sum + item.amountUsd, 0) +
@@ -64,6 +69,14 @@ export const computeQuote = (raw) => {
     complexity.amountUsd +
     employees.amountUsd +
     sector.amountUsd;
+
+  // The public midpoint and range caps protect routine scopes; they are not
+  // maximum fees for larger work. Never present a clipped total as a quote.
+  const uncappedMidpoint = additive * stage.multiplier;
+  if (uncappedMidpoint > quoteConfig.midpointCeilingUsd ||
+      roundMoney(uncappedMidpoint * quoteConfig.upperFactor) > quoteConfig.estimateCeilingUsd) {
+    throw new Error('custom_scope_required');
+  }
 
   const midpoint = clamp(
     additive * stage.multiplier,
