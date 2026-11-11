@@ -28,6 +28,30 @@ export const scopeSchema = {
       ]
     },
     {
+      "key": "productionSystems",
+      "name": "quote_production_systems",
+      "label": "Production systems in scope",
+      "defaultId": "2-5",
+      "options": [
+        {
+          "id": "one",
+          "label": "One production system"
+        },
+        {
+          "id": "2-5",
+          "label": "2–5 production systems"
+        },
+        {
+          "id": "6-plus",
+          "label": "6 or more production systems"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
       "key": "evidenceMaturity",
       "name": "quote_evidence_maturity",
       "label": "Current control evidence",
@@ -100,6 +124,30 @@ export const scopeSchema = {
       ]
     },
     {
+      "key": "dataExposure",
+      "name": "quote_data_exposure",
+      "label": "Production data classification",
+      "defaultId": "business",
+      "options": [
+        {
+          "id": "business",
+          "label": "Standard business data"
+        },
+        {
+          "id": "sensitive",
+          "label": "Personal / sensitive data"
+        },
+        {
+          "id": "regulated",
+          "label": "Regulated data in production"
+        },
+        {
+          "id": "unknown",
+          "label": "Not sure yet"
+        }
+      ]
+    },
+    {
       "key": "remediationLoad",
       "name": "quote_remediation_load",
       "label": "Expected technical remediation",
@@ -155,6 +203,9 @@ export const customScopeReason = (selection, rawMidpoint, config) => {
   const scope = selection.scope;
   if (scope) {
     if (Object.values(scope).includes('unknown')) return 'Some scope assumptions are unknown; please request a reviewed proposal.';
+    if (scope.productionSystems === '6-plus') return 'Six or more production systems need a reviewed engagement boundary.';
+    if (scope.evidenceMaturity === 'early' && selection.deliveryDepthId !== 'advisory') return 'A new program with managed operations or implementation needs a tailored statement of work.';
+    if (scope.dataExposure === 'regulated' && selection.deliveryDepthId === 'remediation') return 'Remediation of regulated production data needs a tailored technical assessment.';
     if (scope.cloudAccountBand === '11-plus') return 'More than ten cloud environments need a system inventory and custom scope.';
     if (scope.controlOwnerBand === '21-plus') return 'More than twenty control owners require custom delivery planning.';
     if (scope.dataFootprint === 'multi-regulated') return 'Multiple regulated entities or jurisdictions require bespoke scoping.';
