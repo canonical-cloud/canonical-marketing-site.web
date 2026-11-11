@@ -64,7 +64,7 @@ test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 c
     new Set(cards.map((card) => Math.round(card.getBoundingClientRect().top))).size,
   );
   assert.equal(rows, 4);
-  const firstRow = await page.$eval('[data-person-card]', (cards) =>
+  const firstRow = await page.$$eval('[data-person-card]', (cards) =>
     Array.from(cards).slice(0, 4).map((card) => [
       card.querySelector('h3')?.textContent?.trim(),
       Math.round(card.getBoundingClientRect().top),
