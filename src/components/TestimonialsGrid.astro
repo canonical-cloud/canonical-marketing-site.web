@@ -5,7 +5,7 @@ import candidates from '../data/testimonial-candidates.json';
 // customer relationship, permission, or an authentic attributable quotation.
 // Do not render even a partial wall until all eight records have been reviewed.
 const isLocalLogo = (path, id) => typeof path === 'string' &&
-  new RegExp('^/brand/testimonials/' + id + '\\.(svg|png|webp)
+  new RegExp('^/brand/testimonials/' + id + '\\.(svg|png|webp)$').test(path);
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
