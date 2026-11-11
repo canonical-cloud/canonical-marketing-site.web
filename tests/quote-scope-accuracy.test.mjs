@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import schema from '../src/data/quote-scope.json' with { type: 'json' };
-import { scopeSchema as clientSchema, customScopeReason as clientReason } from '../public/quote-scope.mjs';
+import { scopeSchema as clientSchema, customScopeReason as clientReason } from '../public/quote-scope.js';
 import { scopeSchema as serverSchema, customScopeReason as serverReason } from '../supabase/functions/public-intake/quote-scope.mjs';
 import { computeQuote } from '../supabase/functions/public-intake/quote-engine.mjs';
 
@@ -34,7 +34,7 @@ test('client, page and authoritative edge share the exact scope taxonomy', async
     assert.ok(field.options.every((option) => !('amountUsd' in option) && !('multiplier' in option)));
   }
   assert.equal(
-    await readFile(new URL('../public/quote-scope.mjs', import.meta.url), 'utf8'),
+    await readFile(new URL('../public/quote-scope.js', import.meta.url), 'utf8'),
     await readFile(new URL('../supabase/functions/public-intake/quote-scope.mjs', import.meta.url), 'utf8'),
   );
 });
