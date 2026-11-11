@@ -184,7 +184,10 @@ Deno.serve(async (request) => {
   if (kind === 'quote') {
     try {
       quote = computeQuote(payload.selection);
-    } catch {
+    } catch (error) {
+      if (error instanceof Error && error.message === 'custom_scope_required') {
+        return json(422, { error: 'custom_scope_required' }, origin);
+      }
       return json(400, { error: 'invalid_quote_selection' }, origin);
     }
   }
@@ -273,12 +276,13 @@ Deno.serve(async (request) => {
       ['Company stage', quote.labels.companyStage],
       ['Employees', quote.labels.employeeBand],
       ['Sector', quote.labels.sector],
+      ...quote.labels.scoping.map(({ name, value }) => [name, value]),
     ];
     subject = `Canonical Plus readiness quote for ${company}`;
     html = `<h1>Your Canonical Plus planning estimate</h1>
       <p><strong>$${quote.range.lowerUsd.toLocaleString()}–$${quote.range.upperUsd.toLocaleString()} USD</strong></p>
       <table>${rows.map(([k,v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')}</table>
-      <p>This is a non-binding planning range. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.</p>
+      <p>This is a non-binding one-time project planning range, not a monthly subscription price. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.</p>
       <p>Payment plans may be available for qualifying engagements. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor or certification-body fees are itemized separately unless expressly included in writing.</p>
       <p>Questions? Reply to this email or contact hello@canonical.plus.</p>`;
     textBody = [
@@ -286,7 +290,7 @@ Deno.serve(async (request) => {
       `$${quote.range.lowerUsd.toLocaleString()}–$${quote.range.upperUsd.toLocaleString()} USD`,
       ...rows.map(([key, value]) => `${key}: ${value}`),
       '',
-      'This is a non-binding planning range. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.',
+      'This is a non-binding one-time project planning range, not a monthly subscription price. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.',
       'Questions? Reply to this email or contact hello@canonical.plus.',
     ].join('\n');
     recipients = [email];
