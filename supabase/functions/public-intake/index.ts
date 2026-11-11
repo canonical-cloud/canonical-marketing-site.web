@@ -1,4 +1,5 @@
 import { computeQuote } from './quote-engine.mjs';
+import { qualifyQuoteScope } from './quote-scope.mjs';
 
 const allowedOrigins = new Set([
   'https://canonical.plus',
@@ -180,11 +181,21 @@ Deno.serve(async (request) => {
     return json(400, { error: 'invalid_request' }, origin);
   }
 
-  let quote: ReturnType<typeof computeQuote> | null = null;
+  let quote: (ReturnType<typeof computeQuote> & { scope: ReturnType<typeof qualifyQuoteScope> }) | null = null;
   if (kind === 'quote') {
     try {
-      quote = computeQuote(payload.selection);
-    } catch {
+      const authoritative = computeQuote(payload.selection);
+      const scope = qualifyQuoteScope(payload.scopeContext, payload.selection);
+      if (scope.requiresCustomScoping) throw new Error('custom_scope_required');
+      quote = {
+        ...authoritative,
+        scope,
+        summary: [authoritative.summary, ...Object.values(scope.labels)].join(' · '),
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message === 'custom_scope_required') {
+        return json(422, { error: 'custom_scope_required' }, origin);
+      }
       return json(400, { error: 'invalid_quote_selection' }, origin);
     }
   }
@@ -273,6 +284,9 @@ Deno.serve(async (request) => {
       ['Company stage', quote.labels.companyStage],
       ['Employees', quote.labels.employeeBand],
       ['Sector', quote.labels.sector],
+      ['Production systems', quote.scope.labels.systemsInScope],
+      ['Control maturity', quote.scope.labels.readinessBaseline],
+      ['Data classification', quote.scope.labels.dataExposure],
     ];
     subject = `Canonical Plus readiness quote for ${company}`;
     html = `<h1>Your Canonical Plus planning estimate</h1>
