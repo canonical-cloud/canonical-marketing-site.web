@@ -35,7 +35,9 @@ test("estimate remains bounded by the shared authority", () => {
   assert.equal(estimator.estimateCeilingUsd, 25000);
   assert.equal(estimator.midpointFloorUsd, 5500);
   assert.equal(estimator.midpointCeilingUsd, 22000);
-  assert.match(runtime, /clamp\(additive \* stageMultiplier, midpointFloor, midpointCeiling\)/);
+  assert.match(runtime, /const rawMidpoint = additive \* stageMultiplier/);
+  assert.match(runtime, /clamp\(rawMidpoint, midpointFloor, midpointCeiling\)/);
+  assert.match(runtime, /customScopeReason\(selection, rawMidpoint/);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
 });
 
