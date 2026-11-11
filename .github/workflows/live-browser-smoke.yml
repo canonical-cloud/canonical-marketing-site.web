@@ -41,7 +41,7 @@ jobs:
       - name: Install lockfile-pinned dependencies
         run: npm ci
       - name: Install the reviewed Chromium build
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install chromium
       - name: Execute deployed security policy in Chromium
         run: >-
           node --test --test-timeout=120000

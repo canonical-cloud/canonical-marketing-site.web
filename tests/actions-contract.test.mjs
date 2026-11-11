@@ -57,7 +57,9 @@ test("live browser smoke is lockfile-strict and executes the deployed policy", (
   assert.match(liveBrowserWorkflow, /PUPPETEER_SKIP_DOWNLOAD: "true"/);
   assert.match(liveBrowserWorkflow, /run: npm ci/);
   assert.doesNotMatch(liveBrowserWorkflow, /npm install|npm i\b/);
-  assert.match(liveBrowserWorkflow, /playwright install --with-deps chromium/);
+  assert.match(liveBrowserWorkflow, /playwright install chromium/);
+  // Prevent apt-based browser setup from reintroducing flaky Ubuntu mirror DNS failures.
+  assert.doesNotMatch(liveBrowserWorkflow, /playwright install --with-deps chromium/);
   assert.match(
     liveBrowserWorkflow,
     /tests\/container-security-playwright\.test\.mjs/,

@@ -4,14 +4,16 @@ import candidates from '../data/testimonial-candidates.json';
 // Fail closed: names supplied for a proposed testimonial are not proof of a
 // customer relationship, permission, or an authentic attributable quotation.
 // Do not render even a partial wall until all eight records have been reviewed.
-const isLocalLogo = (path) => typeof path === 'string' &&
-  /^\/brand\/testimonials\/[a-z0-9-]+\.(svg|png|webp)$/.test(path);
+const isLocalLogo = (path, id) =>
+  typeof path === 'string' &&
+  ['svg', 'png', 'webp'].some((extension) =>
+    path === '/brand/testimonials/' + id + '.' + extension);
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
 const isApproved = (entry) =>
   entry.approvedForPublication === true &&
-  isLocalLogo(entry.logoAssetPath) &&
+  isLocalLogo(entry.logoAssetPath, entry.id) &&
   typeof entry.logoUseConsent === 'string' && entry.logoUseConsent.trim().length > 0 &&
   typeof entry.relationshipEvidence === 'string' && entry.relationshipEvidence.trim().length > 0 &&
   typeof entry.publicationConsent === 'string' && entry.publicationConsent.trim().length > 0 &&

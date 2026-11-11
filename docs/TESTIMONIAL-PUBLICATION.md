@@ -59,3 +59,19 @@ Only after review, set `approvedForPublication: true` **for all eight**.
 Partial approval intentionally leaves the whole section unpublished.
 Run `npm test` and `npm run test:browser` at exact head, then verify the
 deployed origin after a reviewed merge; CI alone does not prove deployment.
+
+
+## Release-integrity checks
+
+A new mandatory prebuild verification step, `node scripts/testimonial-publication.mjs`, validates the exact eight-company order and rejects partial approval, invalid logo paths, missing consent/evidence fields, nonexistent/symlinked assets, malformed PNG/WebP headers, oversized images, and potentially active/external-content SVG features. The validator never downloads remote content, and an unpublished section causes **zero** asset loads.
+
+A conservative SVG check is not equivalent to a complete XML sanitizer. Prefer a visually reviewed PNG/WebP export where possible; manually review every approved logo, its license, its exact domain, and the effective CSP. Brand-source URLs alone are not permissions.
+
+The browser test uses eight **synthetic fixtures created in the test browser only**, checking four desktop columns, two tablet columns, one mobile column, image loads, and light/medium/dark themes. Synthetic text and logo fixtures do not ship with the site. This test must not be described as evidence of public customer endorsements.
+
+To reproduce the release gate:
+- `npm run build` (runs the validator before Astro)
+- `node --test tests/testimonial-publication.test.mjs`
+- `npm run test:browser`
+
+All eight client-specific publication records remain OFF and empty until reviewed evidence and written permission are retained.

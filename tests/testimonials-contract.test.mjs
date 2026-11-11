@@ -26,7 +26,9 @@ test('eight testimonial candidates preserve requested 2×4 order', () => {
   assert.match(homeSource, /<TestimonialsGrid \/>/);
   assert.match(component, /class="testimonial-card__logo"/);
   assert.match(component, /baseNoSlash/);
-  assert.match(component, /isLocalLogo\(entry\.logoAssetPath\)/);
+  assert.match(component, /isLocalLogo\(entry\.logoAssetPath, entry\.id\)/);
+  assert.equal((component.match(/const isApproved =/g) || []).length, 1, 'no duplicated component bodies');
+  assert.equal((component.match(/<style>/g) || []).length, 1, 'only one component stylesheet');
   assert.match(component, /entry\.logoUseConsent/);
 });
 
