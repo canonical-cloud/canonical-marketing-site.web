@@ -81,3 +81,46 @@ test("playwright: no-JavaScript fallback never creates a false sent quote", asyn
   assert.equal(await page.locator('[data-quote-estimator]').getAttribute("data-quote-runtime"), null);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 });
+
+test("playwright: scope answers qualify pricing without silent capped estimates", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+  const page = await browser.newPage({ viewport: { height: 900, width: 1280 } });
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
+
+  const range = page.locator('[data-quote-range]');
+  const button = page.locator('[data-complete-public-quote]');
+  const runtime = page.locator('[data-quote-estimator]');
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.equal(await button.isEnabled(), true);
+
+  await page.locator('select[name="quote_cloud_account_band"]').selectOption("3-10");
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.match(await page.locator('[data-quote-scope-details]').textContent() || "", /3–10/);
+
+  await page.locator('select[name="quote_cloud_account_band"]').selectOption("11-plus");
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.equal(await runtime.getAttribute("data-quote-runtime"), "custom-scope");
+  assert.equal(await button.isDisabled(), true);
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /ten cloud/);
+
+  await page.locator('select[name="quote_cloud_account_band"]').selectOption("1-2");
+  assert.equal(await button.isEnabled(), true);
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+
+  await page.locator('input[name="quote_standard"][value="fedramp"]').check();
+  assert.equal(await button.isDisabled(), true);
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  await page.locator('input[name="quote_standard"][value="fedramp"]').uncheck();
+
+  await page.locator('select[name="quote_evidence_maturity"]').selectOption("early");
+  await page.locator('[data-quote-speed-slider]').fill("2");
+  assert.equal(await button.isDisabled(), true);
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /three-week/);
+  await page.locator('[data-quote-speed-slider]').fill("1");
+  assert.equal(await button.isEnabled(), true);
+  assert.deepEqual(errors, []);
+});
