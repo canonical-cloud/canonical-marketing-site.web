@@ -42,6 +42,17 @@ if (root instanceof HTMLElement) {
   const companyStage = root.querySelector('select[name="quote_company_stage"]');
   const employeeBand = root.querySelector('select[name="quote_employee_band"]');
   const sector = root.querySelector('select[name="quote_sector"]');
+  const systemsInScope = root.querySelector('select[name="quote_systems_in_scope"]');
+  const readinessBaseline = root.querySelector('select[name="quote_readiness_baseline"]');
+  const dataExposure = root.querySelector('select[name="quote_data_exposure"]');
+  const scopeAllowed = {
+    systemsInScope: ['one', 'two-to-five', 'six-plus', 'unsure'],
+    readinessBaseline: ['established', 'partial', 'new', 'unsure'],
+    dataExposure: ['business', 'sensitive', 'regulated', 'unsure'],
+  };
+  const scopeInputValid = (node, values) =>
+    node instanceof HTMLSelectElement && node.options.length === values.length &&
+    [...node.options].every((option, index) => option.value === values[index] && option.textContent.trim());
   const emailInput = root.querySelector('input[name="quote_email"]');
   const companyInput = root.querySelector('input[name="quote_company"]');
   const websiteInput = root.querySelector('input[name="quote_website"]');
@@ -92,6 +103,9 @@ if (root instanceof HTMLElement) {
     selectOptionsValid(companyStage, 'multiplier') &&
     selectOptionsValid(employeeBand, 'amount') &&
     selectOptionsValid(sector, 'amount') &&
+    scopeInputValid(systemsInScope, scopeAllowed.systemsInScope) &&
+    scopeInputValid(readinessBaseline, scopeAllowed.readinessBaseline) &&
+    scopeInputValid(dataExposure, scopeAllowed.dataExposure) &&
     emailInput instanceof HTMLInputElement &&
     companyInput instanceof HTMLInputElement &&
     websiteInput instanceof HTMLInputElement &&
@@ -156,9 +170,30 @@ if (root instanceof HTMLElement) {
           valueOf(complexity) +
           valueOf(employees) +
           valueOf(selectedSector);
-        const midpoint = clamp(additive * stageMultiplier, midpointFloor, midpointCeiling);
+        const uncappedMidpoint = additive * stageMultiplier;
+        const cappedPrice = uncappedMidpoint > midpointCeiling ||
+          roundMoney(uncappedMidpoint * upperFactor) > ceiling;
+        const midpoint = clamp(uncappedMidpoint, midpointFloor, midpointCeiling);
         const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
         const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
+        const scopeContext = {
+          systemsInScope: systemsInScope.value,
+          readinessBaseline: readinessBaseline.value,
+          dataExposure: dataExposure.value,
+        };
+        const customReasons = [];
+        if (standards.some((item) => item.value === 'fedramp')) customReasons.push('Federal/FedRAMP work');
+        if (cappedPrice) customReasons.push('Scope exceeds routine estimator price limits');
+        if (scopeContext.systemsInScope === 'six-plus') customReasons.push('Six or more production systems');
+        if (scopeContext.systemsInScope === 'unsure') customReasons.push('Unverified system boundary');
+        if (scopeContext.readinessBaseline === 'unsure') customReasons.push('Unknown control maturity');
+        if (scopeContext.dataExposure === 'unsure') customReasons.push('Unverified data classification');
+        if (scopeContext.readinessBaseline === 'new' && depth?.value !== 'advisory') {
+          customReasons.push('New program with operational delivery');
+        }
+        if (scopeContext.dataExposure === 'regulated' && depth?.value === 'remediation') {
+          customReasons.push('Regulated-data engineering remediation');
+        }
         const summary = [
           speed.label,
           standards.map(labelOf).filter(Boolean).join(' + ') || 'No framework selected',
@@ -167,18 +202,32 @@ if (root instanceof HTMLElement) {
           labelOf(stage),
           labelOf(employees),
           labelOf(selectedSector),
+          systemsInScope.selectedOptions[0]?.textContent?.trim(),
+          readinessBaseline.selectedOptions[0]?.textContent?.trim(),
+          dataExposure.selectedOptions[0]?.textContent?.trim(),
         ].filter(Boolean).join(' · ');
 
-        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, midpoint, lower, upper, summary };
+        return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, midpoint, lower, upper, summary, scopeContext, customReasons, requiresCustomScoping: customReasons.length > 0 };
       };
 
       const render = () => {
         const quote = calculate();
         speedSlider.setAttribute('aria-valuetext', quote.speed.label);
-        rangeNode.textContent = `${money.format(quote.lower)}–${money.format(quote.upper)}`;
-        summaryNode.textContent = quote.summary;
+        rangeNode.textContent = quote.requiresCustomScoping
+          ? 'Custom scoping required'
+          : `${money.format(quote.lower)}–${money.format(quote.upper)}`;
+        summaryNode.textContent = quote.requiresCustomScoping
+          ? `${quote.summary} · ${quote.customReasons.join('; ')}`
+          : quote.summary;
+        root.dataset.quoteRuntime = quote.requiresCustomScoping ? 'custom-scope' : 'ready';
+        completeButton.disabled = quote.requiresCustomScoping;
+        if (quote.requiresCustomScoping && statusNode instanceof HTMLElement) {
+          statusNode.textContent = 'This scope needs a reviewed proposal rather than a capped instant estimate. Book an intro or email hello@canonical.plus.';
+          statusNode.dataset.error = 'false';
+          if (completedPanel instanceof HTMLElement) completedPanel.hidden = true;
+        }
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
-        meterNode.style.width = `${clamp(percentage, 4, 100)}%`;
+        meterNode.style.width = quote.requiresCustomScoping ? '0%' : `${clamp(percentage, 4, 100)}%`;
         if (quote.standards.length > 0 && standardError instanceof HTMLElement) {
           standardError.hidden = true;
           standardGroup?.removeAttribute('aria-invalid');
@@ -211,6 +260,10 @@ if (root instanceof HTMLElement) {
           if (first instanceof HTMLInputElement) first.focus({ preventScroll: true });
           return;
         }
+        if (quote.requiresCustomScoping) {
+          setStatus('Custom scoping required: contact hello@canonical.plus for a tailored proposal.', true);
+          return;
+        }
         if (!emailInput.reportValidity() || !companyInput.reportValidity()) return;
 
         if (!supabaseUrl) {
@@ -234,6 +287,7 @@ if (root instanceof HTMLElement) {
             employeeBandId: quote.employees?.value || '',
             sectorId: quote.sector?.value || '',
           },
+          scopeContext: quote.scopeContext,
           source: 'canonical.plus/quote',
         };
 
@@ -273,7 +327,7 @@ if (root instanceof HTMLElement) {
         } catch {
           setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
         } finally {
-          completeButton.disabled = false;
+          completeButton.disabled = calculate().requiresCustomScoping;
         }
       });
 
