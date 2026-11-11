@@ -45,7 +45,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
         <h1 class="page-hero__title hero__title">Price the readiness work.<br /><span class="gradient-text">Keep the quote for your team.</span></h1>
         <p class="page-hero__subtitle">
           Estimate readiness and remediation support using delivery speed, frameworks, service depth, environment complexity,
-          company stage, and employee count. Business sector is captured as scoping context. Submit the quote to receive a copy by email.
+          company stage, employee count, production-system scope, readiness maturity, and data classification. Business sector is captured as scoping context. Submit the quote to receive a copy by email.
         </p>
         <div class="page-hero__actions">
           <a href={introHref} class="btn btn--primary btn--large" id="quote-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
@@ -58,6 +58,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <li>Advisory, managed readiness, or hands-on remediation</li>
           <li>Environment complexity, company stage, and employee scale</li>
           <li>Business sector captured for scoping context</li>
+          <li>Production systems, existing control maturity, and data classification</li>
         </ul>
         <p>Planning ranges are non-binding. A reviewed statement of work controls final scope, deliverables, pricing, and deadlines.</p>
       </aside>
@@ -96,7 +97,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
 
           <section class="quote-control-card" role="group" aria-labelledby="quote-frameworks-title">
             <h3 id="quote-frameworks-title">2. Standards and frameworks</h3>
-            <p class="quote-control-note">Choose at least one. Shared controls reduce duplicated effort across frameworks.</p>
+            <p class="quote-control-note">Choose at least one. Shared controls reduce duplicated effort across frameworks. FedRAMP work is custom-scoped rather than priced as a routine framework add-on.</p>
             <div class="quote-checkbox-grid" data-standards-group>
               {estimator.standards.map((item) => (
                 <label class="quote-check"><input type="checkbox" name="quote_standard" value={item.id} data-label={item.label} data-amount={item.amountUsd} checked={estimator.defaults.standardIds.includes(item.id)} /><span>{item.label}</span></label>
@@ -144,8 +145,39 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
             </div>
           </section>
 
+          <section class="quote-control-card" role="group" aria-labelledby="quote-scope-factors-title">
+            <h3 id="quote-scope-factors-title">6. Scope and existing readiness</h3>
+            <p class="quote-control-note">These assumptions determine whether an instant range is appropriate; they do not add unverified dollar surcharges. Select “Not sure” when the boundary is unknown. Larger, unverified, or unusually regulated engagements require a tailored proposal.</p>
+            <div class="quote-profile-grid">
+              <label>Production systems in scope
+                <select name="quote_systems_in_scope">
+                  <option value="one">One production system</option>
+                  <option value="two-to-five" selected>2–5 production systems</option>
+                  <option value="six-plus">6+ production systems</option>
+                  <option value="unsure">Not sure yet</option>
+                </select>
+              </label>
+              <label>Current control maturity
+                <select name="quote_readiness_baseline">
+                  <option value="established">Established controls and evidence</option>
+                  <option value="partial" selected>Some controls and evidence</option>
+                  <option value="new">Starting from scratch</option>
+                  <option value="unsure">Not sure yet</option>
+                </select>
+              </label>
+              <label>Data classification
+                <select name="quote_data_exposure">
+                  <option value="business" selected>Standard business data</option>
+                  <option value="sensitive">Personal or sensitive data</option>
+                  <option value="regulated">Regulated data in production</option>
+                  <option value="unsure">Not sure yet</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
           <section class="quote-control-card" aria-labelledby="quote-recipient-title">
-            <h3 id="quote-recipient-title">6. Email this quote</h3>
+            <h3 id="quote-recipient-title">7. Email this quote</h3>
             <div class="quote-profile-grid">
               <label>Work email
                 <input type="email" name="quote_email" autocomplete="email" maxlength="320" required placeholder="you@company.com" />
@@ -166,9 +198,9 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
         <aside class="quote-estimator__result" aria-live="polite">
           <p class="quote-estimator__eyebrow">Estimated project range</p>
           <p class="quote-estimator__price"><strong data-quote-range>{money.format(10000)}–{money.format(12500)}</strong></p>
-          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS</p>
+          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS · 2–5 production systems · Some controls and evidence · Standard business data</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
-          <p class="quote-estimator__boundary">Typical estimator range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. Final pricing depends on validated scope.</p>
+          <p class="quote-estimator__boundary">Routine-scope planning range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. This is not a maximum engagement fee. FedRAMP and scopes exceeding the estimator limits require custom pricing. Final fees depend on a validated scope.</p>
           <div class="quote-scope" id="quote-scope-summary" aria-labelledby="quote-scope-title">
             <h3 id="quote-scope-title">What this estimate is for</h3>
             <p>Typical proposed readiness work, subject to the agreed scope:</p>
@@ -177,7 +209,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
               <li>Map control and evidence gaps to proposed owners and priorities.</li>
               <li>Plan remediation and prepare an evidence handoff.</li>
             </ul>
-            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, or third-party assessor fees. The signed SOW determines the actual deliverables, timelines, and fees.</p>
+            <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, third-party assessor or 3PAO fees, penetration testing, recurring platform subscriptions, customer internal-labor costs, or taxes. This project estimate is separate from the recurring monthly service tiers below. The signed SOW determines deliverables, timelines, and fees.</p>
             <a href={introHref} class="btn btn--secondary" id="quote-estimate-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
           </div>
           <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Email my quote</button>
@@ -201,7 +233,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
       <div class="section-header">
         <span class="badge">Flexible commercial terms</span>
         <h2>Payment plans and scoped engagement discounts</h2>
-        <p>Qualifying engagements can be structured in milestone-based payment plans. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor or certification-body fees are itemized separately unless a written order expressly states otherwise.</p>
+        <p>These are proposed recurring monthly service tiers, not the one-time project estimator above. Qualifying engagements can be structured in milestone-based payment plans. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor or certification-body fees are itemized separately unless a written order expressly states otherwise.</p>
       </div>
       <div class="quote-tier-grid">
         {catalog.tiers.map((tier) => (
