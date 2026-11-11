@@ -81,3 +81,45 @@ test("playwright: no-JavaScript fallback never creates a false sent quote", asyn
   assert.equal(await page.locator('[data-quote-estimator]').getAttribute("data-quote-runtime"), null);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 });
+
+test("playwright: large, federal and unverified scopes do not show a routine quote", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+  const page = await browser.newPage({ viewport: { height: 900, width: 1280 } });
+  await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
+  const range = page.locator('[data-quote-range]');
+  const runtime = page.locator('[data-quote-estimator]');
+  const submit = page.locator('[data-complete-public-quote]');
+  assert.equal(await runtime.getAttribute("data-quote-runtime"), "ready");
+
+  await page.locator('select[name="quote_systems_in_scope"]').selectOption("six-plus");
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.equal(await runtime.getAttribute("data-quote-runtime"), "custom-scope");
+  assert.equal(await submit.isDisabled(), true);
+
+  await page.locator('select[name="quote_systems_in_scope"]').selectOption("two-to-five");
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.equal(await submit.isEnabled(), true);
+
+  await page.locator('input[name="quote_standard"][value="fedramp"]').check();
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.equal(await submit.isDisabled(), true);
+  await page.locator('input[name="quote_standard"][value="fedramp"]').uncheck();
+
+  await page.locator('select[name="quote_data_exposure"]').selectOption("unsure");
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  await page.locator('select[name="quote_data_exposure"]').selectOption("business");
+
+  await page.locator('[data-quote-speed-slider]').fill("2");
+  await page.locator('select[name="quote_company_stage"]').selectOption("enterprise");
+  await page.locator('select[name="quote_employee_band"]').selectOption("1001-plus");
+  await page.locator('input[name="quote_delivery_depth"][value="remediation"]').check();
+  await page.locator('input[name="quote_complexity"][value="complex"]').check();
+  for (const id of ["nist", "gdpr", "hipaa", "pci", "cis"]) {
+    await page.locator(`input[name="quote_standard"][value="${id}"]`).check();
+  }
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.equal(await submit.isDisabled(), true);
+  assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
+});
