@@ -1,4 +1,4 @@
-import { scopeSchema, validateScope, scopeLabels, customScopeReason } from './quote-scope.mjs';
+import { scopeSchema, validateScope, scopeLabels, customScopeReason } from './quote-scope.js';
 
 const root = document.querySelector('[data-quote-estimator]');
 
