@@ -317,7 +317,9 @@ Deno.serve(async (request) => {
   let textBody = '';
   let recipients: string[] = [];
   let cc: string[] = [];
-  const replyTo = email;
+  // Quotes are sent to the buyer: replies must reach Canonical, not the buyer.
+  // Contact requests are sent to Canonical: replies should reach the requester.
+  const replyTo = kind === 'quote' ? 'hello@canonical.plus' : email;
 
   if (kind === 'quote' && quote) {
     const rows = [
