@@ -13,7 +13,7 @@ const launchBrowser = async (t) => {
   return browser;
 };
 
-test("playwright: quote v2 responds to scale factors and validates delivery fields", async (t) => {
+test("playwright: quote v2 responds to scale factors and does not offer unavailable delivery", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
   const browser = await launchBrowser(t);
@@ -38,16 +38,19 @@ test("playwright: quote v2 responds to scale factors and validates delivery fiel
   const largerRange = (await range.textContent())?.trim() || "";
   assert.notEqual(largerRange, "$14,500–$18,000");
 
+  // Production Pages may intentionally build without PUBLIC_SUPABASE_URL.
+  // A disabled email action must be consistent with the visible fallback.
+  const submit = page.locator('[data-complete-public-quote]');
+  assert.equal(await submit.isDisabled(), true);
+  assert.equal(await page.locator('input[name="quote_email"]').getAttribute('required'), '');
+  assert.equal(await page.locator('input[name="quote_company"]').getAttribute('required'), '');
+  assert.match((await page.locator('[data-intake-unavailable]').textContent()) || '', /temporarily unavailable|hello@canonical\.plus/i);
+
   const standards = page.locator('input[name="quote_standard"]');
   for (let index = 0; index < (await standards.count()); index += 1) await standards.nth(index).uncheck();
-  await page.locator('input[name="quote_email"]').fill("buyer@example.com");
-  await page.locator('input[name="quote_company"]').fill("Example Co");
-  await page.locator('[data-complete-public-quote]').click();
-  assert.equal(await page.locator('[data-standard-error]').isVisible(), true);
-
+  assert.equal(await submit.isDisabled(), true);
   await standards.first().check();
-  await page.locator('[data-complete-public-quote]').click();
-  assert.match((await page.locator('[data-quote-status]').textContent()) || "", /temporarily unavailable|hello@canonical\.plus/i);
+  assert.equal(await submit.isDisabled(), true);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
   assert.deepEqual(pageErrors, []);
 });
@@ -80,6 +83,7 @@ test("playwright: no-JavaScript fallback never creates a false sent quote", asyn
   assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), "$10,000–$12,500");
   assert.equal(await page.locator('[data-quote-estimator]').getAttribute("data-quote-runtime"), null);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
+  assert.equal(await page.locator('[data-complete-public-quote]').isDisabled(), true);
 });
 
 test("playwright: large, federal and unverified scopes do not show a routine quote", async (t) => {
@@ -100,7 +104,8 @@ test("playwright: large, federal and unverified scopes do not show a routine quo
 
   await page.locator('select[name="quote_systems_in_scope"]').selectOption("two-to-five");
   assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
-  assert.equal(await submit.isEnabled(), true);
+  assert.equal(await runtime.getAttribute("data-quote-runtime"), "ready");
+  assert.equal(await submit.isDisabled(), true);
 
 
   for (const [name, custom, routine] of [
@@ -117,7 +122,8 @@ test("playwright: large, federal and unverified scopes do not show a routine quo
     assert.equal(await submit.isDisabled(), true, name);
     await page.locator(`select[name="${name}"]`).selectOption(routine);
     assert.equal((await range.textContent())?.trim(), '$10,000–$12,500', name);
-    assert.equal(await submit.isEnabled(), true, name);
+    assert.equal(await runtime.getAttribute("data-quote-runtime"), "ready", name);
+    assert.equal(await submit.isDisabled(), true, name);
   }
   await page.locator('select[name="quote_remediation_load"]').selectOption('heavy');
   assert.equal((await range.textContent())?.trim(), '$10,000–$12,500');
