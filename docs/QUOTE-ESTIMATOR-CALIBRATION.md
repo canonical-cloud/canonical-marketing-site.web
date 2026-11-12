@@ -81,3 +81,17 @@ The manual-only `.github/workflows/public-intake-release.yml` is **not enabled f
 During the controlled release, `scripts/stamp-public-intake-release.mjs` puts the reviewed main SHA in the deployed Edge bundle. `HEAD /functions/v1/public-intake` is side-effect-free and returns `x-canonical-intake-revision` plus `x-canonical-intake-contract: quote-seven-scope-v1`. `scripts/verify-intake-release.mjs` accepts only an exact source match and verified CORS on HEAD/OPTIONS; it never issues POST or triggers storage/email. The checked-in revision is `unreleased`, so an unstamped deployment cannot falsely pass this check.
 
 **A correct HEAD stamp verifies bundle provenance and protocol readiness, not successful email delivery**. After staging, use only a separately approved controlled inbox to validate storage, rate limits, and actual requester/CC email. Verify the live page revision and server contract together after the Pages release. Keep the public fallback when production environment variables are unavailable.
+
+
+## Intake security audit — idempotency and bounded transport
+
+The intake UUID is bound to the original normalized requester, company, source,
+contact details or canonical quote selection, scope version and price range.
+A second submission using that UUID with different intent must receive HTTP 409,
+before quotas, persistence or email. Concurrent insert conflicts recheck the
+stored intent; failed/expired delivery retries use an atomic row-version-and-status
+claim so two senders cannot independently acquire the same lease. The Edge
+handler reads POST bodies incrementally with a strict 16 KiB byte limit instead
+of allocating the complete untrusted request before enforcing the limit.
+These checks are covered by executed Node and real Edge handler tests; a
+passing test does not establish a deployed Supabase project or mail delivery.

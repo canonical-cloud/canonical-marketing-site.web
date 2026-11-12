@@ -1,5 +1,6 @@
 import { computeQuote } from './quote-engine.mjs';
 import { releaseRevision } from './release-revision.mjs';
+import { readBodyBounded, matchesStoredSubmission } from './admission.mjs';
 
 const allowedOrigins = new Set([
   'https://canonical.plus',
@@ -112,7 +113,7 @@ const existingSubmission = async (
   idempotencyKey: string,
 ) => {
   const url = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
-  url.searchParams.set('select', 'id,delivery_status,updated_at');
+  url.searchParams.set('select', 'id,delivery_status,updated_at,kind,source,email,company,name,topic,message,quote_payload');
   url.searchParams.set('idempotency_key', `eq.${idempotencyKey}`);
   url.searchParams.set('limit', '1');
   const response = await fetchTimed(url, {
@@ -162,9 +163,13 @@ Deno.serve(async (request) => {
     return json(415, { error: 'unsupported_media_type' }, origin);
   }
 
-  const rawBody = await request.text();
-  if (new TextEncoder().encode(rawBody).byteLength > 16_384) {
-    return json(413, { error: 'payload_too_large' }, origin);
+  // Stream in bounded chunks; reject oversized requests before allocating them.
+  let rawBody: string;
+  try {
+    rawBody = await readBodyBounded(request);
+  } catch (error) {
+    const oversized = error instanceof Error && error.message === 'payload_too_large';
+    return json(oversized ? 413 : 400, { error: oversized ? 'payload_too_large' : 'invalid_json' }, origin);
   }
 
   let payload: Record<string, unknown>;
@@ -217,6 +222,21 @@ Deno.serve(async (request) => {
     }
   }
 
+  // Validate contact intent before idempotency lookup or quota consumption.
+  const contact = kind === 'contact' ? {
+    name: cleanLine(payload.name, 120),
+    topic: cleanLine(payload.topic, 80),
+    message: cleanMultiline(payload.message, 4000),
+  } : null;
+  if (contact && (contact.name.length < 2 || contact.message.length < 20 ||
+      !allowedContactTopics.has(contact.topic))) {
+    return json(400, { error: 'invalid_contact' }, origin);
+  }
+  const intent = {
+    kind, source, email, company, quote,
+    name: contact?.name, topic: contact?.topic, message: contact?.message,
+  };
+
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const serviceRole = resolveAdminKey();
   const resendKey = Deno.env.get('RESEND_API_KEY') || '';
@@ -227,8 +247,13 @@ Deno.serve(async (request) => {
   }
 
   let retryRecordId = '';
+  let priorRetryVersion = '';
+  let priorRetryStatus = '';
   try {
     const prior = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
+    if (prior && !matchesStoredSubmission(prior, intent)) {
+      return json(409, { error: 'idempotency_conflict' }, origin);
+    }
     const priorUpdatedAt = prior?.updated_at ? Date.parse(prior.updated_at) : Number.NaN;
     const pendingLeaseExpired =
       prior?.delivery_status === 'pending' &&
@@ -255,6 +280,8 @@ Deno.serve(async (request) => {
       validUuid(prior.id)
     ) {
       retryRecordId = prior.id;
+      priorRetryVersion = prior.updated_at;
+      priorRetryStatus = prior.delivery_status;
     }
 
     const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
@@ -322,13 +349,8 @@ Deno.serve(async (request) => {
     cc = ['hello@canonical.plus'];
     record.quote_payload = quote;
   } else {
-    const name = cleanLine(payload.name, 120);
-    const topic = cleanLine(payload.topic, 80);
-    const message = cleanMultiline(payload.message, 4000);
-    const topicLabel = allowedContactTopics.get(topic);
-    if (name.length < 2 || message.length < 20 || !topicLabel) {
-      return json(400, { error: 'invalid_contact' }, origin);
-    }
+    const { name, topic, message } = contact!;
+    const topicLabel = allowedContactTopics.get(topic)!;
     record.name = name;
     record.topic = topic;
     record.message = message;
@@ -343,6 +365,9 @@ Deno.serve(async (request) => {
     if (retryRecordId) {
       const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
       retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
+      // Compare-and-set the previous lease to exclude concurrent retry senders.
+      retryUrl.searchParams.set('updated_at', `eq.${priorRetryVersion}`);
+      retryUrl.searchParams.set('delivery_status', `eq.${priorRetryStatus}`);
       const retryUpdate = await fetchTimed(retryUrl, {
         method: 'PATCH',
         headers: {
@@ -360,7 +385,18 @@ Deno.serve(async (request) => {
       if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
       const [updated] = await retryUpdate.json();
       if (!updated?.id || !validUuid(updated.id)) {
-        return json(503, { error: 'storage_failed' }, origin);
+        // Another request may have acquired the failed/expired lease first.
+        const winner = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
+        if (winner && !matchesStoredSubmission(winner, intent)) {
+          return json(409, { error: 'idempotency_conflict' }, origin);
+        }
+        if (winner && (winner.delivery_status === 'pending' || winner.delivery_status === 'sent')) {
+          return json(202, {
+            accepted: true, duplicate: true,
+            ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+          }, origin);
+        }
+        return json(503, { error: 'retry_lease_unavailable' }, origin);
       }
       stored = updated;
     } else {
@@ -374,6 +410,16 @@ Deno.serve(async (request) => {
         body: JSON.stringify(record),
       });
       if (insert.status === 409) {
+        // A concurrent insert might reuse our UUID for an unrelated recipient
+        // or price selection. Never report that unrelated record as accepted.
+        const winner = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
+        if (!winner) return json(503, { error: 'storage_failed' }, origin);
+        if (!matchesStoredSubmission(winner, intent)) {
+          return json(409, { error: 'idempotency_conflict' }, origin);
+        }
+        if (winner.delivery_status !== 'pending' && winner.delivery_status !== 'sent') {
+          return json(503, { error: 'retry_lease_unavailable' }, origin);
+        }
         return json(202, {
           accepted: true,
           duplicate: true,
