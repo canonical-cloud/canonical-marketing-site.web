@@ -48,6 +48,24 @@ jobs:
               exit 1
               ;;
           esac
+      # An enabled email form must never be published against the old or
+      # unverified public-intake contract. The exact reviewed main SHA is
+      # stamped by the manual Edge deploy; if it is stale, Pages fails closed
+      # and the previous live site remains until the Edge release is verified.
+      - name: Verify live Edge contract before enabling public quote email
+        shell: bash
+        env:
+          PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
+          CANONICAL_EXPECTED_RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$PUBLIC_SUPABASE_URL" ]]; then
+            echo "::notice::Public intake not configured: quote/contact email disabled in published pages"
+          else
+            export SUPABASE_PROJECT_REF
+            SUPABASE_PROJECT_REF="$(node --input-type=module -e 'import { projectRefFromPublicUrl } from "./scripts/verify-intake-release.mjs"; process.stdout.write(projectRefFromPublicUrl(process.env.PUBLIC_SUPABASE_URL));')"
+            node scripts/verify-intake-release.mjs
+          fi
       - name: Build the canonical.plus site
         env:
           PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
