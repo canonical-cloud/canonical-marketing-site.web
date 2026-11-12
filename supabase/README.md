@@ -30,6 +30,54 @@ The implementation prefers `SUPABASE_SECRET_KEYS` / `SUPABASE_SECRET_KEY` and re
 `SUPABASE_SERVICE_ROLE_KEY` only as a migration fallback. Mail-provider and quota-salt
 credentials remain server-side.
 
+## Approval-gated release for seven-field quotes
+
+The website's quote calculator and the Edge function are one wire-protocol
+release unit, but they deploy separately:
+
+1. Review the single candidate marketing PR #152 with an independent technical
+   and commercial reviewer. Confirm legal/data-scope language from marketing
+   #146 and canonical-docs #60; do not merge conflicting draft branches.
+2. Configure GitHub environments `supabase-staging` and
+   `supabase-production` with **independent required reviewers** and
+   per-environment `SUPABASE_ACCESS_TOKEN` (scoped to the intended project)
+   and `SUPABASE_PROJECT_REF` (20 lowercase alphanumeric characters). These
+   settings require administrator verification and are not configured by this
+   repository. Apply the database migrations first.
+3. Only after those protections exist, enable repository variable
+   `CANONICAL_SUPABASE_DEPLOY_APPROVED=true`. Keep it unset otherwise. From
+   the reviewed `main` commit, manually dispatch
+   `.github/workflows/public-intake-release.yml` with the exact 40-character
+   main SHA, `target=staging`, and
+   `confirmation=DEPLOY_CANONICAL_INTAKE_STAGING`. Check the protected
+   environment approval and the successful **nonzero-step** deployment job.
+4. The staging job stamps the approved commit into the Edge bundle and checks
+   side-effect-free HEAD and OPTIONS requests. A matching
+   `x-canonical-intake-revision` and
+   `x-canonical-intake-contract: quote-seven-scope-v1` establish *deployed
+   source/protocol identity only*—not database migration state or email
+   deliverability. Run an explicitly approved controlled-mailbox test against
+   staging, verifying requester plus CC and stored inquiry state.
+5. After commercial/legal approval, repeat the protected manual deployment
+   with `target=production` and
+   `confirmation=DEPLOY_CANONICAL_INTAKE_PRODUCTION`. Only then allow the
+   public site to publish quote email with `PUBLIC_SUPABASE_URL` set to the
+   exact `https://<20-character-project-ref>.supabase.co` origin.
+6. The `pages` workflow now **fails closed** if the configured production
+   Supabase origin does not serve the expected `main` SHA and CORS-compatible
+   `quote-seven-scope-v1` contract. If intake is not configured, Pages may
+   publish the calculator with the **honest email-unavailable fallback**.
+   For a configured site, rerun the source-pinned Pages workflow after the
+   approved Edge cutover if the earlier automatic attempt was rejected.
+   Verify `https://canonical.plus/quote/` and `/contact/` separately.
+
+Old quote requests missing the new seven-field `selection.scope` contract
+return HTTP 422 before storage or email. Coordinate the temporary disabled
+quote-email period, because server-first cutover intentionally fails closed for
+old clients. Do not send real customer email in automated test fixtures, and
+do not claim the public site is live merely because CI or HEAD attestation
+passes.
+
 ## Email behavior
 
 - Quote submissions are emailed to the requester's work email and CC
