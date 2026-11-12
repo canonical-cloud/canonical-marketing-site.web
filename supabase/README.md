@@ -67,9 +67,19 @@ release unit, but they deploy separately:
    Supabase origin does not serve the expected `main` SHA and CORS-compatible
    `quote-seven-scope-v1` contract. If intake is not configured, Pages may
    publish the calculator with the **honest email-unavailable fallback**.
-   For a configured site, rerun the source-pinned Pages workflow after the
-   approved Edge cutover if the earlier automatic attempt was rejected.
-   Verify `https://canonical.plus/quote/` and `/contact/` separately.
+   After the protected Edge release, use the **manual Pages cutover** to avoid
+   a dummy merge/push: dispatch `.github/workflows/pages.yml` from `main` with
+   `approved_sha` equal to the deployed, current `main` SHA,
+   `ci_run_id` equal to a successful **push-triggered main** `ci` run for that
+   SHA, and `confirmation=PUBLISH_CANONICAL_SITE`. A read-only GitHub API gate
+   validates the exact commit and **executed successful `build`, `browser-e2e`,
+   and `container-browser-e2e` steps**, while the existing production-Edge
+   HEAD/OPTIONS gate verifies the same deployed SHA before Pages upload.
+   Merely rerunning a failed automatic workflow is not sufficient evidence and
+   no branch other than `main` is accepted. If an earlier automatic attempt was
+   rejected by the Edge version check, it is safe to leave it failed and use
+   this explicit reviewed manual path. Verify `https://canonical.plus/quote/`
+   and `/contact/` separately.
 
 Old quote requests missing the new seven-field `selection.scope` contract
 return HTTP 422 before storage or email. Coordinate the temporary disabled
