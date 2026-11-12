@@ -1,6 +1,22 @@
 name: pages
 
 on:
+  # Once the protected Edge release is verified, this manual path republishes
+  # the SAME reviewed main commit without a dummy push or CI bypass.
+  workflow_dispatch:
+    inputs:
+      approved_sha:
+        description: 'Exact reviewed main Git commit (40 lowercase hex)'
+        required: true
+        type: string
+      ci_run_id:
+        description: 'Successful push-triggered main CI run ID for approved_sha'
+        required: true
+        type: string
+      confirmation:
+        description: 'Type PUBLISH_CANONICAL_SITE to authorize the Pages cutover'
+        required: true
+        type: string
   # Production Pages deploys only the exact main-branch commit that completed
   # the blocking CI workflow (including Playwright + Puppeteer). A parallel
   # push-triggered workflow could otherwise publish while browser CI is red.
@@ -11,6 +27,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: pages
@@ -19,16 +36,33 @@ concurrency:
 jobs:
   pages-build:
     if: >-
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.event == 'push' &&
-      github.event.workflow_run.head_branch == 'main'
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main') ||
+      (github.event_name == 'workflow_dispatch' &&
+       github.ref == 'refs/heads/main' &&
+       inputs.confirmation == 'PUBLISH_CANONICAL_SITE')
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.event.workflow_run.head_sha }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'main' || github.event.workflow_run.head_sha }}
           persist-credentials: false
+      - name: Verify manual publication matches main and executed successful CI
+        if: github.event_name == 'workflow_dispatch'
+        shell: bash
+        env:
+          CANONICAL_APPROVED_SHA: ${{ inputs.approved_sha }}
+          CANONICAL_CI_RUN_ID: ${{ inputs.ci_run_id }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANONICAL_APPROVED_SHA" || {
+            echo "::error::Main branch advanced since the approved release"; exit 1;
+          }
+          node scripts/verify-pages-ci.mjs
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22.23.4"
@@ -56,7 +90,7 @@ jobs:
         shell: bash
         env:
           PUBLIC_SUPABASE_URL: ${{ vars.PUBLIC_SUPABASE_URL }}
-          CANONICAL_EXPECTED_RELEASE_SHA: ${{ github.event.workflow_run.head_sha }}
+          CANONICAL_EXPECTED_RELEASE_SHA: ${{ github.event_name == 'workflow_dispatch' && inputs.approved_sha || github.event.workflow_run.head_sha }}
         run: |
           set -euo pipefail
           if [[ -z "$PUBLIC_SUPABASE_URL" ]]; then
