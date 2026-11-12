@@ -74,7 +74,9 @@ export const computeQuote = (raw) => {
   // maximum fees for larger work. Never present a clipped total as a quote.
   const uncappedMidpoint = additive * stage.multiplier;
   if (uncappedMidpoint > quoteConfig.midpointCeilingUsd ||
-      roundMoney(uncappedMidpoint * quoteConfig.upperFactor) > quoteConfig.estimateCeilingUsd) {
+      roundMoney(uncappedMidpoint * quoteConfig.upperFactor) > quoteConfig.estimateCeilingUsd ||
+      uncappedMidpoint < quoteConfig.midpointFloorUsd ||
+      roundMoney(uncappedMidpoint * quoteConfig.lowerFactor) < quoteConfig.estimateFloorUsd) {
     throw new Error('custom_scope_required');
   }
 
