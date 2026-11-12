@@ -125,9 +125,11 @@ test(
       assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$10,000–$12,500');
       await page.locator('input[name="quote_email"]').fill('buyer@example.com');
       await page.locator('input[name="quote_company"]').fill('Example Co');
-      await page.locator('[data-complete-public-quote]').click();
+      const quoteEmailAction = page.locator('[data-complete-public-quote]');
+      assert.equal(await quoteEmailAction.isDisabled(), true);
+      assert.equal(await quoteEmailAction.getAttribute('aria-describedby'), 'quote-intake-unavailable');
       assert.match(
-        (await page.locator('[data-quote-status]').textContent()) || '',
+        (await page.locator('[data-intake-unavailable]').textContent()) || '',
         /temporarily unavailable|hello@canonical\.plus/i,
       );
       assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
