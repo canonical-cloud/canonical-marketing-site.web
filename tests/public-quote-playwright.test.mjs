@@ -55,6 +55,83 @@ test("playwright: quote v2 responds to scale factors and does not offer unavaila
   assert.deepEqual(pageErrors, []);
 });
 
+test("playwright: configured intake requires a valid scope and uses server quote without browser-priced payload", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+  const page = await browser.newPage({ viewport: { height: 900, width: 1280 } });
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+
+  // The ordinary preview build has no backend configured. Intercept only this
+  // page's HTML to exercise the configured UI branch, without a real Supabase
+  // project or any outbound quote email.
+  await page.route("**/quote/", async (route) => {
+    const original = await route.fetch();
+    const html = await original.text();
+    assert.match(html, /data-supabase-url=""/);
+    await route.fulfill({
+      response: original,
+      body: html.replace('data-supabase-url=""', 'data-supabase-url="https://quote-ci.supabase.co"'),
+    });
+  });
+
+  let received = null;
+  await page.route("https://quote-ci.supabase.co/functions/v1/public-intake", async (route) => {
+    received = route.request().postDataJSON();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "access-control-allow-origin": "*" },
+      body: JSON.stringify({
+        quote: {
+          range: { lowerUsd: 10000, upperUsd: 12500, currency: "USD" },
+          summary: "Server-authoritative scope summary",
+        },
+      }),
+    });
+  });
+
+  await page.goto(server.url + "/quote/", { waitUntil: "networkidle" });
+  const runtime = page.locator('[data-quote-estimator]');
+  const submit = page.locator('[data-complete-public-quote]');
+  const standards = page.locator('input[name="quote_standard"]');
+  assert.equal(await runtime.getAttribute("data-quote-runtime"), "ready");
+  assert.equal(await submit.isEnabled(), true);
+
+  for (let index = 0; index < (await standards.count()); index += 1) {
+    await standards.nth(index).uncheck();
+  }
+  await submit.click();
+  assert.equal(await page.locator('[data-standard-error]').isVisible(), true);
+  assert.equal(received, null);
+
+  await standards.first().check();
+  await standards.nth(1).check();
+  await page.locator('select[name="quote_systems_in_scope"]').selectOption("six-plus");
+  assert.equal(await submit.isDisabled(), true);
+  assert.equal(received, null);
+  await page.locator('select[name="quote_systems_in_scope"]').selectOption("two-to-five");
+
+  await page.locator('input[name="quote_email"]').fill("buyer@example.invalid");
+  await page.locator('input[name="quote_company"]').fill("Example Co");
+  assert.equal(await submit.isEnabled(), true);
+  await submit.click();
+  await page.locator('[data-quote-status]').getByText('Quote sent successfully.').waitFor();
+  assert.equal(await page.locator('[data-quote-complete]').isVisible(), true);
+  assert.equal((await page.locator('[data-quote-summary]').textContent())?.trim(), "Server-authoritative scope summary");
+  assert.equal(received.kind, "quote");
+  assert.equal(received.email, "buyer@example.invalid");
+  assert.equal(received.selection.speedWeeks, 5);
+  assert.deepEqual(received.selection.standardIds, ["soc2", "iso27001"]);
+  assert.equal(received.scopeContext.systemsInScope, "two-to-five");
+  assert.equal(received.scopeContext.cloudAccountBand, "1-2");
+  assert.equal(typeof received.idempotencyKey, "string");
+  assert.equal(Object.hasOwn(received, "quote"), false);
+  assert.equal(Object.hasOwn(received, "range"), false);
+  assert.deepEqual(errors, []);
+});
+
 test("playwright: quote cards are responsive without horizontal overflow", async (t) => {
   const server = await startSite();
   t.after(() => server.stop());
