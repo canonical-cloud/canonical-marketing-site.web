@@ -80,3 +80,11 @@ test("quote copy distinguishes priced organization factors from sector context",
   assert.match(page, /Business sector captured for scoping context/i);
   assert.ok(estimator.sectors.every((item) => item.amountUsd === 0));
 });
+
+test("offline quote page does not promise a sent email without an Edge intake endpoint", () => {
+  assert.match(page, /description=\{supabaseUrl \?/);
+  assert.match(page, /emailed summary" : "reviewed proposal available"/);
+  assert.match(page, /Online quote delivery is currently unavailable/);
+  assert.match(page, /data-intake-unavailable/);
+  assert.match(runtime, /Quote email is temporarily unavailable/);
+});
