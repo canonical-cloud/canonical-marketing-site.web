@@ -200,7 +200,8 @@ if (root instanceof HTMLElement) {
           scope,
         };
         const customReason = customScopeReason(selection, rawMidpoint, {
-          midpointCeilingUsd: midpointCeiling, estimateCeilingUsd: ceiling, upperFactor,
+          midpointFloorUsd: midpointFloor, midpointCeilingUsd: midpointCeiling,
+          estimateFloorUsd: floor, estimateCeilingUsd: ceiling, lowerFactor, upperFactor,
         });
         return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, scope, selection, midpoint, lower, upper, summary, customReason, requiresCustomScoping: Boolean(customReason), frameworkUsd, additive, stageMultiplier };
       };
