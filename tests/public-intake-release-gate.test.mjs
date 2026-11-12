@@ -24,6 +24,14 @@ const options = () => response(204, {
   'access-control-allow-methods': 'POST, OPTIONS',
 });
 
+test('manual release workflow pins a reviewed Supabase CLI version rather than latest v3', () => {
+  const workflow = readFileSync(new URL('../.github/workflows/public-intake-release.yml', import.meta.url), 'utf8');
+  assert.match(workflow, /version: '2\.122\.1'/);
+  assert.match(workflow, /Unapproved Supabase CLI release/);
+  assert.doesNotMatch(workflow, /version: latest/);
+  assert.match(workflow, /github\.ref == 'refs\/heads\/main'/);
+});
+
 test('source releases cannot claim a deployment before the approved stamp', () => {
   assert.equal(releaseRevision, 'unreleased');
   assert.equal(renderReleaseRevision(sha).includes(`releaseRevision = '${sha}'`), true);
