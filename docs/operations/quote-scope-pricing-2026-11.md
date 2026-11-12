@@ -19,7 +19,7 @@ The public range remains a **one-time planning estimate**, not a recurring month
 A routine public dollar range is suppressed, and email quote submission is disabled, when:
 
 1. FedRAMP readiness is selected (not an inexpensive add-on to normal SOC 2 work).
-2. The unbounded price would exceed the pinned v2 midpoint or total-estimate ceilings; clipping is not a defensible quote.
+2. The unbounded price falls below the midpoint/total floor or exceeds the midpoint/total ceiling; clipping on either end is not a defensible quote.
 3. There are 6+ production systems, or system scope / maturity / data classification is unknown.
 4. A new program requires managed operational readiness or hands-on remediation rather than advisory-only.
 5. Regulated production-data engineering remediation is requested.
