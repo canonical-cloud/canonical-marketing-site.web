@@ -69,10 +69,10 @@ test("playwright: configured intake requires a valid scope and uses server quote
   await page.route("**/quote/", async (route) => {
     const original = await route.fetch();
     const html = await original.text();
-    assert.match(html, /data-supabase-url(?:="")?(?=\\s|>)/);
+    assert.match(html, /data-supabase-url(?:="")?(?=\s|>)/);
     await route.fulfill({
       response: original,
-      body: html.replace(/data-supabase-url(?:="")?(?=\\s|>)/, 'data-supabase-url="https://quote-ci.supabase.co"'),
+      body: html.replace(/data-supabase-url(?:="")?(?=\s|>)/, 'data-supabase-url="https://quote-ci.supabase.co"'),
     });
   });
 
