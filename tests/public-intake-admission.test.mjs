@@ -159,3 +159,54 @@ test('real Edge handler returns 409 for cross-intent replay without writing or e
   assert.equal(oversizedResponse.status, 413);
   assert.deepEqual(calls, [], 'oversized admission must not access persistence or email');
 });
+
+test('real Edge handler loses expired delivery lease safely without a second email', async (t) => {
+  const previousDeno = globalThis.Deno;
+  const previousFetch = globalThis.fetch;
+  let handler;
+  let stored = { ...prior, delivery_status: 'failed' };
+  const calls = [];
+  globalThis.Deno = {
+    serve: (fn) => { handler = fn; },
+    env: { get: (key) => ({
+      SUPABASE_URL: 'https://test-project.supabase.co',
+      SUPABASE_SECRET_KEY: 'sb_secret_fixture',
+      RESEND_API_KEY: 'fixture_only',
+      PUBLIC_INTAKE_RATE_LIMIT_SALT: 'x'.repeat(32),
+    })[key] ?? '' },
+  };
+  globalThis.fetch = async (input, init = {}) => {
+    const url = new URL(String(input));
+    const method = init.method || 'GET';
+    calls.push({ url: url.href, method });
+    if (url.pathname === '/rest/v1/public_inquiries' && method === 'GET') {
+      return new Response(JSON.stringify([stored]), { status: 200 });
+    }
+    if (url.pathname.includes('/rpc/consume_public_intake_quota')) {
+      return new Response('true', { status: 200 });
+    }
+    if (url.pathname === '/rest/v1/public_inquiries' && method === 'PATCH') {
+      assert.equal(url.searchParams.get('id'), `eq.${prior.id}`);
+      assert.equal(url.searchParams.get('delivery_status'), 'eq.failed');
+      assert.equal(url.searchParams.get('updated_at'), `eq.${prior.updated_at}`);
+      // Another sender won the compare-and-set before this PATCH.
+      stored = { ...stored, delivery_status: 'pending' };
+      return new Response('[]', { status: 200 });
+    }
+    throw new Error('unexpected network operation ' + method + ' ' + url.href);
+  };
+  t.after(() => {
+    if (previousDeno === undefined) delete globalThis.Deno;
+    else globalThis.Deno = previousDeno;
+    globalThis.fetch = previousFetch;
+  });
+  // Separate query URL forces an independently instantiated real Edge handler.
+  await import('../supabase/functions/public-intake/index.ts?lease-race-probe');
+  assert.equal(typeof handler, 'function');
+  const res = await handler(intakeRequest(payload()));
+  assert.equal(res.status, 202);
+  assert.equal((await res.json()).duplicate, true);
+  assert.equal(calls.filter((x) => x.method === 'PATCH').length, 1);
+  assert.equal(calls.filter((x) => x.method === 'GET').length, 2);
+  assert.equal(calls.some((x) => x.url.includes('resend.com')), false);
+});
