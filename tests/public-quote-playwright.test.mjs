@@ -142,7 +142,7 @@ test("playwright: late email response cannot overwrite a changed scoped estimate
   await page.route(`${server.url}/quote/`, async (route) => {
     const response = await route.fetch();
     const html = await response.text();
-    const updated = html.replace('data-supabase-url=""', `data-supabase-url="${fixtureOrigin}"`);
+    const updated = html.replace(/data-supabase-url(?:="")?(?=\\s|>)/, `data-supabase-url="${fixtureOrigin}"`);
     assert.notEqual(updated, html, "quote must expose a configurable, non-privileged intake URL");
     await route.fulfill({ response, body: updated });
   });
