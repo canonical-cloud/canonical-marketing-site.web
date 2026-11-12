@@ -287,6 +287,10 @@ Deno.serve(async (request) => {
       ['Production systems', quote.scope.labels.systemsInScope],
       ['Control maturity', quote.scope.labels.readinessBaseline],
       ['Data classification', quote.scope.labels.dataExposure],
+      ['Cloud accounts', quote.scope.labels.cloudAccountBand],
+      ['Control owners', quote.scope.labels.controlOwnerBand],
+      ['Regulatory footprint', quote.scope.labels.dataFootprint],
+      ['Remediation effort', quote.scope.labels.remediationLoad],
     ];
     subject = `Canonical Plus readiness quote for ${company}`;
     html = `<h1>Your Canonical Plus planning estimate</h1>
