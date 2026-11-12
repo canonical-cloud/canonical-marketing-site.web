@@ -31,6 +31,14 @@ export async function readBodyBounded(request, maxBytes = 16_384) {
   return body;
 }
 
+// PostgreSQL JSONB serializes object keys in a different order from JavaScript
+// insertion order. Compare canonical structures, not textual key order.
+const canonicalJson = (value) => JSON.stringify(value, (_key, object) =>
+  object && typeof object === 'object' && !Array.isArray(object)
+    ? Object.fromEntries(Object.entries(object).sort(([a], [b]) => a.localeCompare(b)))
+    : object,
+);
+
 // An idempotency UUID identifies one immutable intent, not an unlimited
 // permission to acknowledge a different recipient or recomputed quote.
 export function matchesStoredSubmission(prior, intent) {
@@ -47,6 +55,6 @@ export function matchesStoredSubmission(prior, intent) {
       typeof prior.quote_payload !== 'object') return false;
   const original = prior.quote_payload;
   return original.scopeSchemaVersion === intent.quote.scopeSchemaVersion &&
-    JSON.stringify(original.selection) === JSON.stringify(intent.quote.selection) &&
-    JSON.stringify(original.range) === JSON.stringify(intent.quote.range);
+    canonicalJson(original.selection) === canonicalJson(intent.quote.selection) &&
+    canonicalJson(original.range) === canonicalJson(intent.quote.range);
 }
