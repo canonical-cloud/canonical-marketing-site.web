@@ -46,7 +46,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
         <h1 class="page-hero__title hero__title">Price the readiness work.<br /><span class="gradient-text">Keep the quote for your team.</span></h1>
         <p class="page-hero__subtitle">
           Estimate readiness and remediation support using delivery speed, frameworks, service depth, environment complexity,
-          company stage, and employee count. Business sector is captured as scoping context. Submit the quote to receive a copy by email.
+          company stage, and employee count. Additional scoping checks cover cloud accounts, production systems, control ownership, evidence maturity, data sensitivity, jurisdiction footprint, and remediation effort. Business sector is scoping context. Submit the quote to receive a copy by email.
         </p>
         <div class="page-hero__actions">
           <a href={introHref} class="btn btn--primary btn--large" id="quote-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
@@ -59,7 +59,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <li>Advisory, managed readiness, or hands-on remediation</li>
           <li>Environment complexity, company stage, and employee scale</li>
           <li>Business sector captured for scoping context</li>
-          <li>Cloud footprint, control ownership, evidence maturity, and remediation effort qualify whether an instant range is appropriate</li>
+          <li>Cloud and production-system footprint, control ownership, evidence maturity, data sensitivity, jurisdiction reach, and remediation effort qualify whether an instant range is appropriate</li>
         </ul>
         <p>Planning ranges are non-binding. A reviewed statement of work controls final scope, deliverables, pricing, and deadlines.</p>
       </aside>
@@ -184,7 +184,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
           <p class="quote-estimator__eyebrow">Estimated project range</p>
           <p class="quote-estimator__price"><strong data-quote-range>{money.format(10000)}–{money.format(12500)}</strong></p>
           <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS</p>
-          <p class="quote-control-note" data-quote-scope-details>Assumes 1–2 cloud environments, partial existing evidence, 1–5 control owners, one primary jurisdiction and moderate remediation.</p>
+          <p class="quote-control-note" data-quote-scope-details>Assumes 1–2 cloud accounts, 2–5 production systems, partial existing evidence, 1–5 control owners, standard business data, one primary jurisdiction and moderate remediation.</p>
           <p class="quote-validation" data-quote-custom-reason role="status" hidden></p>
           <p class="quote-estimator__boundary" data-quote-price-basis>Range components: delivery timeline, frameworks, service depth, environment complexity, employee band and company-stage factor. Industry and additional scoping answers do not apply automatic surcharges.</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
