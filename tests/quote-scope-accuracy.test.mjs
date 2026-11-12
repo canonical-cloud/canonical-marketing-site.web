@@ -25,7 +25,7 @@ test('client, page and authoritative edge share the exact scope taxonomy', async
   assert.deepEqual(serverSchema, schema);
   assert.equal(schema.scopeSchemaVersion, 1);
   assert.deepEqual(schema.fields.map((field) => field.key), [
-    'cloudAccountBand', 'evidenceMaturity', 'controlOwnerBand', 'dataFootprint', 'remediationLoad',
+    'cloudAccountBand', 'productionSystems', 'evidenceMaturity', 'controlOwnerBand', 'dataExposure', 'dataFootprint', 'remediationLoad',
   ]);
   for (const field of schema.fields) {
     assert.match(field.name, /^quote_[a-z_]+$/);
@@ -54,6 +54,8 @@ test('ordinary quote remains calibrated to the pinned v2 authority and carries s
 test('scoping answers never silently invent extra numeric charges', () => {
   for (const [key, value] of [
     ['cloudAccountBand','3-10'],
+    ['productionSystems','one'],
+    ['dataExposure','sensitive'],
     ['evidenceMaturity','organized'],
     ['controlOwnerBand','6-20'],
     ['dataFootprint','multi'],
@@ -67,6 +69,10 @@ test('fail closed for federal authorization and unbounded or uncertain work', ()
   const custom = [
     qualified({ standardIds: ['soc2', 'fedramp'] }),
     qualified({}, { ...standardScope, cloudAccountBand: '11-plus' }),
+    qualified({}, { ...standardScope, productionSystems: '6-plus' }),
+    qualified({}, { ...standardScope, dataExposure: 'unknown' }),
+    qualified({ deliveryDepthId: 'remediation' }, { ...standardScope, dataExposure: 'regulated' }),
+    qualified({ deliveryDepthId: 'managed' }, { ...standardScope, evidenceMaturity: 'early' }),
     qualified({}, { ...standardScope, controlOwnerBand: '21-plus' }),
     qualified({}, { ...standardScope, dataFootprint: 'multi-regulated' }),
     qualified({}, { ...standardScope, evidenceMaturity: 'unknown' }),
@@ -130,6 +136,8 @@ test('UI, edge and delivery documents make qualification and pricing boundaries 
   assert.match(client, /completeButton\.disabled = quote\.requiresCustomScoping/);
   assert.match(client, /selection: quote\.selection/);
   assert.match(client, /customScopeReason\(/);
+  assert.match(client, /selectionRevision/);
+  assert.match(client, /submittedRevision !== selectionRevision/);
   assert.match(edge, /return json\(422, \{ error: 'custom_scope_required' \}, origin\)/);
   assert.match(edge, /quote\.labels\.scoping\.map/);
 });
