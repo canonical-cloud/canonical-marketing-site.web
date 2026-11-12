@@ -1,4 +1,5 @@
 import { computeQuote } from './quote-engine.mjs';
+import { releaseRevision } from './release-revision.mjs';
 
 const allowedOrigins = new Set([
   'https://canonical.plus',
@@ -127,6 +128,21 @@ const existingSubmission = async (
 Deno.serve(async (request) => {
   const origin = request.headers.get('origin') || '';
 
+  // Read-only source attestation: never reads secrets, database, or email state.
+  // The protected deploy workflow stamps the exact reviewed main SHA.
+  if (request.method === 'HEAD') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'cache-control': 'no-store, max-age=0',
+        'x-content-type-options': 'nosniff',
+        'x-canonical-intake-revision': releaseRevision,
+        'x-canonical-intake-contract': 'quote-seven-scope-v1',
+        ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
+        'vary': 'Origin',
+      },
+    });
+  }
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: allowedOrigins.has(origin) ? 204 : 403,
