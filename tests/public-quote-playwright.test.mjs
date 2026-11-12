@@ -102,6 +102,31 @@ test("playwright: large, federal and unverified scopes do not show a routine quo
   assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
   assert.equal(await submit.isEnabled(), true);
 
+
+  for (const [name, custom, routine] of [
+    ['quote_cloud_account_band', '11-plus', '1-2'],
+    ['quote_control_owner_band', '21-plus', '1-5'],
+    ['quote_data_footprint', 'multi-regulated', 'single'],
+    ['quote_remediation_load', 'unknown', 'moderate'],
+    ['quote_cloud_account_band', 'unknown', '1-2'],
+    ['quote_control_owner_band', 'unknown', '1-5'],
+    ['quote_data_footprint', 'unknown', 'single'],
+  ]) {
+    await page.locator(`select[name="${name}"]`).selectOption(custom);
+    assert.equal((await range.textContent())?.trim(), 'Custom scoping required', name);
+    assert.equal(await submit.isDisabled(), true, name);
+    await page.locator(`select[name="${name}"]`).selectOption(routine);
+    assert.equal((await range.textContent())?.trim(), '$10,000–$12,500', name);
+    assert.equal(await submit.isEnabled(), true, name);
+  }
+  await page.locator('select[name="quote_remediation_load"]').selectOption('heavy');
+  assert.equal((await range.textContent())?.trim(), '$10,000–$12,500');
+  await page.locator('input[name="quote_delivery_depth"][value="remediation"]').check();
+  assert.equal((await range.textContent())?.trim(), 'Custom scoping required');
+  await page.locator('select[name="quote_remediation_load"]').selectOption('moderate');
+  await page.locator('input[name="quote_delivery_depth"][value="managed"]').check();
+  assert.equal((await range.textContent())?.trim(), '$10,000–$12,500');
+
   await page.locator('input[name="quote_standard"][value="fedramp"]').check();
   assert.equal((await range.textContent())?.trim(), "Custom scoping required");
   assert.equal(await submit.isDisabled(), true);
