@@ -120,7 +120,7 @@ test('Pages must attest the exact reviewed Edge contract before publishing enabl
   const deploy = pages.indexOf('name: Deploy GitHub Pages artifact');
   assert.ok(verifier > 0 && publisher > verifier && deploy > publisher,
     'verified deployment must precede artifacts and deployment');
-  assert.match(pages, /CANONICAL_EXPECTED_RELEASE_SHA: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/);
+  assert.ok(pages.includes("CANONICAL_EXPECTED_RELEASE_SHA: ${{ github.event_name == 'workflow_dispatch' && inputs.approved_sha || github.event.workflow_run.head_sha }}"));
   assert.match(pages, /projectRefFromPublicUrl\(process\.env\.PUBLIC_SUPABASE_URL\)/);
   assert.match(pages, /node scripts\/verify-intake-release\.mjs/);
   assert.match(pages, /Public intake not configured: quote\/contact email disabled/);
