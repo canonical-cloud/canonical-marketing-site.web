@@ -92,6 +92,7 @@ test('fail closed for federal authorization and unbounded or uncertain work', ()
     assert.throws(() => computeQuote(selection), /custom_scope_required/, JSON.stringify(selection));
   }
   assert.throws(() => computeQuote({ ...validSelection, standardIds: ['fedramp'] }), /custom_scope_required/);
+  assert.throws(() => computeQuote(qualified({ speedWeeks: 9, standardIds: ['soc2'], deliveryDepthId: 'advisory', complexityId: 'focused', companyStageId: 'startup', employeeBandId: '1-10' })), /custom_scope_required/, 'below-floor quote must not be padded to $5k');
 });
 
 test('malformed scoping input cannot bypass server validation', () => {
@@ -108,7 +109,7 @@ test('malformed scoping input cannot bypass server validation', () => {
 
 test('the browser and server use identical custom-qualification rules', () => {
   const raw = 11250;
-  const limits = { midpointCeilingUsd: 22000, estimateCeilingUsd: 25000, upperFactor: 1.12 };
+  const limits = { midpointFloorUsd: 5500, midpointCeilingUsd: 22000, estimateFloorUsd: 5000, estimateCeilingUsd: 25000, lowerFactor: 0.9, upperFactor: 1.12 };
   for (const selection of [
     qualified(),
     qualified({ standardIds: ['fedramp'] }),
@@ -119,6 +120,8 @@ test('the browser and server use identical custom-qualification rules', () => {
   }
   assert.match(serverReason(qualified(), 23000, limits), /published estimator range/);
   assert.match(serverReason(qualified(), 22500, limits), /published estimator range/);
+  assert.match(serverReason(qualified(), 4750, limits), /published estimator range/);
+  assert.match(clientReason(qualified(), 4750, limits), /published estimator range/);
 });
 
 test('UI, edge and delivery documents make qualification and pricing boundaries explicit', async () => {
@@ -140,4 +143,58 @@ test('UI, edge and delivery documents make qualification and pricing boundaries 
   assert.match(client, /submittedRevision !== selectionRevision/);
   assert.match(edge, /return json\(422, \{ error: 'custom_scope_required' \}, origin\)/);
   assert.match(edge, /quote\.labels\.scoping\.map/);
+});
+
+
+test('actual public intake handler rejects missing scope and unsafe pricing before DB/email', async (t) => {
+  const previousDeno = globalThis.Deno;
+  const previousFetch = globalThis.fetch;
+  let handler;
+  let envReads = 0;
+  let networkCalls = 0;
+  globalThis.Deno = {
+    serve: (fn) => { handler = fn; },
+    env: { get: () => { envReads += 1; return ''; } },
+  };
+  globalThis.fetch = () => { networkCalls += 1; throw new Error('unexpected external call'); };
+  t.after(() => {
+    if (previousDeno === undefined) delete globalThis.Deno;
+    else globalThis.Deno = previousDeno;
+    globalThis.fetch = previousFetch;
+  });
+
+  await import('../supabase/functions/public-intake/index.ts');
+  assert.equal(typeof handler, 'function', 'the real TypeScript Edge handler must be loaded');
+
+  const payload = (selection) => ({
+    kind: 'quote', source: 'canonical.plus/quote',
+    email: 'fixture@example.invalid', company: 'Fixture Co',
+    idempotencyKey: '123e4567-e89b-42d3-a456-426614174000',
+    selection,
+  });
+  const request = (selection) => new Request('https://unused.invalid/functions/v1/public-intake', {
+    method: 'POST',
+    headers: { origin: 'https://canonical.plus', 'content-type': 'application/json' },
+    body: JSON.stringify(payload(selection)),
+  });
+  for (const [selection, status, reason] of [
+    [validSelection, 422, 'legacy client without scope'],
+    [{ ...validSelection, scope: { ...standardScope, productionSystems: '6-plus' } }, 422, 'large scope'],
+    [{ ...validSelection, scope: { ...standardScope, controlOwnerBand: 'unknown' } }, 422, 'unknown scope'],
+    [{ ...validSelection, scope: standardScope, standardIds: ['fedramp'] }, 422, 'federal scope'],
+    [{ ...validSelection, scope: standardScope, speedWeeks: 9, standardIds: ['soc2'], deliveryDepthId: 'advisory', complexityId: 'focused', companyStageId: 'startup', employeeBandId: '1-10' }, 422, 'below-floor price'],
+    [{ ...validSelection, scope: null }, 400, 'invalid scope'],
+    [{ ...validSelection, scope: { ...standardScope, random: 'field' } }, 400, 'injected field'],
+  ]) {
+    const response = await handler(request(selection));
+    assert.equal(response.status, status, reason);
+    assert.equal((await response.json()).error, status === 422 ? 'custom_scope_required' : 'invalid_quote_selection', reason);
+    assert.equal(envReads, 0, reason + ' must not read service credentials');
+    assert.equal(networkCalls, 0, reason + ' must not invoke persistence or email');
+  }
+
+  const routine = await handler(request({ ...validSelection, scope: standardScope }));
+  assert.equal(routine.status, 503, 'valid scoped quote reaches service availability check');
+  assert.ok(envReads > 0);
+  assert.equal(networkCalls, 0, 'no real network or email is used by this test');
 });
