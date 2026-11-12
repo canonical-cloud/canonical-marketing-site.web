@@ -119,8 +119,10 @@ test("playwright: scope answers qualify pricing without silent capped estimates"
   await page.locator('select[name="quote_evidence_maturity"]').selectOption("early");
   await page.locator('[data-quote-speed-slider]').fill("2");
   assert.equal(await button.isDisabled(), true);
-  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /three-week/);
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /new program|three-week/);
   await page.locator('[data-quote-speed-slider]').fill("1");
+  assert.equal(await button.isDisabled(), true);
+  await page.locator('select[name="quote_evidence_maturity"]').selectOption("partial");
   assert.equal(await button.isEnabled(), true);
   assert.deepEqual(errors, []);
 });
