@@ -75,7 +75,7 @@ jobs:
       - name: Verify server denial, ordinary quote computation and no-side-effect attestation
         run: |
           node --test tests/public-intake-security-contract.test.mjs tests/public-intake-release-gate.test.mjs
-          node --experimental-strip-types --test tests/quote-scope-accuracy.test.mjs
+          node --experimental-strip-types --test tests/quote-scope-accuracy.test.mjs tests/public-intake-delivery-routing.test.mjs
       - name: Stamp reviewed source revision into deployable bundle
         run: |
           set -euo pipefail
