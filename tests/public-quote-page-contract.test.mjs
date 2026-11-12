@@ -87,7 +87,7 @@ test("scope qualifiers do not alter the pinned v2 price factors", () => {
   assert.match(runtime, /const cappedPrice = uncappedMidpoint > midpointCeiling/);
   assert.match(runtime, /Custom scoping required/);
   assert.match(runtime, /scopeContext: quote\.scopeContext/);
-  assert.match(runtime, /completeButton\.disabled = quote\.requiresCustomScoping/);
+  assert.match(runtime, /completeButton\.disabled = !supabaseUrl \|\| quote\.requiresCustomScoping/);
   assert.match(page, /not a maximum engagement fee/i);
   assert.match(page, /separate from the recurring monthly service tiers below/i);
 });
