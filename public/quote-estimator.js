@@ -205,6 +205,8 @@ if (root instanceof HTMLElement) {
         return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, scope, selection, midpoint, lower, upper, summary, customReason, requiresCustomScoping: Boolean(customReason), frameworkUsd, additive, stageMultiplier };
       };
 
+      let selectionRevision = 0;
+      let isSubmitting = false;
       const render = () => {
         const quote = calculate();
         speedSlider.setAttribute('aria-valuetext', quote.speed.label);
@@ -217,7 +219,7 @@ if (root instanceof HTMLElement) {
         const percentage = ((quote.midpoint - floor) / Math.max(1, ceiling - floor)) * 100;
         meterNode.style.width = quote.requiresCustomScoping ? '0%' : `${clamp(percentage, 4, 100)}%`;
         root.dataset.quoteRuntime = quote.requiresCustomScoping ? 'custom-scope' : 'ready';
-        completeButton.disabled = quote.requiresCustomScoping;
+        completeButton.disabled = quote.requiresCustomScoping || isSubmitting;
         if (quote.standards.length > 0 && standardError instanceof HTMLElement) {
           standardError.hidden = true;
           standardGroup?.removeAttribute('aria-invalid');
@@ -233,6 +235,7 @@ if (root instanceof HTMLElement) {
 
       let submissionKey = '';
       const invalidate = () => {
+        selectionRevision += 1;
         submissionKey = '';
         if (completedPanel instanceof HTMLElement) completedPanel.hidden = true;
         setStatus('');
@@ -242,6 +245,7 @@ if (root instanceof HTMLElement) {
       root.addEventListener('change', invalidate);
 
       completeButton.addEventListener('click', async () => {
+        if (isSubmitting) return;
         const quote = render();
         if (quote.requiresCustomScoping) {
           setStatus(quote.customReason + ' Contact hello@canonical.plus for a reviewed proposal.', true);
@@ -272,6 +276,8 @@ if (root instanceof HTMLElement) {
           source: 'canonical.plus/quote',
         };
 
+        const submittedRevision = selectionRevision;
+        isSubmitting = true;
         completeButton.disabled = true;
         setStatus('Sending your quote…');
         try {
@@ -283,6 +289,10 @@ if (root instanceof HTMLElement) {
             body: JSON.stringify(payload),
           });
           const result = await response.json().catch(() => ({}));
+          if (submittedRevision !== selectionRevision) {
+            setStatus(response.ok ? 'A previous selection was submitted; your current estimate has changed. Check your email before requesting another quote.' : 'Selections changed during submission; the earlier request could not be confirmed. Review your email before resubmitting.', !response.ok);
+            return;
+          }
           if (!response.ok) {
             if (response.status === 422 && result?.error === 'custom_scope_required') {
               setStatus('The server requires a reviewed proposal for this scope. Contact hello@canonical.plus.', true);
@@ -312,8 +322,11 @@ if (root instanceof HTMLElement) {
           setStatus('Quote sent successfully.');
           submissionKey = '';
         } catch {
-          setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
+          if (submittedRevision === selectionRevision) {
+            setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
+          }
         } finally {
+          isSubmitting = false;
           completeButton.disabled = calculate().requiresCustomScoping;
         }
       });
