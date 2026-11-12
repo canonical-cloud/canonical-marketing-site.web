@@ -34,6 +34,12 @@ const intakeRequest = (data) => new Request('https://unused.invalid/functions/v1
 
 test('same intent can be acknowledged but changed recipient, company, or selection cannot', () => {
   assert.equal(matchesStoredSubmission(prior, envelope), true);
+  // Database JSONB may return canonicalized/reordered keys at every level.
+  const reorderJsonb = (v) => JSON.parse(JSON.stringify(v, (_key, object) =>
+    object && typeof object === 'object' && !Array.isArray(object)
+      ? Object.fromEntries(Object.entries(object).sort(([a], [b]) => b.localeCompare(a)))
+      : object));
+  assert.equal(matchesStoredSubmission({ ...prior, quote_payload: reorderJsonb(quote) }, envelope), true);
   assert.equal(matchesStoredSubmission(prior, { ...envelope, email: 'attacker@example.com' }), false);
   assert.equal(matchesStoredSubmission(prior, { ...envelope, company: 'Other Co' }), false);
   assert.equal(matchesStoredSubmission(prior, {
