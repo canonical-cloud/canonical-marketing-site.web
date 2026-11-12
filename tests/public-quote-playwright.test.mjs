@@ -97,6 +97,27 @@ test("playwright: scope answers qualify pricing without silent capped estimates"
   assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
   assert.equal(await button.isEnabled(), true);
 
+  // Previously, a small scope was silently rounded up to the $5k floor.
+  // The estimator must instead explain that this scope needs a reviewed quote.
+  await page.locator('[data-quote-speed-slider]').fill("0");
+  await page.locator('input[name="quote_standard"][value="iso27001"]').uncheck();
+  await page.locator('input[name="quote_delivery_depth"][value="advisory"]').check();
+  await page.locator('input[name="quote_complexity"][value="focused"]').check();
+  await page.locator('select[name="quote_company_stage"]').selectOption("startup");
+  await page.locator('select[name="quote_employee_band"]').selectOption("1-10");
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /outside the published estimator range/);
+  assert.equal(await button.isDisabled(), true);
+
+  await page.locator('[data-quote-speed-slider]').fill("1");
+  await page.locator('input[name="quote_standard"][value="iso27001"]').check();
+  await page.locator('input[name="quote_delivery_depth"][value="managed"]').check();
+  await page.locator('input[name="quote_complexity"][value="growing"]').check();
+  await page.locator('select[name="quote_company_stage"]').selectOption("business");
+  await page.locator('select[name="quote_employee_band"]').selectOption("11-50");
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.equal(await button.isEnabled(), true);
+
   await page.locator('select[name="quote_cloud_account_band"]').selectOption("3-10");
   assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
   assert.match(await page.locator('[data-quote-scope-details]').textContent() || "", /3–10/);
