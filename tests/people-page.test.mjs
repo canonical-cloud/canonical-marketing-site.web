@@ -17,8 +17,9 @@ const workflow = await read('../.github/workflows/people-contract.yml');
 const roster = [
   ['Alexander Mills', 'Integrations and DevOps'],
   ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
-  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Vikkie Pandey', 'Marketing and Sales'],
+  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
+  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
   ['Elijah Gizzarelli', 'Ops & HR'],
   ['Marcus Gerlach', 'Engineering'],
   ['Eugene Li', 'CPA & Legal'],
@@ -31,12 +32,15 @@ const roster = [
   ['Casey Myers', 'Sales Engineer'],
 ];
 
-test('people directory has exactly fourteen named roles in the requested order', () => {
+test('people directory has exactly fifteen named roles in the requested order', () => {
   assert.equal(directory.schemaVersion, 'canonical-cloud.people/v1');
   assert.deepEqual(directory.people.map(({ name, role }) => [name, role]), roster);
-  assert.equal(directory.people.length, 14);
-  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 14, 'person ids must be unique');
-  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 14, 'initials must be unique');
+  assert.equal(directory.people[0].id, 'alexander-mills', 'Alex must be first');
+  assert.equal(directory.people[3].id, 'jessica-adinolfi', 'Jessica must be at the end of the first four-card row');
+  assert.equal(directory.people[4].id, 'jeremy-reynolds', 'Jeremy must start the second row');
+  assert.equal(directory.people.length, 15);
+  assert.equal(new Set(directory.people.map(({ id }) => id)).size, 15, 'person ids must be unique');
+  assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 15, 'initials must be unique');
 });
 
 test('homepage and people page share the validated directory', () => {
@@ -44,7 +48,7 @@ test('homepage and people page share the validated directory', () => {
   assert.match(grid, /const people = directory\.people/);
   assert.match(grid, /people\.map\(\(person\)/);
   assert.match(grid, /data-person-id=\{person\.id\}/);
-  assert.match(source, /Fourteen people, one readiness platform/);
+  assert.match(source, /Fifteen people, one readiness platform/);
   for (const page of [source, home]) assert.match(page, /<PeopleGrid\s*\/>/);
 });
 
@@ -62,6 +66,7 @@ test('local team headshots are used and unresolved identities stay neutral', () 
     '/team/alex-mills.jpg',
     '/team/john-siciliano.jpg',
     '/team/vinayak-pandey.png',
+    '/team/jessica-adinolfi.webp',
     '/team/elijah-gizzarelli.jpeg',
     '/team/marcus-gerlach.jpg',
     '/team/rebecca-toni.jpg',

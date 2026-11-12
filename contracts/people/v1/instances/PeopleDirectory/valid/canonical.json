@@ -16,17 +16,24 @@
       "photoUrl": "/team/john-siciliano.jpg"
     },
     {
-      "id": "jeremy-reynolds",
-      "name": "Jeremy Reynolds",
-      "role": "Browser, Mobile, Clientside",
-      "initials": "JR"
-    },
-    {
       "id": "vikkie-pandey",
       "name": "Vikkie Pandey",
       "role": "Marketing and Sales",
       "initials": "VP",
       "photoUrl": "/team/vinayak-pandey.png"
+    },
+    {
+      "id": "jessica-adinolfi",
+      "name": "Jessica Adinolfi",
+      "role": "Compliance Expert (ISO and NIST)",
+      "initials": "JA",
+      "photoUrl": "/team/jessica-adinolfi.webp"
+    },
+    {
+      "id": "jeremy-reynolds",
+      "name": "Jeremy Reynolds",
+      "role": "Browser, Mobile, Clientside",
+      "initials": "JR"
     },
     {
       "id": "elijah-gizzarelli",
