@@ -222,7 +222,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
             {supabaseUrl ? (
               <p class="quote-control-note">We email the estimate and scope summary to you and copy <strong>hello@canonical.plus</strong> so our team can follow up.</p>
             ) : (
-              <p class="quote-control-note" role="status" data-intake-unavailable>Quote email delivery is temporarily unavailable. You can still explore the estimate; for a written quote, email <a href="mailto:hello@canonical.plus">hello@canonical.plus</a>.</p>
+              <p class="quote-control-note" role="status" id="quote-intake-unavailable" data-intake-unavailable>Quote email delivery is temporarily unavailable. You can still explore the estimate; for a written quote, email <a href="mailto:hello@canonical.plus">hello@canonical.plus</a>.</p>
             )}
           </section>
         </div>
@@ -244,7 +244,7 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
             <p><strong>Not included by default:</strong> independent audit testing, an audit opinion, attestation, certification, authorization, third-party assessor or 3PAO fees, penetration testing, recurring platform subscriptions, customer internal-labor costs, or taxes. This project estimate is separate from the recurring monthly service tiers below. The signed SOW determines deliverables, timelines, and fees.</p>
             <a href={introHref} class="btn btn--secondary" id="quote-estimate-book-intro" target="_blank" rel="noopener noreferrer">Book an intro</a>
           </div>
-          <button class="btn btn--primary btn--large" type="button" data-complete-public-quote>Email my quote</button>
+          <button class="btn btn--primary btn--large" type="button" data-complete-public-quote disabled={!supabaseUrl} aria-describedby={!supabaseUrl ? "quote-intake-unavailable" : undefined}>Email my quote</button>
           <p class="quote-estimator__status" data-quote-status role="status"></p>
           <p class="quote-estimator__privacy">Quote submissions are stored for follow-up and delivery. Do not include secrets, credentials, regulated data, or audit evidence in this public form.</p>
         </aside>
