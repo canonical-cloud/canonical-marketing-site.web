@@ -119,7 +119,7 @@ test('browser quote submission is revision-fenced against stale async completion
   assert.match(browserRuntime, /selectionRevision \+= 1/);
   assert.match(browserRuntime, /const submittedRevision = selectionRevision/);
   assert.match(browserRuntime, /if \(submittedRevision !== selectionRevision\)/);
-  assert.match(browserRuntime, /completeButton\.disabled = calculate\(\)\.requiresCustomScoping/);
+  assert.match(browserRuntime, /completeButton\.disabled = !supabaseUrl \|\| calculate\(\)\.requiresCustomScoping/);
   assert.doesNotMatch(browserRuntime, /range:\s*\{\s*lowerUsd:/);
 });
 
