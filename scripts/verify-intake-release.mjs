@@ -12,6 +12,19 @@ export const validateRef = (projectRef) => {
   return projectRef;
 };
 
+// The marketing build may expose only an exact owned Supabase project origin.
+// A wildcard hostname check would let an arbitrary subdomain reach the public form.
+export const projectRefFromPublicUrl = (publicUrl) => {
+  if (typeof publicUrl !== 'string') {
+    throw new Error('PUBLIC_SUPABASE_URL must be an exact Supabase project origin');
+  }
+  const match = /^https:\/\/([a-z0-9]{20})\.supabase\.co\/?$/.exec(publicUrl);
+  if (!match) {
+    throw new Error('PUBLIC_SUPABASE_URL must be an exact https://<20-char-ref>.supabase.co origin');
+  }
+  return validateRef(match[1]);
+};
+
 export const verifyIntakeRelease = async ({
   projectRef, expectedSha, fetchImpl = fetch,
 }) => {
