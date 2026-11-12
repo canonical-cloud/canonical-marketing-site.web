@@ -95,3 +95,12 @@ handler reads POST bodies incrementally with a strict 16 KiB byte limit instead
 of allocating the complete untrusted request before enforcing the limit.
 These checks are covered by executed Node and real Edge handler tests; a
 passing test does not establish a deployed Supabase project or mail delivery.
+
+
+### Supabase CLI major-version hardening
+
+The protected Edge release workflow uses the reviewed **Supabase CLI 2.122.1**
+rather than `latest`. Supabase CLI 3 (released November 2026) changed hosted
+mutations and unattended confirmation semantics; silently upgrading could break
+the approved production release path. Require a deliberate, reviewed v3 migration
+before changing the pinned major version.
