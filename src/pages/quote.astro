@@ -173,6 +173,38 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
                   <option value="unsure">Not sure yet</option>
                 </select>
               </label>
+              <label>Cloud accounts / environments
+                <select name="quote_cloud_account_band">
+                  <option value="1-2" selected>1–2 cloud accounts</option>
+                  <option value="3-10">3–10 cloud accounts</option>
+                  <option value="11-plus">11+ cloud accounts</option>
+                  <option value="unknown">Not sure yet</option>
+                </select>
+              </label>
+              <label>Control owners / stakeholders
+                <select name="quote_control_owner_band">
+                  <option value="1-5" selected>1–5 control owners</option>
+                  <option value="6-20">6–20 control owners</option>
+                  <option value="21-plus">21+ control owners</option>
+                  <option value="unknown">Not sure yet</option>
+                </select>
+              </label>
+              <label>Regulatory / jurisdiction footprint
+                <select name="quote_data_footprint">
+                  <option value="single" selected>One primary entity/jurisdiction</option>
+                  <option value="multi">Multiple regions, one legal entity</option>
+                  <option value="multi-regulated">Multiple regulated entities/jurisdictions</option>
+                  <option value="unknown">Not sure yet</option>
+                </select>
+              </label>
+              <label>Expected technical remediation
+                <select name="quote_remediation_load">
+                  <option value="light">Advisory or minor fixes</option>
+                  <option value="moderate" selected>Some implementation work</option>
+                  <option value="heavy">Substantial technical implementation</option>
+                  <option value="unknown">Not sure yet</option>
+                </select>
+              </label>
             </div>
           </section>
 
@@ -198,9 +230,9 @@ const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: esti
         <aside class="quote-estimator__result" aria-live="polite">
           <p class="quote-estimator__eyebrow">Estimated project range</p>
           <p class="quote-estimator__price"><strong data-quote-range>{money.format(10000)}–{money.format(12500)}</strong></p>
-          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS · 2–5 production systems · Some controls and evidence · Standard business data</p>
+          <p class="quote-estimator__summary" data-quote-summary>5 weeks · SOC 2 + ISO 27001 · Managed readiness · Growing environment · Business · 11–50 employees · Technology / SaaS · 2–5 production systems · Some controls and evidence · Standard business data · 1–2 cloud accounts · 1–5 control owners · One primary entity/jurisdiction · Some implementation work</p>
           <div class="quote-estimator__meter" aria-hidden="true"><span data-quote-meter></span></div>
-          <p class="quote-estimator__boundary">Routine-scope planning range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. This is not a maximum engagement fee. FedRAMP and scopes exceeding the estimator limits require custom pricing. Final fees depend on a validated scope.</p>
+          <p class="quote-estimator__boundary">Routine-scope planning range: {money.format(estimator.estimateFloorUsd)}–{money.format(estimator.estimateCeilingUsd)}. This is not a maximum engagement fee. Large account/owner inventories, substantial remediation, uncertain boundaries, regulated multi-entity work, FedRAMP, and scopes exceeding the estimator limits require custom pricing. Final fees depend on a validated scope.</p>
           <div class="quote-scope" id="quote-scope-summary" aria-labelledby="quote-scope-title">
             <h3 id="quote-scope-title">What this estimate is for</h3>
             <p>Typical proposed readiness work, subject to the agreed scope:</p>
