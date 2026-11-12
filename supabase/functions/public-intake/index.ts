@@ -182,8 +182,17 @@ Deno.serve(async (request) => {
 
   let quote: ReturnType<typeof computeQuote> | null = null;
   if (kind === 'quote') {
+    // This is the authoritative public admission boundary. Old clients missing
+    // seven-field scope classification must never bypass custom-price checks.
+    // Reject before touching storage or email; deploy server first with a
+    // controlled frontend cutover (legacy requests receive HTTP 422).
+    const selection = payload.selection;
+    if (!selection || typeof selection !== 'object' || Array.isArray(selection) ||
+        !Object.hasOwn(selection, 'scope')) {
+      return json(422, { error: 'custom_scope_required' }, origin);
+    }
     try {
-      quote = computeQuote(payload.selection);
+      quote = computeQuote(selection);
     } catch (error) {
       if (error instanceof Error && error.message === 'custom_scope_required') {
         return json(422, { error: 'custom_scope_required' }, origin);
