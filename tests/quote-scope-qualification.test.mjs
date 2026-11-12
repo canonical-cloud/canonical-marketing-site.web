@@ -44,6 +44,19 @@ test('prices that would be clipped by a cap require a reviewed proposal', () => 
   assert.throws(() => computeQuote(expansive), /custom_scope_required/);
 });
 
+test('below-floor values do not become artificially padded minimum quotes', () => {
+  const small = {
+    ...normal,
+    speedWeeks: 9,
+    standardIds: ['soc2'],
+    deliveryDepthId: 'advisory',
+    complexityId: 'focused',
+    companyStageId: 'startup',
+    employeeBandId: '1-10',
+  };
+  assert.throws(() => computeQuote(small), /custom_scope_required/);
+});
+
 test('large, unknown and regulated remediation scopes are routed to custom scoping', () => {
   for (const changed of [
     { systemsInScope: 'six-plus' },
