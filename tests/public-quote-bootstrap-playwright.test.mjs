@@ -31,7 +31,7 @@ test("playwright: quote cannot complete when JavaScript is unavailable", async (
   assert.equal(await completion.isHidden(), true);
   assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), '$10,000–$12,500');
 
-  await completeButton.click();
+  assert.equal(await completeButton.isDisabled(), true, 'no-JavaScript / unconfigured intake must never allow submission');
   assert.equal(await completion.isHidden(), true, 'static fallback must never create a completed quote');
 });
 
