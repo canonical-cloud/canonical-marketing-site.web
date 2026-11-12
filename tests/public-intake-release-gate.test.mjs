@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import { renderReleaseRevision } from '../scripts/stamp-public-intake-release.mjs';
-import { verifyIntakeRelease, validateRef } from '../scripts/verify-intake-release.mjs';
+import { verifyIntakeRelease, validateRef, projectRefFromPublicUrl } from '../scripts/verify-intake-release.mjs';
 import { releaseRevision } from '../supabase/functions/public-intake/release-revision.mjs';
 
 const ref = 'abcdefghijklmnopqrst';
@@ -94,4 +94,35 @@ test('server attestation precedes all writes and cannot report an arbitrary env 
   assert.match(source, /'x-canonical-intake-contract': 'quote-seven-scope-v1'/);
   assert.match(source, /'x-canonical-intake-revision': releaseRevision/);
   assert.match(source, /json\(422, \{ error: 'custom_scope_required' \}, origin\)/);
+});
+
+test('public marketing origin must bind to a single exact Supabase project', () => {
+  const ref = 'abcdefghijklmnopqrst';
+  assert.equal(projectRefFromPublicUrl(`https://${ref}.supabase.co`), ref);
+  assert.equal(projectRefFromPublicUrl(`https://${ref}.supabase.co/`), ref);
+  for (const bad of [
+    '', 'https://example.com', 'http://abcdefghijklmnopqrst.supabase.co',
+    'https://evil.example.com/abcdefghijklmnopqrst.supabase.co',
+    'https://abcdefghijklmnopqrst.supabase.co.evil.test',
+    'https://ABCDEFGHIJKLMNOPQRST.supabase.co',
+    'https://short.supabase.co',
+    'https://abcdefghijklmnopqrst.supabase.co/path',
+    'https://abcdefghijklmnopqrst.supabase.co/?redirect=https://bad.test',
+    'https://abcdefghijklmnopqrst.supabase.co#fragment',
+    'https://abcdefghijklmnopqrst.supabase.co:8443',
+  ]) assert.throws(() => projectRefFromPublicUrl(bad), /PUBLIC_SUPABASE_URL/);
+});
+
+test('Pages must attest the exact reviewed Edge contract before publishing enabled quote delivery', () => {
+  const pages = readFileSync(new URL('../.github/workflows/pages.yml', import.meta.url), 'utf8');
+  const verifier = pages.indexOf('name: Verify live Edge contract before enabling public quote email');
+  const publisher = pages.indexOf('name: Upload GitHub Pages artifact');
+  const deploy = pages.indexOf('name: Deploy GitHub Pages artifact');
+  assert.ok(verifier > 0 && publisher > verifier && deploy > publisher,
+    'verified deployment must precede artifacts and deployment');
+  assert.match(pages, /CANONICAL_EXPECTED_RELEASE_SHA: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/);
+  assert.match(pages, /projectRefFromPublicUrl\(process\.env\.PUBLIC_SUPABASE_URL\)/);
+  assert.match(pages, /node scripts\/verify-intake-release\.mjs/);
+  assert.match(pages, /Public intake not configured: quote\/contact email disabled/);
+  assert.match(pages, /github\.event\.workflow_run\.conclusion == 'success'/);
 });
