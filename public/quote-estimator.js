@@ -45,10 +45,18 @@ if (root instanceof HTMLElement) {
   const systemsInScope = root.querySelector('select[name="quote_systems_in_scope"]');
   const readinessBaseline = root.querySelector('select[name="quote_readiness_baseline"]');
   const dataExposure = root.querySelector('select[name="quote_data_exposure"]');
+  const cloudAccountBand = root.querySelector('select[name="quote_cloud_account_band"]');
+  const controlOwnerBand = root.querySelector('select[name="quote_control_owner_band"]');
+  const dataFootprint = root.querySelector('select[name="quote_data_footprint"]');
+  const remediationLoad = root.querySelector('select[name="quote_remediation_load"]');
   const scopeAllowed = {
     systemsInScope: ['one', 'two-to-five', 'six-plus', 'unsure'],
     readinessBaseline: ['established', 'partial', 'new', 'unsure'],
     dataExposure: ['business', 'sensitive', 'regulated', 'unsure'],
+    cloudAccountBand: ['1-2', '3-10', '11-plus', 'unknown'],
+    controlOwnerBand: ['1-5', '6-20', '21-plus', 'unknown'],
+    dataFootprint: ['single', 'multi', 'multi-regulated', 'unknown'],
+    remediationLoad: ['light', 'moderate', 'heavy', 'unknown'],
   };
   const scopeInputValid = (node, values) =>
     node instanceof HTMLSelectElement && node.options.length === values.length &&
@@ -106,6 +114,10 @@ if (root instanceof HTMLElement) {
     scopeInputValid(systemsInScope, scopeAllowed.systemsInScope) &&
     scopeInputValid(readinessBaseline, scopeAllowed.readinessBaseline) &&
     scopeInputValid(dataExposure, scopeAllowed.dataExposure) &&
+    scopeInputValid(cloudAccountBand, scopeAllowed.cloudAccountBand) &&
+    scopeInputValid(controlOwnerBand, scopeAllowed.controlOwnerBand) &&
+    scopeInputValid(dataFootprint, scopeAllowed.dataFootprint) &&
+    scopeInputValid(remediationLoad, scopeAllowed.remediationLoad) &&
     emailInput instanceof HTMLInputElement &&
     companyInput instanceof HTMLInputElement &&
     websiteInput instanceof HTMLInputElement &&
@@ -180,6 +192,10 @@ if (root instanceof HTMLElement) {
           systemsInScope: systemsInScope.value,
           readinessBaseline: readinessBaseline.value,
           dataExposure: dataExposure.value,
+          cloudAccountBand: cloudAccountBand.value,
+          controlOwnerBand: controlOwnerBand.value,
+          dataFootprint: dataFootprint.value,
+          remediationLoad: remediationLoad.value,
         };
         const customReasons = [];
         if (standards.some((item) => item.value === 'fedramp')) customReasons.push('Federal/FedRAMP work');
@@ -188,11 +204,27 @@ if (root instanceof HTMLElement) {
         if (scopeContext.systemsInScope === 'unsure') customReasons.push('Unverified system boundary');
         if (scopeContext.readinessBaseline === 'unsure') customReasons.push('Unknown control maturity');
         if (scopeContext.dataExposure === 'unsure') customReasons.push('Unverified data classification');
+        if (scopeContext.cloudAccountBand === '11-plus') customReasons.push('Eleven or more cloud accounts');
+        if (scopeContext.cloudAccountBand === 'unknown') customReasons.push('Cloud-account boundary not yet known');
+        if (scopeContext.controlOwnerBand === '21-plus') customReasons.push('More than 20 control owners');
+        if (scopeContext.controlOwnerBand === 'unknown') customReasons.push('Control-owner count not yet known');
+        if (scopeContext.dataFootprint === 'multi-regulated') customReasons.push('Multiple regulated entities or jurisdictions');
+        if (scopeContext.dataFootprint === 'unknown') customReasons.push('Regulatory footprint not yet known');
+        if (scopeContext.remediationLoad === 'unknown') customReasons.push('Remediation effort not yet known');
         if (scopeContext.readinessBaseline === 'new' && depth?.value !== 'advisory') {
           customReasons.push('New program with operational delivery');
         }
         if (scopeContext.dataExposure === 'regulated' && depth?.value === 'remediation') {
           customReasons.push('Regulated-data engineering remediation');
+        }
+        if (scopeContext.remediationLoad === 'heavy' && depth?.value === 'remediation') {
+          customReasons.push('Substantial technical remediation');
+        }
+        if (scopeContext.readinessBaseline === 'new' && Number(speed.id) <= 3) {
+          customReasons.push('Accelerated delivery without an established control program');
+        }
+        if (stage?.value === 'enterprise' && employees?.value === '1001-plus' && complexity?.value === 'complex') {
+          customReasons.push('Large, complex enterprise scope');
         }
         const summary = [
           speed.label,
@@ -205,6 +237,10 @@ if (root instanceof HTMLElement) {
           systemsInScope.selectedOptions[0]?.textContent?.trim(),
           readinessBaseline.selectedOptions[0]?.textContent?.trim(),
           dataExposure.selectedOptions[0]?.textContent?.trim(),
+          cloudAccountBand.selectedOptions[0]?.textContent?.trim(),
+          controlOwnerBand.selectedOptions[0]?.textContent?.trim(),
+          dataFootprint.selectedOptions[0]?.textContent?.trim(),
+          remediationLoad.selectedOptions[0]?.textContent?.trim(),
         ].filter(Boolean).join(' · ');
 
         return { speed, standards, depth, complexity, stage, employees, sector: selectedSector, midpoint, lower, upper, summary, scopeContext, customReasons, requiresCustomScoping: customReasons.length > 0 };
