@@ -25,7 +25,7 @@ test('client, page and authoritative edge share the exact scope taxonomy', async
   assert.deepEqual(serverSchema, schema);
   assert.equal(schema.scopeSchemaVersion, 1);
   assert.deepEqual(schema.fields.map((field) => field.key), [
-    'cloudAccountBand', 'productionSystems', 'evidenceMaturity', 'controlOwnerBand', 'dataExposure', 'dataFootprint', 'remediationLoad',
+    'cloudAccountBand', 'productionSystems', 'evidenceMaturity', 'controlOwnerBand', 'dataFootprint', 'dataExposure', 'remediationLoad',
   ]);
   for (const field of schema.fields) {
     assert.match(field.name, /^quote_[a-z_]+$/);
