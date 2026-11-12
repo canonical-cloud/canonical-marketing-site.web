@@ -215,8 +215,12 @@ export const customScopeReason = (selection, rawMidpoint, config) => {
   if (selection.employeeBandId === '1001-plus' && selection.complexityId === 'complex') {
     return 'Large regulated enterprise programs require a tailored statement of work.';
   }
-  if (rawMidpoint > config.midpointCeilingUsd || rawMidpoint * config.upperFactor > config.estimateCeilingUsd) {
-    return 'The modeled effort exceeds the published estimator range; request a tailored proposal.';
+  if (!Number.isFinite(rawMidpoint) ||
+      rawMidpoint < config.midpointFloorUsd ||
+      rawMidpoint * config.lowerFactor < config.estimateFloorUsd ||
+      rawMidpoint > config.midpointCeilingUsd ||
+      rawMidpoint * config.upperFactor > config.estimateCeilingUsd) {
+    return 'The modeled effort falls outside the published estimator range; request a tailored proposal.';
   }
   return '';
 };
