@@ -184,7 +184,9 @@ if (root instanceof HTMLElement) {
           valueOf(selectedSector);
         const uncappedMidpoint = additive * stageMultiplier;
         const cappedPrice = uncappedMidpoint > midpointCeiling ||
-          roundMoney(uncappedMidpoint * upperFactor) > ceiling;
+          roundMoney(uncappedMidpoint * upperFactor) > ceiling ||
+          uncappedMidpoint < midpointFloor ||
+          roundMoney(uncappedMidpoint * lowerFactor) < floor;
         const midpoint = clamp(uncappedMidpoint, midpointFloor, midpointCeiling);
         const lower = clamp(roundMoney(midpoint * lowerFactor), floor, ceiling);
         const upper = clamp(roundMoney(midpoint * upperFactor), lower, ceiling);
@@ -199,7 +201,7 @@ if (root instanceof HTMLElement) {
         };
         const customReasons = [];
         if (standards.some((item) => item.value === 'fedramp')) customReasons.push('Federal/FedRAMP work');
-        if (cappedPrice) customReasons.push('Scope exceeds routine estimator price limits');
+        if (cappedPrice) customReasons.push('Scope falls outside routine estimator price limits');
         if (scopeContext.systemsInScope === 'six-plus') customReasons.push('Six or more production systems');
         if (scopeContext.systemsInScope === 'unsure') customReasons.push('Unverified system boundary');
         if (scopeContext.readinessBaseline === 'unsure') customReasons.push('Unknown control maturity');
