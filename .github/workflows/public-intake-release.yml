@@ -85,9 +85,16 @@ jobs:
       - name: Set up reviewed Supabase CLI action
         uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf # v2.1.1
         with:
-          version: latest
-      - name: Record deployed CLI version without tokens
-        run: supabase --version
+          # Pin v2: CLI v3 (2026-11-02) requires --yes for hosted mutations.
+          # This release gate intentionally stays on an exact reviewed v2 build.
+          version: '2.122.1'
+      - name: Require reviewed Supabase CLI major version without tokens
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(supabase --version)"
+          echo "Supabase CLI version: $version"
+          [[ "$version" == 2.122.1 ]] || { echo "::error::Unapproved Supabase CLI release"; exit 1; }
       - name: Deploy only the reviewed public-intake function
         run: supabase functions deploy public-intake --project-ref "$SUPABASE_PROJECT_REF" --use-api
       - name: Verify live release with HEAD and OPTIONS only (never sends email)
