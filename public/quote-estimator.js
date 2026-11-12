@@ -258,7 +258,7 @@ if (root instanceof HTMLElement) {
           ? `${quote.summary} · ${quote.customReasons.join('; ')}`
           : quote.summary;
         root.dataset.quoteRuntime = quote.requiresCustomScoping ? 'custom-scope' : 'ready';
-        completeButton.disabled = quote.requiresCustomScoping;
+        completeButton.disabled = !supabaseUrl || quote.requiresCustomScoping;
         if (quote.requiresCustomScoping && statusNode instanceof HTMLElement) {
           statusNode.textContent = 'This scope needs a reviewed proposal rather than a capped instant estimate. Book an intro or email hello@canonical.plus.';
           statusNode.dataset.error = 'false';
@@ -372,7 +372,7 @@ if (root instanceof HTMLElement) {
         } catch {
           setStatus('We could not send the quote. Please email hello@canonical.plus and we will help.', true);
         } finally {
-          completeButton.disabled = calculate().requiresCustomScoping;
+          completeButton.disabled = !supabaseUrl || calculate().requiresCustomScoping;
         }
       });
 
