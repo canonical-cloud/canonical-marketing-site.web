@@ -165,6 +165,14 @@ test('actual public intake handler rejects missing scope and unsafe pricing befo
 
   await import('../supabase/functions/public-intake/index.ts');
   assert.equal(typeof handler, 'function', 'the real TypeScript Edge handler must be loaded');
+  const health = await handler(new Request('https://unused.invalid/functions/v1/public-intake', {
+    method: 'HEAD', headers: { origin: 'https://canonical.plus' },
+  }));
+  assert.equal(health.status, 204);
+  assert.equal(health.headers.get('x-canonical-intake-revision'), 'unreleased');
+  assert.equal(health.headers.get('x-canonical-intake-contract'), 'quote-seven-scope-v1');
+  assert.equal(envReads, 0, 'safe attestation must not load secrets');
+  assert.equal(networkCalls, 0, 'safe attestation must not perform I/O');
 
   const payload = (selection) => ({
     kind: 'quote', source: 'canonical.plus/quote',
