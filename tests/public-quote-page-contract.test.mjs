@@ -88,3 +88,13 @@ test("offline quote page does not promise a sent email without an Edge intake en
   assert.match(page, /data-intake-unavailable/);
   assert.match(runtime, /Quote email is temporarily unavailable/);
 });
+
+test("commercial copy discloses non-included federal and third-party costs in page and email", async () => {
+  const edge = await readFile(new URL("supabase/functions/public-intake/index.ts", root), "utf8");
+  assert.match(page, /independent audit testing/);
+  assert.match(page, /third-party auditor or 3PAO fees/);
+  assert.match(page, /recurring platform subscriptions, customer internal labor, and taxes/);
+  assert.match(page, /independent 3PAO assessment, agency authorization/);
+  assert.match(edge, /Independent auditor\/3PAO or certification-body fees/);
+  assert.match(edge, /third-party testing, recurring platform subscriptions, internal labor, and taxes/);
+});
