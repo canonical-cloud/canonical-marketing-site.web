@@ -136,6 +136,8 @@ test("playwright: late email response cannot overwrite a changed scoped estimate
   let releaseResponse;
   const heldResponse = new Promise((resolve) => { releaseResponse = resolve; });
   let receivedSelection = null;
+  let signalReceived;
+  const received = new Promise((resolve) => { signalReceived = resolve; });
 
   await page.route(`${server.url}/quote/`, async (route) => {
     const response = await route.fetch();
@@ -157,6 +159,7 @@ test("playwright: late email response cannot overwrite a changed scoped estimate
       return;
     }
     receivedSelection = route.request().postDataJSON()?.selection;
+    signalReceived();
     await heldResponse;
     await route.fulfill({
       status: 202,
@@ -181,6 +184,7 @@ test("playwright: late email response cannot overwrite a changed scoped estimate
   );
   await page.locator('[data-complete-public-quote]').click();
   await posted;
+  await received;
   assert.equal(receivedSelection?.scope?.productionSystems, "2-5");
   assert.equal(await page.locator('[data-complete-public-quote]').isDisabled(), true);
 
@@ -188,7 +192,7 @@ test("playwright: late email response cannot overwrite a changed scoped estimate
   assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), "Custom scoping required");
   releaseResponse();
 
-  await page.locator('[data-quote-status]').getByText(/previous selection was submitted/i).waitFor();
+  await page.getByText(/previous selection was submitted/i).waitFor();
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
   assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), "Custom scoping required");
   assert.equal(await page.locator('[data-complete-public-quote]').isDisabled(), true);
