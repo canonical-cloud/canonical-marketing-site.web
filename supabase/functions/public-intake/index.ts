@@ -335,7 +335,7 @@ Deno.serve(async (request) => {
       <p><strong>$${quote.range.lowerUsd.toLocaleString()}–$${quote.range.upperUsd.toLocaleString()} USD</strong></p>
       <table>${rows.map(([k,v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')}</table>
       <p>This is a non-binding one-time project planning range, not a monthly subscription price. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.</p>
-      <p>Payment plans may be available for qualifying engagements. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor or certification-body fees are itemized separately unless expressly included in writing.</p>
+      <p>Payment plans may be available for qualifying engagements. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor/3PAO or certification-body fees, third-party testing, recurring platform subscriptions, internal labor, and taxes are excluded by default unless expressly included in the signed statement of work.</p>
       <p>Questions? Reply to this email or contact hello@canonical.plus.</p>`;
     textBody = [
       'Your Canonical Plus planning estimate',
@@ -343,6 +343,7 @@ Deno.serve(async (request) => {
       ...rows.map(([key, value]) => `${key}: ${value}`),
       '',
       'This is a non-binding one-time project planning range, not a monthly subscription price. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.',
+      'Independent auditor/3PAO or certification-body fees, third-party testing, recurring platform subscriptions, internal labor, and taxes are excluded by default unless expressly included in the signed statement of work.',
       'Questions? Reply to this email or contact hello@canonical.plus.',
     ].join('\n');
     recipients = [email];
