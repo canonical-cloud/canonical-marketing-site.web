@@ -35,7 +35,9 @@ test("estimate remains bounded by the shared authority", () => {
   assert.equal(estimator.estimateCeilingUsd, 25000);
   assert.equal(estimator.midpointFloorUsd, 5500);
   assert.equal(estimator.midpointCeilingUsd, 22000);
-  assert.match(runtime, /clamp\(additive \* stageMultiplier, midpointFloor, midpointCeiling\)/);
+  assert.match(runtime, /const rawMidpoint = additive \* stageMultiplier/);
+  assert.match(runtime, /clamp\(rawMidpoint, midpointFloor, midpointCeiling\)/);
+  assert.match(runtime, /customScopeReason\(selection, rawMidpoint/);
   assert.match(runtime, /clamp\(roundMoney\(midpoint \* lowerFactor\), floor, ceiling\)/);
 });
 
@@ -74,7 +76,25 @@ test("public quote form includes an offscreen bot trap without exposing secrets"
 
 
 test("quote copy distinguishes priced organization factors from sector context", () => {
-  assert.match(page, /company stage, and employee count\. Business sector is captured as scoping context/i);
+  assert.match(page, /company stage, and employee count[\s\S]*Business sector is scoping context/i);
   assert.match(page, /Business sector captured for scoping context/i);
   assert.ok(estimator.sectors.every((item) => item.amountUsd === 0));
+});
+
+test("offline quote page does not promise a sent email without an Edge intake endpoint", () => {
+  assert.match(page, /description=\{supabaseUrl \?/);
+  assert.match(page, /emailed summary" : "reviewed proposal available"/);
+  assert.match(page, /Online quote delivery is currently unavailable/);
+  assert.match(page, /data-intake-unavailable/);
+  assert.match(runtime, /Quote email is temporarily unavailable/);
+});
+
+test("commercial copy discloses non-included federal and third-party costs in page and email", async () => {
+  const edge = await readFile(new URL("supabase/functions/public-intake/index.ts", root), "utf8");
+  assert.match(page, /independent audit testing/);
+  assert.match(page, /third-party auditor or 3PAO fees/);
+  assert.match(page, /recurring platform subscriptions, customer internal labor, and taxes/);
+  assert.match(page, /independent 3PAO assessment, agency authorization/);
+  assert.match(edge, /Independent auditor\/3PAO or certification-body fees/);
+  assert.match(edge, /third-party testing, recurring platform subscriptions, internal labor, and taxes/);
 });

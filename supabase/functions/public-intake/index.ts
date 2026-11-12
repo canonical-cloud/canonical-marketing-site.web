@@ -1,4 +1,6 @@
 import { computeQuote } from './quote-engine.mjs';
+import { releaseRevision } from './release-revision.mjs';
+import { readBodyBounded, matchesStoredSubmission } from './admission.mjs';
 
 const allowedOrigins = new Set([
   'https://canonical.plus',
@@ -111,7 +113,7 @@ const existingSubmission = async (
   idempotencyKey: string,
 ) => {
   const url = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
-  url.searchParams.set('select', 'id,delivery_status,updated_at');
+  url.searchParams.set('select', 'id,delivery_status,updated_at,kind,source,email,company,name,topic,message,quote_payload');
   url.searchParams.set('idempotency_key', `eq.${idempotencyKey}`);
   url.searchParams.set('limit', '1');
   const response = await fetchTimed(url, {
@@ -127,6 +129,21 @@ const existingSubmission = async (
 Deno.serve(async (request) => {
   const origin = request.headers.get('origin') || '';
 
+  // Read-only source attestation: never reads secrets, database, or email state.
+  // The protected deploy workflow stamps the exact reviewed main SHA.
+  if (request.method === 'HEAD') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'cache-control': 'no-store, max-age=0',
+        'x-content-type-options': 'nosniff',
+        'x-canonical-intake-revision': releaseRevision,
+        'x-canonical-intake-contract': 'quote-seven-scope-v1',
+        ...(allowedOrigins.has(origin) ? { 'access-control-allow-origin': origin } : {}),
+        'vary': 'Origin',
+      },
+    });
+  }
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: allowedOrigins.has(origin) ? 204 : 403,
@@ -146,9 +163,13 @@ Deno.serve(async (request) => {
     return json(415, { error: 'unsupported_media_type' }, origin);
   }
 
-  const rawBody = await request.text();
-  if (new TextEncoder().encode(rawBody).byteLength > 16_384) {
-    return json(413, { error: 'payload_too_large' }, origin);
+  // Stream in bounded chunks; reject oversized requests before allocating them.
+  let rawBody: string;
+  try {
+    rawBody = await readBodyBounded(request);
+  } catch (error) {
+    const oversized = error instanceof Error && error.message === 'payload_too_large';
+    return json(oversized ? 413 : 400, { error: oversized ? 'payload_too_large' : 'invalid_json' }, origin);
   }
 
   let payload: Record<string, unknown>;
@@ -182,12 +203,39 @@ Deno.serve(async (request) => {
 
   let quote: ReturnType<typeof computeQuote> | null = null;
   if (kind === 'quote') {
+    // This is the authoritative public admission boundary. Old clients missing
+    // seven-field scope classification must never bypass custom-price checks.
+    // Reject before touching storage or email; deploy server first with a
+    // controlled frontend cutover (legacy requests receive HTTP 422).
+    const selection = payload.selection;
+    if (!selection || typeof selection !== 'object' || Array.isArray(selection) ||
+        !Object.hasOwn(selection, 'scope')) {
+      return json(422, { error: 'custom_scope_required' }, origin);
+    }
     try {
-      quote = computeQuote(payload.selection);
-    } catch {
+      quote = computeQuote(selection);
+    } catch (error) {
+      if (error instanceof Error && error.message === 'custom_scope_required') {
+        return json(422, { error: 'custom_scope_required' }, origin);
+      }
       return json(400, { error: 'invalid_quote_selection' }, origin);
     }
   }
+
+  // Validate contact intent before idempotency lookup or quota consumption.
+  const contact = kind === 'contact' ? {
+    name: cleanLine(payload.name, 120),
+    topic: cleanLine(payload.topic, 80),
+    message: cleanMultiline(payload.message, 4000),
+  } : null;
+  if (contact && (contact.name.length < 2 || contact.message.length < 20 ||
+      !allowedContactTopics.has(contact.topic))) {
+    return json(400, { error: 'invalid_contact' }, origin);
+  }
+  const intent = {
+    kind, source, email, company, quote,
+    name: contact?.name, topic: contact?.topic, message: contact?.message,
+  };
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
   const serviceRole = resolveAdminKey();
@@ -199,8 +247,13 @@ Deno.serve(async (request) => {
   }
 
   let retryRecordId = '';
+  let priorRetryVersion = '';
+  let priorRetryStatus = '';
   try {
     const prior = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
+    if (prior && !matchesStoredSubmission(prior, intent)) {
+      return json(409, { error: 'idempotency_conflict' }, origin);
+    }
     const priorUpdatedAt = prior?.updated_at ? Date.parse(prior.updated_at) : Number.NaN;
     const pendingLeaseExpired =
       prior?.delivery_status === 'pending' &&
@@ -227,6 +280,8 @@ Deno.serve(async (request) => {
       validUuid(prior.id)
     ) {
       retryRecordId = prior.id;
+      priorRetryVersion = prior.updated_at;
+      priorRetryStatus = prior.delivery_status;
     }
 
     const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
@@ -262,7 +317,9 @@ Deno.serve(async (request) => {
   let textBody = '';
   let recipients: string[] = [];
   let cc: string[] = [];
-  const replyTo = email;
+  // Quotes are sent to the buyer: replies must reach Canonical, not the buyer.
+  // Contact requests are sent to Canonical: replies should reach the requester.
+  const replyTo = kind === 'quote' ? 'hello@canonical.plus' : email;
 
   if (kind === 'quote' && quote) {
     const rows = [
@@ -273,33 +330,30 @@ Deno.serve(async (request) => {
       ['Company stage', quote.labels.companyStage],
       ['Employees', quote.labels.employeeBand],
       ['Sector', quote.labels.sector],
+      ...quote.labels.scoping.map(({ name, value }) => [name, value]),
     ];
     subject = `Canonical Plus readiness quote for ${company}`;
     html = `<h1>Your Canonical Plus planning estimate</h1>
       <p><strong>$${quote.range.lowerUsd.toLocaleString()}–$${quote.range.upperUsd.toLocaleString()} USD</strong></p>
       <table>${rows.map(([k,v]) => `<tr><td><strong>${escapeHtml(k)}</strong></td><td>${escapeHtml(v)}</td></tr>`).join('')}</table>
-      <p>This is a non-binding planning range. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.</p>
-      <p>Payment plans may be available for qualifying engagements. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor or certification-body fees are itemized separately unless expressly included in writing.</p>
+      <p>This is a non-binding one-time project planning range, not a monthly subscription price. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.</p>
+      <p>Payment plans may be available for qualifying engagements. Larger full-program readiness engagements may qualify for scoped discounts. Independent auditor/3PAO or certification-body fees, third-party testing, recurring platform subscriptions, internal labor, and taxes are excluded by default unless expressly included in the signed statement of work.</p>
       <p>Questions? Reply to this email or contact hello@canonical.plus.</p>`;
     textBody = [
       'Your Canonical Plus planning estimate',
       `$${quote.range.lowerUsd.toLocaleString()}–$${quote.range.upperUsd.toLocaleString()} USD`,
       ...rows.map(([key, value]) => `${key}: ${value}`),
       '',
-      'This is a non-binding planning range. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.',
+      'This is a non-binding one-time project planning range, not a monthly subscription price. A reviewed and signed statement of work controls final scope, deliverables, deadlines, and price.',
+      'Independent auditor/3PAO or certification-body fees, third-party testing, recurring platform subscriptions, internal labor, and taxes are excluded by default unless expressly included in the signed statement of work.',
       'Questions? Reply to this email or contact hello@canonical.plus.',
     ].join('\n');
     recipients = [email];
     cc = ['hello@canonical.plus'];
     record.quote_payload = quote;
   } else {
-    const name = cleanLine(payload.name, 120);
-    const topic = cleanLine(payload.topic, 80);
-    const message = cleanMultiline(payload.message, 4000);
-    const topicLabel = allowedContactTopics.get(topic);
-    if (name.length < 2 || message.length < 20 || !topicLabel) {
-      return json(400, { error: 'invalid_contact' }, origin);
-    }
+    const { name, topic, message } = contact!;
+    const topicLabel = allowedContactTopics.get(topic)!;
     record.name = name;
     record.topic = topic;
     record.message = message;
@@ -314,6 +368,9 @@ Deno.serve(async (request) => {
     if (retryRecordId) {
       const retryUrl = new URL(`${supabaseUrl}/rest/v1/public_inquiries`);
       retryUrl.searchParams.set('id', `eq.${retryRecordId}`);
+      // Compare-and-set the previous lease to exclude concurrent retry senders.
+      retryUrl.searchParams.set('updated_at', `eq.${priorRetryVersion}`);
+      retryUrl.searchParams.set('delivery_status', `eq.${priorRetryStatus}`);
       const retryUpdate = await fetchTimed(retryUrl, {
         method: 'PATCH',
         headers: {
@@ -331,7 +388,18 @@ Deno.serve(async (request) => {
       if (!retryUpdate.ok) return json(503, { error: 'storage_failed' }, origin);
       const [updated] = await retryUpdate.json();
       if (!updated?.id || !validUuid(updated.id)) {
-        return json(503, { error: 'storage_failed' }, origin);
+        // Another request may have acquired the failed/expired lease first.
+        const winner = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
+        if (winner && !matchesStoredSubmission(winner, intent)) {
+          return json(409, { error: 'idempotency_conflict' }, origin);
+        }
+        if (winner && (winner.delivery_status === 'pending' || winner.delivery_status === 'sent')) {
+          return json(202, {
+            accepted: true, duplicate: true,
+            ...(quote ? { quote: { range: quote.range, summary: quote.summary } } : {}),
+          }, origin);
+        }
+        return json(503, { error: 'retry_lease_unavailable' }, origin);
       }
       stored = updated;
     } else {
@@ -345,6 +413,16 @@ Deno.serve(async (request) => {
         body: JSON.stringify(record),
       });
       if (insert.status === 409) {
+        // A concurrent insert might reuse our UUID for an unrelated recipient
+        // or price selection. Never report that unrelated record as accepted.
+        const winner = await existingSubmission(supabaseUrl, serviceRole, idempotencyKey);
+        if (!winner) return json(503, { error: 'storage_failed' }, origin);
+        if (!matchesStoredSubmission(winner, intent)) {
+          return json(409, { error: 'idempotency_conflict' }, origin);
+        }
+        if (winner.delivery_status !== 'pending' && winner.delivery_status !== 'sent') {
+          return json(503, { error: 'retry_lease_unavailable' }, origin);
+        }
         return json(202, {
           accepted: true,
           duplicate: true,

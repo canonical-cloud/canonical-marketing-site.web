@@ -17,17 +17,19 @@ test("Pages deploys only a successful, tested main-branch commit", () => {
   assert.match(pagesWorkflow, /types: \[completed\]/);
   assert.match(pagesWorkflow, /branches: \[main\]/);
   assert.doesNotMatch(pagesWorkflow, /\n\s+push:\s*\n/);
-  assert.doesNotMatch(pagesWorkflow, /workflow_dispatch:/);
+  // Manual publication is permitted only after exact-main CI and Edge checks.
+  assert.match(pagesWorkflow, /workflow_dispatch:/);
+  assert.ok(pagesWorkflow.includes("confirmation == 'PUBLISH_CANONICAL_SITE'"));
+  assert.ok(pagesWorkflow.includes("github.ref == 'refs/heads/main'"));
+  assert.ok(pagesWorkflow.includes('node scripts/verify-pages-ci.mjs'));
+  assert.ok(pagesWorkflow.includes('test "$(git rev-parse HEAD)" = "$CANONICAL_APPROVED_SHA"'));
   assert.match(
     pagesWorkflow,
     /workflow_run\.conclusion == 'success'/,
   );
   assert.match(pagesWorkflow, /workflow_run\.event == 'push'/);
   assert.match(pagesWorkflow, /workflow_run\.head_branch == 'main'/);
-  assert.match(
-    pagesWorkflow,
-    /ref: \$\{\{ github\.event\.workflow_run\.head_sha \}\}/,
-  );
+  assert.ok(pagesWorkflow.includes("ref: ${{ github.event_name == 'workflow_dispatch' && 'main' || github.event.workflow_run.head_sha }}"));
 });
 
 test("Pages build and deploy checks are uniquely named and least privilege", () => {

@@ -81,3 +81,141 @@ test("playwright: no-JavaScript fallback never creates a false sent quote", asyn
   assert.equal(await page.locator('[data-quote-estimator]').getAttribute("data-quote-runtime"), null);
   assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
 });
+
+test("playwright: scope answers qualify pricing without silent capped estimates", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+  const page = await browser.newPage({ viewport: { height: 900, width: 1280 } });
+  const errors = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
+
+  const range = page.locator('[data-quote-range]');
+  const button = page.locator('[data-complete-public-quote]');
+  const runtime = page.locator('[data-quote-estimator]');
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.equal(await button.isEnabled(), true);
+
+  // Previously, a small scope was silently rounded up to the $5k floor.
+  // The estimator must instead explain that this scope needs a reviewed quote.
+  await page.locator('[data-quote-speed-slider]').fill("0");
+  await page.locator('input[name="quote_standard"][value="iso27001"]').uncheck();
+  await page.locator('input[name="quote_delivery_depth"][value="advisory"]').check();
+  await page.locator('input[name="quote_complexity"][value="focused"]').check();
+  await page.locator('select[name="quote_company_stage"]').selectOption("startup");
+  await page.locator('select[name="quote_employee_band"]').selectOption("1-10");
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /outside the published estimator range/);
+  assert.equal(await button.isDisabled(), true);
+
+  await page.locator('[data-quote-speed-slider]').fill("1");
+  await page.locator('input[name="quote_standard"][value="iso27001"]').check();
+  await page.locator('input[name="quote_delivery_depth"][value="managed"]').check();
+  await page.locator('input[name="quote_complexity"][value="growing"]').check();
+  await page.locator('select[name="quote_company_stage"]').selectOption("business");
+  await page.locator('select[name="quote_employee_band"]').selectOption("11-50");
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.equal(await button.isEnabled(), true);
+
+  await page.locator('select[name="quote_cloud_account_band"]').selectOption("3-10");
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+  assert.match(await page.locator('[data-quote-scope-details]').textContent() || "", /3–10/);
+
+  await page.locator('select[name="quote_cloud_account_band"]').selectOption("11-plus");
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  assert.equal(await runtime.getAttribute("data-quote-runtime"), "custom-scope");
+  assert.equal(await button.isDisabled(), true);
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /ten cloud/);
+
+  await page.locator('select[name="quote_cloud_account_band"]').selectOption("1-2");
+  assert.equal(await button.isEnabled(), true);
+  assert.equal((await range.textContent())?.trim(), "$10,000–$12,500");
+
+  await page.locator('input[name="quote_standard"][value="fedramp"]').check();
+  assert.equal(await button.isDisabled(), true);
+  assert.equal((await range.textContent())?.trim(), "Custom scoping required");
+  await page.locator('input[name="quote_standard"][value="fedramp"]').uncheck();
+
+  await page.locator('select[name="quote_evidence_maturity"]').selectOption("early");
+  await page.locator('[data-quote-speed-slider]').fill("2");
+  assert.equal(await button.isDisabled(), true);
+  assert.match(await page.locator('[data-quote-custom-reason]').textContent() || "", /new program|three-week/);
+  await page.locator('[data-quote-speed-slider]').fill("1");
+  assert.equal(await button.isDisabled(), true);
+  await page.locator('select[name="quote_evidence_maturity"]').selectOption("partial");
+  assert.equal(await button.isEnabled(), true);
+  assert.deepEqual(errors, []);
+});
+
+test("playwright: late email response cannot overwrite a changed scoped estimate", async (t) => {
+  const server = await startSite();
+  t.after(() => server.stop());
+  const browser = await launchBrowser(t);
+  const page = await browser.newPage({ viewport: { height: 900, width: 1280 } });
+  const fixtureOrigin = "https://canonical-intake-fixture.supabase.co";
+  let releaseResponse;
+  const heldResponse = new Promise((resolve) => { releaseResponse = resolve; });
+  let receivedSelection = null;
+  let signalReceived;
+  const received = new Promise((resolve) => { signalReceived = resolve; });
+
+  await page.route(`${server.url}/quote/`, async (route) => {
+    const response = await route.fetch();
+    const html = await response.text();
+    const updated = html.replace(/data-supabase-url(?:="")?(?=\s|>)/, `data-supabase-url="${fixtureOrigin}"`);
+    assert.notEqual(updated, html, "quote must expose a configurable, non-privileged intake URL");
+    await route.fulfill({ response, body: updated });
+  });
+
+  await page.route(`${fixtureOrigin}/functions/v1/public-intake`, async (route) => {
+    const headers = {
+      "access-control-allow-origin": server.url,
+      "access-control-allow-methods": "POST, OPTIONS",
+      "access-control-allow-headers": "content-type",
+      "content-type": "application/json",
+    };
+    if (route.request().method() === "OPTIONS") {
+      await route.fulfill({ status: 204, headers });
+      return;
+    }
+    receivedSelection = route.request().postDataJSON()?.selection;
+    signalReceived();
+    await heldResponse;
+    await route.fulfill({
+      status: 202,
+      headers,
+      body: JSON.stringify({
+        accepted: true,
+        quote: {
+          range: { lowerUsd: 10000, upperUsd: 12500, currency: "USD" },
+          summary: "Previously submitted, now stale",
+        },
+      }),
+    });
+  });
+
+  await page.goto(`${server.url}/quote/`, { waitUntil: "networkidle" });
+  assert.equal(await page.locator('[data-quote-estimator]').getAttribute("data-quote-runtime"), "ready");
+  await page.locator('input[name="quote_email"]').fill("buyer@example.com");
+  await page.locator('input[name="quote_company"]').fill("Example Co");
+
+  const posted = page.waitForRequest(
+    (request) => request.url().startsWith(fixtureOrigin) && request.method() === "POST",
+  );
+  await page.locator('[data-complete-public-quote]').click();
+  await posted;
+  await received;
+  assert.equal(receivedSelection?.scope?.productionSystems, "2-5");
+  assert.equal(await page.locator('[data-complete-public-quote]').isDisabled(), true);
+
+  await page.locator('select[name="quote_production_systems"]').selectOption("6-plus");
+  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), "Custom scoping required");
+  releaseResponse();
+
+  await page.getByText(/previous selection was submitted/i).waitFor();
+  assert.equal(await page.locator('[data-quote-complete]').isHidden(), true);
+  assert.equal((await page.locator('[data-quote-range]').textContent())?.trim(), "Custom scoping required");
+  assert.equal(await page.locator('[data-complete-public-quote]').isDisabled(), true);
+  assert.doesNotMatch(await page.locator('[data-quote-summary]').textContent() || "", /Previously submitted, now stale/);
+});
