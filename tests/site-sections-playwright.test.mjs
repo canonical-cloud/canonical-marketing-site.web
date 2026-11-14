@@ -80,8 +80,8 @@ test("playwright: page ships readiness SEO metadata, a single h1, and survives m
   const { page, pageErrors } = await open(t, "/", { height: 812, width: 375 });
 
   const meta = async (selector) => page.locator(selector).getAttribute("content");
-  assert.match(await meta('meta[name="description"]'), /identify compliance gaps/);
-  assert.match(await meta('meta[property="og:title"]'), /Compliance readiness/);
+  assert.match(await meta('meta[name="description"]'), /prioritize technical remediation/);
+  assert.match(await meta('meta[property="og:title"]'), /Startup security and compliance readiness/);
   assert.ok((await meta('meta[property="og:description"]'))?.length > 0);
 
   assert.equal(await page.locator("h1").count(), 1);

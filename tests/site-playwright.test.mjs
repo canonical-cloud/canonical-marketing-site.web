@@ -23,13 +23,13 @@ test("playwright renders the readiness-first canonical.plus landing page", async
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle" });
-  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.plus");
+  assert.equal(await page.title(), "Startup security and compliance readiness | canonical.plus");
 
   const hero = page.getByRole("heading", { level: 1 });
   await hero.waitFor({ state: "visible" });
   assert.match(
     (await hero.innerText()).replace(/\s+/g, " ").trim(),
-    /Know what stands between you and\s*audit-ready/,
+    /Enterprise-ready security for startups\s*that need to move fast\./,
   );
 
   await page.locator(".nav__logo-text").filter({ hasText: "CANONICAL" }).first().waitFor({ state: "visible" });

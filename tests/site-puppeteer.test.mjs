@@ -22,12 +22,12 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   page.on("pageerror", (error) => pageErrors.push(error.message));
 
   await page.goto(`${server.url}/`, { waitUntil: "networkidle0" });
-  assert.equal(await page.title(), "Compliance readiness for software teams | canonical.plus");
+  assert.equal(await page.title(), "Startup security and compliance readiness | canonical.plus");
 
   const heroTitle = await page.$eval(".hero__title", (element) =>
     (element.textContent ?? "").replace(/\s+/g, " ").trim(),
   );
-  assert.match(heroTitle, /Know what stands between you and\s*audit-ready/);
+  assert.match(heroTitle, /Enterprise-ready security for startups\s*that need to move fast\./);
 
   const brand = await page.$eval(".nav__logo-text", (element) =>
     (element.textContent ?? "").replace(/\s+/g, "").trim(),
@@ -59,7 +59,7 @@ test("puppeteer renders the readiness-first canonical.plus landing page", async 
   const navLinks = await page.$$eval(".nav__link", (nodes) =>
     nodes.map((node) => node.textContent?.trim()),
   );
-  assert.deepEqual(navLinks, ["Readiness", "Process", "Frameworks", "Compare", "FAQ", "Insights", "People"]);
+  assert.deepEqual(navLinks, ["Readiness", "Startups", "Process", "Frameworks", "Compare", "FAQ", "Insights", "People"]);
   assert.equal(
     await page.$eval("#nav-people", (element) => new URL(element.href).pathname),
     "/people/",
