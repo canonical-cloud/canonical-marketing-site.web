@@ -4,9 +4,12 @@ import PeopleGrid from '../components/PeopleGrid.astro';
 import TestimonialsGrid from '../components/TestimonialsGrid.astro';
 import '../styles/global.css';
 import '../styles/marketing-pages.css';
+import '../styles/audience-pages.css';
+import { audienceLinks } from '../data/audiences';
 
 const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const readinessHref = `${baseNoSlash}/readiness/`;
+const startupsHref = `${baseNoSlash}/startups/`;
 const frameworksHref = `${baseNoSlash}/frameworks/`;
 const compareHref = `${baseNoSlash}/compare/`;
 const faqHref = `${baseNoSlash}/faq/`;
@@ -37,30 +40,31 @@ const featuredFrameworks = [
 ---
 
 <BaseLayout
-  title="Compliance readiness for software teams"
-  description="Canonical Plus helps software and cloud teams identify compliance gaps, prioritize technical remediation, and prepare evidence for independent audits and certifications."
+  title="Startup security and compliance readiness"
+  description="Security and compliance readiness for seed-stage B2B startups. Clarify customer requirements, prioritize technical remediation, and prepare evidence for independent review."
 >
   <section class="page-hero section--hero bg-grid bg-radial" id="hero">
     <div class="container page-hero__grid">
       <div class="page-hero__copy">
         <div class="badge animate-fade-in-up">
           <span class="badge__dot" aria-hidden="true"></span>
-          Readiness-first compliance support
+          Compliance readiness for growing startups
         </div>
 
         <p class="page-hero__eyebrow animate-fade-in-up stagger-1">
-          Built for software, SaaS, and cloud teams
+          Built for seed-stage and growing B2B teams
         </p>
 
         <h1 class="page-hero__title hero__title animate-fade-in-up stagger-2">
-          Know what stands between you and
-          <span class="gradient-text">audit-ready</span>
+          Enterprise-ready security for startups
+          <span class="gradient-text">that need to move fast.</span>
         </h1>
 
         <p class="page-hero__subtitle animate-fade-in-up stagger-2">
-          Canonical Plus scopes your target frameworks, identifies control and evidence gaps,
-          and turns them into a prioritized technical roadmap. We prepare your team for
-          independent review; we do not issue audit opinions, certifications, or regulatory approvals.
+          When an enterprise customer asks about SOC 2, security controls, or evidence, a small
+          team needs a practical next step. Canonical Plus scopes requirements, identifies
+          gaps, and prioritizes remediation while your team keeps building. Qualified
+          independent parties—not Canonical Plus—perform formal audits and certifications.
         </p>
 
         <div class="page-hero__actions animate-fade-in-up stagger-3">
@@ -72,8 +76,8 @@ const featuredFrameworks = [
           >
             Start readiness assessment
           </a>
-          <a href={readinessHref} class="btn btn--secondary btn--large" id="hero-cta-secondary">
-            See how readiness works
+          <a href={startupsHref} class="btn btn--secondary btn--large" id="hero-cta-secondary">
+            For seed-stage startups
           </a>
           <a href={introHref} class="btn btn--secondary btn--large" id="hero-cta-book-intro" target="_blank" rel="noopener noreferrer">
             Book an intro
@@ -82,7 +86,7 @@ const featuredFrameworks = [
       </div>
 
       <aside class="page-hero__panel animate-fade-in-up stagger-3" aria-label="Readiness assessment outputs">
-        <h2>A useful first assessment should produce</h2>
+        <h2>Give your next security review a clear starting point</h2>
         <ul class="check-list">
           <li>A clear scope and target-framework map</li>
           <li>A gap register tied to controls and evidence</li>
@@ -103,6 +107,28 @@ const featuredFrameworks = [
       <div class="outcome-strip__item"><strong>Control roadmap</strong><span>What to implement, in what order, and why</span></div>
       <div class="outcome-strip__item"><strong>Evidence plan</strong><span>What an independent reviewer is likely to request</span></div>
       <div class="outcome-strip__item"><strong>Handoff boundary</strong><span>What Canonical prepares versus what an assessor decides</span></div>
+    </div>
+  </section>
+
+  <section class="section audience-home" id="who-we-help" aria-labelledby="who-we-help-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">For the teams moving the deal forward</span>
+        <h2 id="who-we-help-heading">Security readiness is a business priority, not just a CTO task.</h2>
+        <p>Founders, engineers, sales leaders, and portfolio operators see different problems. We connect customer requirements to scoped readiness work without assuming every startup needs a full compliance program.</p>
+      </header>
+      <div class="audience-link-grid">
+        {audienceLinks.map((link) => (
+          <a class="audience-route" href={`${baseNoSlash}/${link.slug}/`}>
+            <strong>{link.label} <span aria-hidden="true">↗</span></strong>
+            <span>{link.teaser}</span>
+          </a>
+        ))}
+      </div>
+      <div class="action-row">
+        <a href={startupsHref} class="btn btn--secondary">Explore startup readiness</a>
+        <a href={readinessHref} class="btn btn--secondary">See readiness deliverables</a>
+      </div>
     </div>
   </section>
 
@@ -205,7 +231,7 @@ const featuredFrameworks = [
     </div>
   </section>
 
-  <section class="section" id="contact"><div class="container"><div class="cta-panel animate-fade-in-up"><span class="badge">Start with scope</span><h2>Get a preliminary readiness estimate</h2><p>Tell us the frameworks, systems, data sensitivity, and current program stage. The result is an initial estimate and planning input—not an audit opinion or certification.</p><div class="action-row"><a href={quoteHref} class="btn btn--primary btn--large" id="cta-readiness-btn" data-application-link="quote">Start readiness assessment</a><a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large" id="cta-contact-btn">Discuss your scope</a></div></div></div></section>
+  <section class="section" id="contact"><div class="container"><div class="cta-panel animate-fade-in-up"><span class="badge">Start with scope</span><h2>Get a scoped plan for your next security review</h2><p>Bring the customer requirement, your current systems, and the gaps you know about. Start with a preliminary estimate; final scope and price are defined in a signed statement of work, not an audit opinion or certification.</p><div class="action-row"><a href={quoteHref} class="btn btn--primary btn--large" id="cta-readiness-btn" data-application-link="quote">Start readiness assessment</a><a href="mailto:hello@canonical.plus" class="btn btn--secondary btn--large" id="cta-contact-btn">Discuss your scope</a></div></div></div></section>
 </BaseLayout>
 
 <style>

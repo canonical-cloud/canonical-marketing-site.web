@@ -68,7 +68,7 @@ test("puppeteer: hero CTAs target the readiness app and explanatory page", async
   );
   assert.equal(
     await page.$eval("#hero-cta-secondary", (element) => element.getAttribute("href")),
-    "/readiness/",
+    "/startups/",
   );
 
   const featured = await page.$$eval("#frameworks .frameworks__item h4", (nodes) =>
