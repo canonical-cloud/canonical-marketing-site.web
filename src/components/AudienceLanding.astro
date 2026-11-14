@@ -1,0 +1,137 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { AudiencePage } from '../data/audiences';
+import { audienceLinks } from '../data/audiences';
+import '../styles/global.css';
+import '../styles/marketing-pages.css';
+import '../styles/audience-pages.css';
+
+interface Props { page: AudiencePage; }
+const { page } = Astro.props;
+const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const publicQuoteHref = `${baseNoSlash}/quote/`;
+const startupHref = `${baseNoSlash}/startups/`;
+const pricingHref = `${baseNoSlash}/pricing/`;
+const introHref = 'https://calendly.com/hello-canonical/30min';
+---
+<BaseLayout title={page.title} description={page.description}>
+  <section class="page-hero section--hero bg-grid bg-radial audience-hero" aria-labelledby="audience-heading">
+    <div class="container page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="badge">{page.eyebrow}</span>
+        <h1 class="page-hero__title hero__title" id="audience-heading">{page.lead} <span class="gradient-text">{page.accent}</span></h1>
+        <p class="page-hero__subtitle">{page.intro}</p>
+        <div class="page-hero__actions">
+          <a class="btn btn--primary btn--large" href={introHref} target="_blank" rel="noopener noreferrer">Book an intro</a>
+          <a class="btn btn--secondary btn--large" href={publicQuoteHref}>Build a readiness quote</a>
+        </div>
+        <p class="audience-micro">We provide readiness and remediation support, not independent audit opinions, certifications, or guarantees of customer approval.</p>
+      </div>
+      <aside class="page-hero__panel" aria-label="When this support helps">
+        <h2>Does this sound familiar?</h2>
+        <p>{page.scenario}</p>
+        <ul class="check-list audience-signals">{page.signals.map((signal) => <li>{signal}</li>)}</ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section" id="outcomes" aria-labelledby="outcomes-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Practical outcomes</span>
+        <h2 id="outcomes-heading">A clearer path from request to readiness</h2>
+        <p>Every engagement begins with scope. Specific deliverables depend on the agreed systems, requirements, responsibilities, and signed statement of work.</p>
+      </header>
+      <div class="audience-benefits">
+        {page.benefits.map((benefit, index) => (
+          <article class="card audience-benefit">
+            <span class="service-card__number">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{benefit.title}</h3>
+            <p>{benefit.detail}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-noise" id="approach" aria-labelledby="approach-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">How to start</span>
+        <h2 id="approach-heading">Work from the real requirement, not a generic checklist</h2>
+      </header>
+      <div class="process-list audience-steps">
+        {page.steps.map((step) => <article class="process-step"><div><h3>{step.title}</h3><p>{step.detail}</p></div></article>)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="fit" aria-labelledby="fit-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Fit and scope</span>
+        <h2 id="fit-heading">A good fit, with clear boundaries</h2>
+      </header>
+      <div class="audience-fit">
+        <article class="definition-card definition-card--positive">
+          <h3>Good fit for</h3>
+          <ul class="check-list">{page.fit.map((item) => <li>{item}</li>)}</ul>
+        </article>
+        <article class="definition-card definition-card--independent">
+          <h3>Important boundaries</h3>
+          <ul class="audience-plain-list">{page.boundaries.map((item) => <li>{item}</li>)}</ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section audience-faq" id="questions" aria-labelledby="audience-faq-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Before you commit</span>
+        <h2 id="audience-faq-heading">Questions worth asking first</h2>
+      </header>
+      <div class="audience-faq-list">
+        {page.faqs.map((faq) => (
+          <details class="starter-guide">
+            <summary>{faq.question}<span aria-hidden="true">+</span></summary>
+            <div class="starter-guide__body"><p>{faq.answer}</p></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="other-teams" aria-labelledby="other-teams-heading">
+    <div class="container">
+      <header class="section-header">
+        <span class="badge">Who we help</span>
+        <h2 id="other-teams-heading">Different teams. One coherent readiness plan.</h2>
+      </header>
+      <div class="audience-link-grid">
+        {audienceLinks.filter((link) => link.slug !== page.slug).map((link) => (
+          <a class="audience-route" href={`${baseNoSlash}/${link.slug}/`}>
+            <strong>{link.label} <span aria-hidden="true">↗</span></strong>
+            <span>{link.teaser}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="next-step">
+    <div class="container">
+      <div class="cta-panel">
+        <span class="badge">Start with scope</span>
+        <h2>{page.closing}</h2>
+        <p>Bring your customer or compliance requirements to a first conversation. We can discuss a scoped assessment, existing readiness packages, and what—if anything—belongs with an independent reviewer.</p>
+        <div class="action-row">
+          <a class="btn btn--primary btn--large" href={introHref} target="_blank" rel="noopener noreferrer">Book an intro</a>
+          <a class="btn btn--secondary btn--large" href={pricingHref}>View existing packages</a>
+          {page.slug !== 'startups' && <a class="btn btn--secondary btn--large" href={startupHref}>For startups</a>}
+        </div>
+        <p class="audience-micro">Canonical Plus supports readiness and technical remediation planning. Formal assurance is performed by qualified independent parties.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

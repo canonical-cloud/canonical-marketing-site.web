@@ -1,0 +1,23 @@
+/* Buyer-persona landing pages: use site tokens and inherit global themes. */
+.audience-hero .page-hero__panel p { margin-bottom: var(--space-lg); }
+.audience-signals { margin-top: var(--space-lg); }
+.audience-micro { margin-top: var(--space-lg); max-width: 48rem; font-size: 0.86rem; line-height: 1.6; color: var(--av-text-muted); }
+.audience-benefits { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-lg); }
+.audience-benefit { min-width: 0; }
+.audience-benefit h3 { margin-bottom: var(--space-sm); }
+.audience-steps { max-width: 980px; }
+.audience-fit { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-lg); }
+.audience-plain-list { list-style: disc; padding-left: 1.25rem; display: grid; gap: var(--space-md); color: var(--av-text-secondary); }
+.audience-faq-list { display: grid; max-width: 950px; gap: var(--space-md); }
+.audience-link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); }
+.audience-route { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; padding: var(--space-xl); border: 1px solid var(--av-border); border-radius: var(--radius-lg); background: var(--av-surface); transition: border-color var(--duration-normal) var(--ease-out); }
+.audience-route:hover, .audience-route:focus-visible { border-color: var(--av-border-active); }
+.audience-route strong { color: var(--av-text-primary); }
+.audience-route strong span { color: var(--av-teal); }
+.audience-route > span { color: var(--av-text-secondary); font-size: 0.96rem; line-height: 1.55; }
+.audience-home .audience-link-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 1024px) { .audience-home .audience-link-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .audience-benefits, .audience-fit, .audience-link-grid, .audience-home .audience-link-grid { grid-template-columns: 1fr; }
+  .audience-route { padding: var(--space-lg); }
+}
