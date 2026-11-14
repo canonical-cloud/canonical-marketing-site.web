@@ -528,7 +528,11 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261102-lmd-theme`;
 
       .footer__columns {
         display: flex;
-        gap: var(--space-3xl);
+        flex: 1 1 auto;
+        min-width: 0;
+        flex-wrap: wrap;
+        column-gap: var(--space-xl);
+        row-gap: var(--space-2xl);
       }
 
       .footer__col {
@@ -602,7 +606,7 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261102-lmd-theme`;
         .nav__links { gap: var(--space-sm); }
         #nav-insights { display: none; }
       }
-      @media (min-width: 769px) and (max-width: 1120px) { #nav-faq { display: none; } }
+      @media (min-width: 769px) and (max-width: 1120px) { #nav-faq, .nav__cta { display: none; } }
       @media (min-width: 769px) and (max-width: 1000px) { #nav-process, #nav-about { display: none; } }
 
       @media (max-width: 900px) {
