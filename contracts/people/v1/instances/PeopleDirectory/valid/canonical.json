@@ -4,101 +4,101 @@
     {
       "id": "alexander-mills",
       "name": "Alexander Mills",
-      "role": "Integrations and DevOps",
+      "role": "Chief Technology Officer",
       "initials": "AM",
       "photoUrl": "/team/alex-mills.jpg"
     },
     {
       "id": "john-siciliano",
       "name": "John Siciliano",
-      "role": "DevOps, Security & Infrastructure Expert",
+      "role": "Cloud Infrastructure & Security",
       "initials": "JS",
       "photoUrl": "/team/john-siciliano.jpg"
     },
     {
       "id": "vikkie-pandey",
       "name": "Vikkie Pandey",
-      "role": "Marketing and Sales",
+      "role": "Marketing & Business Development Specialist",
       "initials": "VP",
       "photoUrl": "/team/vinayak-pandey.png"
     },
     {
       "id": "jessica-adinolfi",
       "name": "Jessica Adinolfi",
-      "role": "Compliance Expert (ISO and NIST)",
+      "role": "GRC & Compliance Specialist",
       "initials": "JA",
       "photoUrl": "/team/jessica-adinolfi.webp"
     },
     {
       "id": "jeremy-reynolds",
       "name": "Jeremy Reynolds",
-      "role": "Browser, Mobile, Clientside",
+      "role": "Frontend & Mobile Applications",
       "initials": "JR"
     },
     {
       "id": "elijah-gizzarelli",
       "name": "Elijah Gizzarelli",
-      "role": "Ops & HR",
+      "role": "People Operations & Business Operations Coordinator",
       "initials": "EG",
       "photoUrl": "/team/elijah-gizzarelli.jpeg"
     },
     {
       "id": "marcus-gerlach",
       "name": "Marcus Gerlach",
-      "role": "Engineering",
+      "role": "Security & Infosec",
       "initials": "MG",
       "photoUrl": "/team/marcus-gerlach.jpg"
     },
     {
       "id": "eugene-li",
       "name": "Eugene Li",
-      "role": "CPA & Legal",
+      "role": "CPA & Accounting Advisor",
       "initials": "EL"
     },
     {
       "id": "tom-mensch",
       "name": "Tom Mensch",
-      "role": "Software & Legal",
+      "role": "Software & Legal Technology Specialist",
       "initials": "TM"
     },
     {
       "id": "rebecca-toni",
       "name": "Rebecca Toni",
-      "role": "Team",
+      "role": "Client Readiness Coordinator",
       "initials": "RT",
       "photoUrl": "/team/rebecca-toni.jpg"
     },
     {
       "id": "georgiana-fabrecce",
       "name": "Georgiana Fabrecce",
-      "role": "Team",
+      "role": "Readiness Program Coordinator",
       "initials": "GF"
     },
     {
       "id": "bryce-merrson",
       "name": "Bryce Merrson",
-      "role": "Technical Support",
+      "role": "Technical Support Specialist",
       "initials": "BM",
       "photoUrl": "/team/bryce-merrson.jpg"
     },
     {
       "id": "nouman-siddiqui",
       "name": "Nouman Siddiqui",
-      "role": "Team",
+      "role": "Technical Delivery Associate",
       "initials": "NS",
       "photoUrl": "/team/nouman-siddiqui.jpg"
     },
     {
       "id": "utkarsh-shukla",
       "name": "Utkarsh Shukla",
-      "role": "Infosec Expert",
+      "role": "Information Security Specialist",
       "initials": "US",
       "photoUrl": "/team/utkarsh-shukla.webp"
     },
     {
       "id": "casey-myers",
       "name": "Casey Myers",
-      "role": "Sales Engineer",
+      "role": "Solutions Engineer",
       "initials": "CM",
       "photoUrl": "/team/casey-myers.jpg"
     }
