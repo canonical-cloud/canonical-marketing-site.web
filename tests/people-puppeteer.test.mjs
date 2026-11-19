@@ -4,21 +4,21 @@ import puppeteer from 'puppeteer';
 import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 
 const expectedPeople = [
-  ['Alexander Mills', 'Integrations and DevOps'],
-  ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
-  ['Vikkie Pandey', 'Marketing and Sales'],
-  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
-  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
-  ['Elijah Gizzarelli', 'Ops & HR'],
-  ['Marcus Gerlach', 'Engineering'],
-  ['Eugene Li', 'CPA & Legal'],
-  ['Tom Mensch', 'Software & Legal'],
-  ['Rebecca Toni', 'Team'],
-  ['Georgiana Fabrecce', 'Team'],
-  ['Bryce Merrson', 'Technical Support'],
-  ['Nouman Siddiqui', 'Team'],
-  ['Utkarsh Shukla', 'Infosec Expert'],
-  ['Casey Myers', 'Sales Engineer'],
+  ['Alexander Mills', 'Chief Technology Officer'],
+  ['John Siciliano', 'Cloud Infrastructure & Security'],
+  ['Vikkie Pandey', 'Marketing & Business Development Specialist'],
+  ['Jessica Adinolfi', 'GRC & Compliance Specialist'],
+  ['Jeremy Reynolds', 'Frontend & Mobile Applications'],
+  ['Elijah Gizzarelli', 'People Operations & Business Operations Coordinator'],
+  ['Marcus Gerlach', 'Security & Infosec'],
+  ['Eugene Li', 'CPA & Accounting Advisor'],
+  ['Tom Mensch', 'Software & Legal Technology Specialist'],
+  ['Rebecca Toni', 'Client Readiness Coordinator'],
+  ['Georgiana Fabrecce', 'Readiness Program Coordinator'],
+  ['Bryce Merrson', 'Technical Support Specialist'],
+  ['Nouman Siddiqui', 'Technical Delivery Associate'],
+  ['Utkarsh Shukla', 'Information Security Specialist'],
+  ['Casey Myers', 'Solutions Engineer'],
 ];
 
 test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 columns', async (t) => {

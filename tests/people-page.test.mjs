@@ -15,21 +15,21 @@ const invalidMissingRole = JSON.parse(await read('../contracts/people/v1/instanc
 const workflow = await read('../.github/workflows/people-contract.yml');
 
 const roster = [
-  ['Alexander Mills', 'Integrations and DevOps'],
-  ['John Siciliano', 'DevOps, Security & Infrastructure Expert'],
-  ['Vikkie Pandey', 'Marketing and Sales'],
-  ['Jessica Adinolfi', 'Compliance Expert (ISO and NIST)'],
-  ['Jeremy Reynolds', 'Browser, Mobile, Clientside'],
-  ['Elijah Gizzarelli', 'Ops & HR'],
-  ['Marcus Gerlach', 'Engineering'],
-  ['Eugene Li', 'CPA & Legal'],
-  ['Tom Mensch', 'Software & Legal'],
-  ['Rebecca Toni', 'Team'],
-  ['Georgiana Fabrecce', 'Team'],
-  ['Bryce Merrson', 'Technical Support'],
-  ['Nouman Siddiqui', 'Team'],
-  ['Utkarsh Shukla', 'Infosec Expert'],
-  ['Casey Myers', 'Sales Engineer'],
+  ['Alexander Mills', 'Chief Technology Officer'],
+  ['John Siciliano', 'Cloud Infrastructure & Security'],
+  ['Vikkie Pandey', 'Marketing & Business Development Specialist'],
+  ['Jessica Adinolfi', 'GRC & Compliance Specialist'],
+  ['Jeremy Reynolds', 'Frontend & Mobile Applications'],
+  ['Elijah Gizzarelli', 'People Operations & Business Operations Coordinator'],
+  ['Marcus Gerlach', 'Security & Infosec'],
+  ['Eugene Li', 'CPA & Accounting Advisor'],
+  ['Tom Mensch', 'Software & Legal Technology Specialist'],
+  ['Rebecca Toni', 'Client Readiness Coordinator'],
+  ['Georgiana Fabrecce', 'Readiness Program Coordinator'],
+  ['Bryce Merrson', 'Technical Support Specialist'],
+  ['Nouman Siddiqui', 'Technical Delivery Associate'],
+  ['Utkarsh Shukla', 'Information Security Specialist'],
+  ['Casey Myers', 'Solutions Engineer'],
 ];
 
 test('people directory has exactly fifteen named roles in the requested order', () => {
