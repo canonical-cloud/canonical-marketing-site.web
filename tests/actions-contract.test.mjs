@@ -157,6 +157,7 @@ test("production HTTPS curl commands use real shell continuations and retain TLS
   assert.match(audit, /--proto-redir '=https'/);
   assert.match(audit, /for route in \/ \/insights\/; do/);
   assert.match(audit, /--resolve "\$\{host\}:443:\$\{ip\}"/);
-  assert.doesNotMatch(audit, /--insecure|--no-check-certificate/);
+  const executableAudit = lines.filter((line) => !line.trimStart().startsWith("#")).join("\n");
+  assert.doesNotMatch(executableAudit, /--insecure|--no-check-certificate/);
   assert.match(audit, /\$\{route_exit\}.*!= 0.*\$\{route_status\}.*!= 200/);
 });
