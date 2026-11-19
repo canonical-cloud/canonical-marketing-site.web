@@ -142,6 +142,6 @@ test("live response preflight cannot mask the strict Chromium production failure
 
 test("live production smoke must verify both routes against approved team directory", () => {
   assert.match(liveBrowserWorkflow, /name: Verify live team directory on homepage and People page/);
-  assert.match(liveBrowserWorkflow, /run: node scripts\\/verify-live-people\\.mjs/);
-  assert.doesNotMatch(liveBrowserWorkflow, /run: node scripts\\/verify-live-people\\.mjs\\s*\\n\\s*continue-on-error: true/);
+  assert.ok(liveBrowserWorkflow.includes("run: node scripts/verify-live-people.mjs"));
+  assert.ok(!liveBrowserWorkflow.includes("run: node scripts/verify-live-people.mjs\n        continue-on-error: true"));
 });
