@@ -11,6 +11,7 @@ export const PAGES = Object.freeze([
   Object.freeze({ path: "/readiness/", file: "readiness/index.html" }),
   Object.freeze({ path: "/frameworks/", file: "frameworks/index.html" }),
   Object.freeze({ path: "/compare/", file: "compare/index.html" }),
+  Object.freeze({ path: "/people/", file: "people/index.html" }),
 ]);
 const SHA = /^[0-9a-f]{40}$/;
 const HASH = /^[0-9a-f]{64}$/;

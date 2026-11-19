@@ -46,6 +46,8 @@ jobs:
         run: >-
           node --test --test-timeout=120000
           tests/container-security-playwright.test.mjs
+      - name: Verify live team directory on homepage and People page
+        run: node scripts/verify-live-people.mjs
       - name: Upload bounded browser evidence
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
