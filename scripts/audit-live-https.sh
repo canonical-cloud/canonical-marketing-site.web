@@ -83,5 +83,16 @@ for route in / /insights/; do
     echo "::error::Public HTTPS route ${route} failed. Do not mark the site healthy based on the blog alone."
     exit 1
   fi
+  # Cloudflare can serve a branded error page with HTTP 200, or route both URLs
+  # to a single fallback. Require stable, route-specific HTML identity markers.
+  case "${route}" in
+    /) expected_content='Startup security and compliance readiness' ;;
+    /insights/) expected_content='Latest articles' ;;
+    *) echo "::error::Unexpected HTTPS audit route: ${route}"; exit 1 ;;
+  esac
+  if ! grep -qF -- "${expected_content}" "${scratch}/route.html"; then
+    echo "::error::Public HTTPS route ${route} returned HTTP 200 but its expected content is missing."
+    exit 1
+  fi
 done
-echo "PASS: HTTPS root, insights, and blog routes have trusted TLS and expected status; blog content verified."
+echo "PASS: HTTPS root, insights, and blog routes have trusted TLS, HTTP 200 and route-specific content."
