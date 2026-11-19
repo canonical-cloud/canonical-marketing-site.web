@@ -145,3 +145,19 @@ test("live production smoke must verify both routes against approved team direct
   assert.ok(liveBrowserWorkflow.includes("run: node scripts/verify-live-people.mjs"));
   assert.ok(!liveBrowserWorkflow.includes("run: node scripts/verify-live-people.mjs\n        continue-on-error: true"));
 });
+
+test("production HTTPS curl commands use real shell continuations and retain TLS validation", async () => {
+  const audit = await readFile(new URL("../scripts/audit-live-https.sh", import.meta.url), "utf8");
+  const lines = audit.split("\n");
+  assert.deepEqual(
+    lines.filter((line) => line.endsWith("\\\\")),
+    [],
+    "a doubled trailing backslash quotes the backslash instead of continuing curl",
+  );
+  assert.match(audit, /--proto-redir '=https'/);
+  assert.match(audit, /for route in \/ \/insights\/; do/);
+  assert.match(audit, /--resolve "\$\{host\}:443:\$\{ip\}"/);
+  const executableAudit = lines.filter((line) => !line.trimStart().startsWith("#") && !line.trimStart().startsWith("echo ")).join("\n");
+  assert.doesNotMatch(executableAudit, /--insecure|--no-check-certificate/);
+  assert.match(audit, /\$\{route_exit\}.*!= 0.*\$\{route_status\}.*!= 200/);
+});

@@ -75,8 +75,8 @@ fi
 # is actually served. All redirects must remain HTTPS; status must be 200.
 for route in / /insights/; do
   route_exit=0
-  route_status="$(curl --silent --show-error --location --proto-redir '=https' \\
-    --max-redirs 4 --max-time 25 --output "${scratch}/route.html" \\
+  route_status="$(curl --silent --show-error --location --proto-redir '=https' \
+    --max-redirs 4 --max-time 25 --output "${scratch}/route.html" \
     --write-out '%{http_code}' "https://${host}${route}")" || route_exit=$?
   echo "GET https://${host}${route}: HTTP ${route_status:-000}, curl exit ${route_exit}"
   if [[ "${route_exit}" != 0 || "${route_status}" != 200 ]]; then
