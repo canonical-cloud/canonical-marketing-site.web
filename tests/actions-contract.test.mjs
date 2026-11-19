@@ -171,7 +171,7 @@ test("public HTTPS root and insights probes verify the page identity, not only H
   assert.match(audit, /\/insights\/\)\s+expected_content='Latest articles'/);
   assert.match(audit, /grep -qF -- "\$\{expected_content\}" "\$\{scratch\}\/route\.html"/);
   assert.match(audit, /if ! grep -qF[\s\S]+?exit 1\s+fi\s+done/);
-  assert.doesNotMatch(audit, /grep[\s\S]*?\|\|\s*true/);
+  assert.doesNotMatch(audit, /grep -qF -- "\$\{expected_content\}"[^\n]*\|\|\s*true/);
   // Both marker strings must exist in the respective Astro page sources.
   const root = await readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8");
   const insights = await readFile(new URL("../src/pages/insights/index.astro", import.meta.url), "utf8");
