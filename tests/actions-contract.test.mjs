@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
+import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -195,4 +198,23 @@ test("production HTTPS audit rejects redirects leaving the canonical URL and rem
   assert.ok(audit.includes("--proto-redir '=https'"));
   const executable = audit.split("\n").filter((line) => !line.trimStart().startsWith("#") && !line.trimStart().startsWith("echo ")).join("\n");
   assert.doesNotMatch(executable, /--insecure|--no-check-certificate/);
+});
+
+test("production HTTPS smoke rejects cross-origin redirects even with valid HTTP 200 page content", (t) => {
+  const dir = mkdtempSync(join(tmpdir(), "canonical-https-redirect-"));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const mockCurl = ["#!/usr/bin/env bash","set -euo pipefail","url=''; out=''; headers=''; format=''","while (( $# )); do","  case \"$1\" in","    --output) out=\"$2\"; shift 2 ;;","    --dump-header) headers=\"$2\"; shift 2 ;;","    --write-out) format=\"$2\"; shift 2 ;;","    https://*) url=\"$1\"; shift ;;","    *) shift ;;","  esac","done","case \"$url\" in","  https://canonical.plus/blogs/1/) body='How C++26 becomes an ISO standard' ;;","  https://canonical.plus/insights/) body='Latest articles' ;;","  https://canonical.plus/) body='Startup security and compliance readiness' ;;","  *) exit 77 ;;","esac","if [[ -n \"$out\" ]]; then printf '%s' \"$body\" >\"$out\"; fi","if [[ -n \"$headers\" ]]; then printf 'HTTP/2 200\\r\\ncontent-type: text/html\\r\\n' >\"$headers\"; fi","effective=\"$url\"","if [[ \"${FAKE_HTTPS_MODE:-ok}\" == bad_blog && \"$url\" == */blogs/1/ ]]; then effective='https://outside.invalid/blogs/1/'; fi","if [[ \"${FAKE_HTTPS_MODE:-ok}\" == bad_root && \"$url\" == 'https://canonical.plus/' ]]; then effective='https://outside.invalid/'; fi","if [[ \"${FAKE_HTTPS_MODE:-ok}\" == bad_insights && \"$url\" == */insights/ ]]; then effective='https://outside.invalid/insights/'; fi","if [[ \"$format\" == *url_effective* ]]; then printf '200\\t%s' \"$effective\"; else printf '200'; fi"].join("\n") + "\n";
+  writeFileSync(join(dir, "curl"), mockCurl);
+  writeFileSync(join(dir, "dig"), "#!/bin/sh\nexit 0\n");
+  writeFileSync(join(dir, "openssl"), "#!/bin/sh\nexit 0\n");
+  for (const name of ["curl", "dig", "openssl"]) chmodSync(join(dir, name), 0o755);
+  const audit = fileURLToPath(new URL("../scripts/audit-live-https.sh", import.meta.url));
+  for (const [mode, expectedExit] of [["ok", 0], ["bad_blog", 1], ["bad_root", 1], ["bad_insights", 1]]) {
+    const outcome = spawnSync("bash", [audit], {
+      encoding: "utf8", timeout: 15000,
+      env: { ...process.env, PATH: dir + ":" + process.env.PATH, TMPDIR: dir, FAKE_HTTPS_MODE: mode },
+    });
+    assert.equal(outcome.status, expectedExit, mode + ": " + outcome.stdout + "\n" + outcome.stderr);
+    if (expectedExit !== 0) assert.match(outcome.stdout + outcome.stderr, /::error::Public HTTPS/);
+  }
 });
