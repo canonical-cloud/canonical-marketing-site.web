@@ -4,7 +4,11 @@ import { readFile } from 'node:fs/promises';
 import puppeteer from 'puppeteer';
 import { chromeExecutablePath, startSite } from './site-browser-harness.mjs';
 
-const expectedDescriptions = JSON.parse(await readFile(new URL('../contracts/people/v1/instances/PeopleDirectory/valid/canonical.json', import.meta.url), 'utf8')).people.map((person) => person.description);
+const peopleDirectory = JSON.parse(await readFile(
+  new URL('../contracts/people/v1/instances/PeopleDirectory/valid/canonical.json', import.meta.url),
+  'utf8',
+));
+const expectedDescriptions = peopleDirectory.people.map((person) => person.description);
 
 const expectedPeople = [
   ['Alexander Mills', 'Principal Platform Engineer'],
@@ -57,7 +61,7 @@ test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 c
     ]),
   );
   assert.deepEqual(people, expectedPeople);
-  const descriptions = await page.$eval('[data-person-description]', (nodes) => nodes.map((node) => node.textContent?.trim()));
+  const descriptions = await page.$$eval('[data-person-description]', (nodes) => nodes.map((node) => node.textContent?.trim()));
   assert.deepEqual(descriptions, expectedDescriptions);
 
   const columnCount = async () => page.$eval('[data-people-grid]', (grid) =>
@@ -102,8 +106,8 @@ test('puppeteer: people page renders fifteen cards with responsive 4-to-2-to-1 c
   assert.deepEqual(placeholders, ['AM', 'JS', 'VP', 'JA', 'JR', 'EG', 'MG', 'EL', 'TM', 'RT', 'GF', 'BM', 'NS', 'US', 'CM']);
 
   await page.goto(`${server.url}/`, { waitUntil: 'networkidle0' });
-  assert.equal(await page.$eval('[data-person-card]', (cards) => cards.length), 15);
-  assert.deepEqual(await page.$eval('[data-person-description]', (nodes) => nodes.map((node) => node.textContent?.trim())), expectedDescriptions);
+  assert.equal(await page.$$eval('[data-person-card]', (cards) => cards.length), 15);
+  assert.deepEqual(await page.$$eval('[data-person-description]', (nodes) => nodes.map((node) => node.textContent?.trim())), expectedDescriptions);
   for (const [width, columns] of [[1440, 4], [1024, 4], [800, 2], [375, 1]]) {
     await page.setViewport({ height: 900, width });
     assert.equal(await columnCount(), columns);
