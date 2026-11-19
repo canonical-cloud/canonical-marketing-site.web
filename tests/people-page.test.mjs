@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
+import { assertLivePeople } from '../scripts/verify-live-people.mjs';
 
 const read = (path) => readFile(new URL(path, import.meta.url), 'utf8');
 const source = await read('../src/pages/people.astro');
@@ -142,4 +143,21 @@ test('people contract workflow pins reviewed TJSV and fails closed on the corpus
   assert.match(workflow, /--schema=contracts\/people\/v1\/authored\.schema\.json/);
   assert.match(workflow, /--instances=contracts\/people\/v1\/instances/);
   assert.match(workflow, /people\.parity\.json/);
+});
+
+test('production people verifier detects stale titles, stale descriptions, missing cards, and reordered profiles', () => {
+  const expected = directory.people;
+  const asLive = expected.map(({ id, name, role, description }) => ({ id, name, role, description }));
+  assert.doesNotThrow(() => assertLivePeople(expected, asLive));
+  for (const change of [
+    (cards) => cards.splice(2, 1),
+    (cards) => { cards[0].role = 'Chief Technology Officer'; },
+    (cards) => { cards[1].description = 'Outdated description'; },
+    (cards) => { [cards[0], cards[1]] = [cards[1], cards[0]]; },
+    (cards) => { cards[0].id = cards[1].id; },
+  ]) {
+    const altered = structuredClone(asLive);
+    change(altered);
+    assert.throws(() => assertLivePeople(expected, altered));
+  }
 });
