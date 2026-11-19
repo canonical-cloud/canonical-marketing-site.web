@@ -161,3 +161,20 @@ test("production HTTPS curl commands use real shell continuations and retain TLS
   assert.doesNotMatch(executableAudit, /--insecure|--no-check-certificate/);
   assert.match(audit, /\$\{route_exit\}.*!= 0.*\$\{route_status\}.*!= 200/);
 });
+
+
+test("public HTTPS root and insights probes verify the page identity, not only HTTP 200", async () => {
+  const audit = await readFile(new URL("../scripts/audit-live-https.sh", import.meta.url), "utf8");
+  assert.match(audit, /for route in \/ \/insights\/; do/);
+  assert.match(audit, /case "\$\{route\}" in/);
+  assert.match(audit, /\/\)\s+expected_content='Startup security and compliance readiness'/);
+  assert.match(audit, /\/insights\/\)\s+expected_content='Latest articles'/);
+  assert.match(audit, /grep -qF -- "\$\{expected_content\}" "\$\{scratch\}\/route\.html"/);
+  assert.match(audit, /if ! grep -qF[\s\S]+?exit 1\s+fi\s+done/);
+  assert.doesNotMatch(audit, /grep -qF -- "\$\{expected_content\}"[^\n]*\|\|\s*true/);
+  // Both marker strings must exist in the respective Astro page sources.
+  const root = await readFile(new URL("../src/pages/index.astro", import.meta.url), "utf8");
+  const insights = await readFile(new URL("../src/pages/insights/index.astro", import.meta.url), "utf8");
+  assert.ok(root.includes('title="Startup security and compliance readiness"'));
+  assert.ok(insights.includes("Latest articles"));
+});
