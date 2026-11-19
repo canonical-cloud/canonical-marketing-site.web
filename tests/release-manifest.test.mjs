@@ -39,10 +39,10 @@ test("source-revision and page-byte constraints fail closed", () => {
   assert.throws(() => buildManifest(["text", ...contents.slice(1)], revision), /INVALID_PAGE_BYTES/);
   assert.throws(() => buildManifest([Buffer.alloc(0), ...contents.slice(1)], revision), /INVALID_PAGE_SIZE/);
 });
-test("successful verification checks every page with five credential-free GETs", async () => {
+test("successful verification checks every page with six credential-free GETs", async () => {
   const mock = transport();
-  assert.deepEqual(await verifyRelease(revision, mock.fetch), { status: "PASS", sourceRevision: revision, pagesChecked: 4 });
-  assert.equal(mock.calls.length, 5);
+  assert.deepEqual(await verifyRelease(revision, mock.fetch), { status: "PASS", sourceRevision: revision, pagesChecked: 5 });
+  assert.equal(mock.calls.length, 6);
   for (const { url, options } of mock.calls) {
     assert.equal(url.origin, ORIGIN);
     assert.equal(url.searchParams.get("canonical_release"), revision);
@@ -83,7 +83,7 @@ for (const [name, change, error] of [
   });
 }
 test("mixed release: a matching marker cannot conceal stale HTML", async () => {
-  const mock = transport((url) => url.pathname === "/readiness/" ?
+  const mock = transport((url) => url.pathname === "/people/" ?
     new Response("old page", { headers: { "content-type": "text/html" } }) : undefined);
   await assert.rejects(verifyRelease(revision, mock.fetch), /DEPLOYED_CONTENT_MISMATCH/);
 });
@@ -141,7 +141,7 @@ async function cliFixture(t) {
     const result = spawnSync(process.execPath, ["scripts/release-manifest.mjs", "stamp"], { cwd: project, env, encoding: "utf8" });
     assert.equal(result.status, 0, result.stderr);
     const output = JSON.parse(await readFile(join(project, "dist/release.json"), "utf8"));
-    assert.deepEqual(JSON.parse(result.stdout), { status: "STAMPED", sourceRevision: output.sourceRevision, pages: 4 });
+    assert.deepEqual(JSON.parse(result.stdout), { status: "STAMPED", sourceRevision: output.sourceRevision, pages: 5 });
     return output;
   };
   return { root, project, init, stamp };
