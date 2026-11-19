@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath } from "node:url";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
@@ -177,4 +179,19 @@ test("public HTTPS root and insights probes verify the page identity, not only H
   const insights = await readFile(new URL("../src/pages/insights/index.astro", import.meta.url), "utf8");
   assert.ok(root.includes('title="Startup security and compliance readiness"'));
   assert.ok(insights.includes("Latest articles"));
+});
+
+test("production HTTPS audit rejects redirects leaving the canonical URL and remains valid bash", async () => {
+  const file = new URL("../scripts/audit-live-https.sh", import.meta.url);
+  const audit = await readFile(file, "utf8");
+  const syntax = spawnSync("bash", ["-n", fileURLToPath(file)], { encoding: "utf8" });
+  assert.equal(syntax.status, 0, syntax.stderr);
+  assert.equal((audit.match(/--write-out '%\{http_code\}\\t%\{url_effective\}'/g) ?? []).length, 2,
+    "both blog and root/insights probes must record HTTP code plus effective redirect target");
+  assert.ok(audit.includes("final_url=\"${public_info#*$'\\t'}\""));
+  assert.ok(audit.includes("route_final_url=\"${route_info#*$'\\t'}\""));
+  assert.ok(audit.includes('"${final_url}" != "${public_url}"'));
+  assert.ok(audit.includes('"${route_final_url}" != "https://${host}${route}"'));
+  assert.ok(audit.includes("--proto-redir '=https'"));
+  assert.doesNotMatch(audit, /--insecure|--no-check-certificate/);
 });
