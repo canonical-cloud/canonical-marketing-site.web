@@ -8,6 +8,8 @@ path="/blogs/1/"
 public_url="https://${host}${path}"
 scratch="$(mktemp -d)"
 status=""
+final_url=""
+public_info=""
 curl_exit=0
 
 echo "::group::Public DNS (from GitHub-hosted runner)"
@@ -22,10 +24,12 @@ done
 echo "::endgroup::"
 
 echo "::group::Live end-to-end HTTPS via Cloudflare"
-status="$(curl --silent --show-error --location --proto-redir '=https' --max-redirs 4 --max-time 25 \
+public_info="$(curl --silent --show-error --location --proto-redir '=https' --max-redirs 4 --max-time 25 \
   --output "${scratch}/public.html" --dump-header "${scratch}/public.headers" \
-  --write-out '%{http_code}' "${public_url}")" || curl_exit=$?
-echo "GET ${public_url}: HTTP ${status:-000}, curl exit ${curl_exit}"
+  --write-out '%{http_code}\t%{url_effective}' "${public_url}")" || curl_exit=$?
+status="${public_info%%$'\t'*}"
+final_url="${public_info#*$'\t'}"
+echo "GET ${public_url}: HTTP ${status:-000}, final URL ${final_url:-none}, curl exit ${curl_exit}"
 grep -iE '^(server:|cf-ray:|location:|content-type:)' "${scratch}/public.headers" || true
 if [[ "${status}" =~ ^52(5|6)$ ]]; then
   echo "::error title=Cloudflare origin TLS failure::HTTP ${status}: check GitHub Pages origin certificate and Cloudflare DNS / TLS mode."
@@ -60,7 +64,7 @@ timeout 12 openssl s_client -connect 185.199.108.153:443 -servername "${host}" <
 echo "::endgroup::"
 
 
-if [[ "${curl_exit}" != 0 || "${status}" != 200 ]]; then
+if [[ "${curl_exit}" != 0 || "${status}" != 200 || "${final_url}" != "${public_url}" ]]; then
   echo "::error::Public HTTPS smoke check failed; deployment success alone does not mean Cloudflare origin TLS is valid."
   exit 1
 fi
@@ -75,11 +79,13 @@ fi
 # is actually served. All redirects must remain HTTPS; status must be 200.
 for route in / /insights/; do
   route_exit=0
-  route_status="$(curl --silent --show-error --location --proto-redir '=https' \
+  route_info="$(curl --silent --show-error --location --proto-redir '=https' \
     --max-redirs 4 --max-time 25 --output "${scratch}/route.html" \
-    --write-out '%{http_code}' "https://${host}${route}")" || route_exit=$?
-  echo "GET https://${host}${route}: HTTP ${route_status:-000}, curl exit ${route_exit}"
-  if [[ "${route_exit}" != 0 || "${route_status}" != 200 ]]; then
+    --write-out '%{http_code}\t%{url_effective}' "https://${host}${route}")" || route_exit=$?
+  route_status="${route_info%%$'\t'*}"
+  route_final_url="${route_info#*$'\t'}"
+  echo "GET https://${host}${route}: HTTP ${route_status:-000}, final URL ${route_final_url:-none}, curl exit ${route_exit}"
+  if [[ "${route_exit}" != 0 || "${route_status}" != 200 || "${route_final_url}" != "https://${host}${route}" ]]; then
     echo "::error::Public HTTPS route ${route} failed. Do not mark the site healthy based on the blog alone."
     exit 1
   fi
