@@ -32,7 +32,8 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
       </div>
       <div class="person-card__body">
         <h3>{person.name}</h3>
-        <p>{person.role}</p>
+        <p class="person-card__role">{person.role}</p>
+        {person.description && <p class="person-card__description" data-person-description>{person.description}</p>}
       </div>
     </article>
   ))}
@@ -148,12 +149,20 @@ const baseNoSlash = import.meta.env.BASE_URL.replace(/\/+$/, '');
     font-size: 1.2rem;
   }
 
-  .person-card__body p {
+  .person-card__body .person-card__role {
     margin-top: 0.35rem;
     color: var(--av-teal);
     font-size: 0.92rem;
     font-weight: 700;
     line-height: 1.45;
+  }
+
+  .person-card__body .person-card__description {
+    margin-top: 0.6rem;
+    color: var(--av-text-muted);
+    font-size: 0.84rem;
+    font-weight: 400;
+    line-height: 1.55;
   }
 
   @media (max-width: 1000px) {

@@ -4,14 +4,16 @@
     {
       "id": "alexander-mills",
       "name": "Alexander Mills",
-      "role": "Chief Technology Officer",
+      "role": "Principal Platform Engineer",
+      "description": "Leads platform architecture, software integrations, cloud infrastructure, and the technical foundations of Canonical Plus readiness services.",
       "initials": "AM",
       "photoUrl": "/team/alex-mills.jpg"
     },
     {
       "id": "john-siciliano",
       "name": "John Siciliano",
-      "role": "Cloud Infrastructure & Security",
+      "role": "Cloud Infrastructure & Security Engineer",
+      "description": "Builds and maintains cloud infrastructure, deployment pipelines, access controls, and infrastructure security.",
       "initials": "JS",
       "photoUrl": "/team/john-siciliano.jpg"
     },
@@ -19,6 +21,7 @@
       "id": "vikkie-pandey",
       "name": "Vikkie Pandey",
       "role": "Marketing & Business Development Specialist",
+      "description": "Supports marketing strategy, brand positioning, customer outreach, lead generation, and business development.",
       "initials": "VP",
       "photoUrl": "/team/vinayak-pandey.png"
     },
@@ -26,26 +29,30 @@
       "id": "jessica-adinolfi",
       "name": "Jessica Adinolfi",
       "role": "GRC & Compliance Specialist",
+      "description": "Supports governance, risk, and compliance readiness through control mapping, requirements review, and remediation planning.",
       "initials": "JA",
       "photoUrl": "/team/jessica-adinolfi.webp"
     },
     {
       "id": "jeremy-reynolds",
       "name": "Jeremy Reynolds",
-      "role": "Frontend & Mobile Applications",
+      "role": "Frontend & Mobile Applications Engineer",
+      "description": "Develops browser interfaces, mobile applications, and customer-facing application experiences.",
       "initials": "JR"
     },
     {
       "id": "elijah-gizzarelli",
       "name": "Elijah Gizzarelli",
       "role": "People Operations & Business Operations Coordinator",
+      "description": "Coordinates people operations, onboarding, team administration, and internal business processes.",
       "initials": "EG",
       "photoUrl": "/team/elijah-gizzarelli.jpeg"
     },
     {
       "id": "marcus-gerlach",
       "name": "Marcus Gerlach",
-      "role": "Security & Infosec",
+      "role": "Software Engineer",
+      "description": "Contributes to application development, software implementation, and ongoing platform improvements.",
       "initials": "MG",
       "photoUrl": "/team/marcus-gerlach.jpg"
     },
@@ -53,18 +60,21 @@
       "id": "eugene-li",
       "name": "Eugene Li",
       "role": "CPA & Accounting Advisor",
+      "description": "Advises on accounting, financial-control documentation, and accounting-related readiness matters.",
       "initials": "EL"
     },
     {
       "id": "tom-mensch",
       "name": "Tom Mensch",
       "role": "Software & Legal Technology Specialist",
+      "description": "Supports software development and legal-technology workflows for compliance-related operations.",
       "initials": "TM"
     },
     {
       "id": "rebecca-toni",
       "name": "Rebecca Toni",
       "role": "Client Readiness Coordinator",
+      "description": "Coordinates client readiness activities, evidence requests, engagement follow-ups, and delivery tasks.",
       "initials": "RT",
       "photoUrl": "/team/rebecca-toni.jpg"
     },
@@ -72,12 +82,14 @@
       "id": "georgiana-fabrecce",
       "name": "Georgiana Fabrecce",
       "role": "Readiness Program Coordinator",
+      "description": "Organizes readiness workstreams, tracks deliverables, and coordinates customer engagement activities.",
       "initials": "GF"
     },
     {
       "id": "bryce-merrson",
       "name": "Bryce Merrson",
       "role": "Technical Support Specialist",
+      "description": "Supports technical troubleshooting, issue investigation, customer questions, and escalation.",
       "initials": "BM",
       "photoUrl": "/team/bryce-merrson.jpg"
     },
@@ -85,6 +97,7 @@
       "id": "nouman-siddiqui",
       "name": "Nouman Siddiqui",
       "role": "Technical Delivery Associate",
+      "description": "Supports technical implementation and coordination between customer requirements and engineering delivery.",
       "initials": "NS",
       "photoUrl": "/team/nouman-siddiqui.jpg"
     },
@@ -92,6 +105,7 @@
       "id": "utkarsh-shukla",
       "name": "Utkarsh Shukla",
       "role": "Information Security Specialist",
+      "description": "Supports security assessments, security-control implementation, risk identification, and readiness activities.",
       "initials": "US",
       "photoUrl": "/team/utkarsh-shukla.webp"
     },
@@ -99,6 +113,7 @@
       "id": "casey-myers",
       "name": "Casey Myers",
       "role": "Solutions Engineer",
+      "description": "Scopes customer technical requirements, explains solutions, and supports technical pre-sales engagements.",
       "initials": "CM",
       "photoUrl": "/team/casey-myers.jpg"
     }

@@ -15,13 +15,13 @@ const invalidMissingRole = JSON.parse(await read('../contracts/people/v1/instanc
 const workflow = await read('../.github/workflows/people-contract.yml');
 
 const roster = [
-  ['Alexander Mills', 'Chief Technology Officer'],
-  ['John Siciliano', 'Cloud Infrastructure & Security'],
+  ['Alexander Mills', 'Principal Platform Engineer'],
+  ['John Siciliano', 'Cloud Infrastructure & Security Engineer'],
   ['Vikkie Pandey', 'Marketing & Business Development Specialist'],
   ['Jessica Adinolfi', 'GRC & Compliance Specialist'],
-  ['Jeremy Reynolds', 'Frontend & Mobile Applications'],
+  ['Jeremy Reynolds', 'Frontend & Mobile Applications Engineer'],
   ['Elijah Gizzarelli', 'People Operations & Business Operations Coordinator'],
-  ['Marcus Gerlach', 'Security & Infosec'],
+  ['Marcus Gerlach', 'Software Engineer'],
   ['Eugene Li', 'CPA & Accounting Advisor'],
   ['Tom Mensch', 'Software & Legal Technology Specialist'],
   ['Rebecca Toni', 'Client Readiness Coordinator'],
@@ -41,6 +41,18 @@ test('people directory has exactly fifteen named roles in the requested order', 
   assert.equal(directory.people.length, 15);
   assert.equal(new Set(directory.people.map(({ id }) => id)).size, 15, 'person ids must be unique');
   assert.equal(new Set(directory.people.map(({ initials }) => initials)).size, 15, 'initials must be unique');
+});
+
+test('every public person has a specific, non-placeholder description', () => {
+  assert.equal(directory.people.length, 15);
+  for (const person of directory.people) {
+    assert.equal(typeof person.description, 'string', `${person.name} needs a description`);
+    assert.ok(person.description.length >= 45, `${person.name} needs a meaningful description`);
+    assert.doesNotMatch(person.description, /\b(?:placeholder|lorem ipsum|TBD)\b/i);
+  }
+  assert.match(grid, /data-person-description/);
+  assert.match(typeSpec, /description\?: string;/);
+  assert.ok(authoredSchema.$defs.PersonProfile.properties.description);
 });
 
 test('homepage and people page share the validated directory', () => {
