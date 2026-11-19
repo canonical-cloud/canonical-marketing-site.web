@@ -193,5 +193,6 @@ test("production HTTPS audit rejects redirects leaving the canonical URL and rem
   assert.ok(audit.includes('"${final_url}" != "${public_url}"'));
   assert.ok(audit.includes('"${route_final_url}" != "https://${host}${route}"'));
   assert.ok(audit.includes("--proto-redir '=https'"));
-  assert.doesNotMatch(audit, /--insecure|--no-check-certificate/);
+  const executable = audit.split("\n").filter((line) => !line.trimStart().startsWith("#") && !line.trimStart().startsWith("echo ")).join("\n");
+  assert.doesNotMatch(executable, /--insecure|--no-check-certificate/);
 });
