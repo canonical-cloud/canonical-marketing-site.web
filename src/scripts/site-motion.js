@@ -77,13 +77,16 @@ function initializeSiteMotion() {
         reveals.push(item);
       });
 
+      // People cards are geometry-sensitive: their row-count contract must
+      // remain stable even while the staggered fade is in progress.
+      const geometrySensitive = group.matches('.people-grid');
       gsap.from(items, {
         opacity: 0,
-        y: 30,
+        ...(geometrySensitive ? {} : { y: 30 }),
         duration: 0.75,
         stagger: 0.085,
         ease: 'power2.out',
-        clearProps: 'opacity,transform',
+        clearProps: geometrySensitive ? 'opacity' : 'opacity,transform',
         scrollTrigger: {
           trigger: group,
           start: 'top 88%',
