@@ -547,10 +547,11 @@ p {
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    /* No stagger delay or fill-mode frame may conceal content when the
+       user enables reduced motion, including during a live preference flip. */
+    animation: none !important;
     scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    transition: none !important;
   }
 }
 

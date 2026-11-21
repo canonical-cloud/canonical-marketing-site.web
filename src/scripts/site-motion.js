@@ -98,7 +98,7 @@ function initializeSiteMotion() {
       // Focus into a link/card must not leave its content visually hidden.
       const revealOnFocus = () => {
         revealTween.progress(1);
-        revealTween.scrollTrigger?.kill();
+        revealTween.scrollTrigger?.kill(false);
       };
       group.addEventListener('focusin', revealOnFocus);
       revealDisposers.push(() => group.removeEventListener('focusin', revealOnFocus));

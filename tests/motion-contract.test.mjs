@@ -37,9 +37,23 @@ test('focus and magnetic interactions include explicit event cleanup', async () 
   const source = await read('../src/scripts/site-motion.js');
   assert.match(source, /group\.addEventListener\('focusin', revealOnFocus\)/);
   assert.match(source, /revealTween\.progress\(1\)/);
-  assert.match(source, /revealTween\.scrollTrigger\?\.kill\(\)/);
+  assert.match(source, /revealTween\.scrollTrigger\?\.kill\(false\)/);
   assert.match(source, /revealDisposers\.forEach\(\(dispose\) => dispose\(\)\)/);
   assert.match(source, /button\.addEventListener\('pointerenter', onEnter\)/);
   assert.match(source, /button\.removeEventListener\('pointerenter', onEnter\)/);
   assert.match(source, /Math\.max\(-5, Math\.min\(5, dx \* 10\)\)/);
+});
+
+
+test('GSAP tarball is integrity-pinned and CSS reduced-motion never hides content', async () => {
+  const lock = JSON.parse(await read('../package-lock.json'));
+  const gsapPackage = lock.packages['node_modules/gsap'];
+  assert.equal(gsapPackage.version, '3.15.1');
+  assert.equal(gsapPackage.resolved, 'https://registry.npmjs.org/gsap/-/gsap-3.15.1.tgz');
+  assert.equal(gsapPackage.integrity, 'sha512-63yjWRFWj3QRP1UOuD8kcidCcy3nxb1mMRpwHr/xJRvPfm9GtWOXFAYUiL0ro1fgPq2nY53LR+98pAgy9BumBg==');
+  const css = await read('../src/styles/global.css');
+  const reduced = css.split('@media (prefers-reduced-motion: reduce)')[1];
+  assert.ok(reduced, 'reduced motion must have a dedicated CSS policy');
+  assert.match(reduced, /animation:\s*none\s*!important/);
+  assert.match(reduced, /transition:\s*none\s*!important/);
 });
