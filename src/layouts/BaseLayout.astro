@@ -1,4 +1,6 @@
 ---
+import '../styles/site-motion.css';
+
 interface Props {
   title: string;
   description?: string;
@@ -58,6 +60,7 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261102-lmd-theme`;
     <script is:inline src={themeInitScriptHref}></script>
   </head>
   <body>
+    <div class="site-scroll-progress" aria-hidden="true"></div>
     <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <nav class="nav" id="main-nav" aria-label="Primary navigation">
@@ -691,5 +694,6 @@ const siteScriptHref = `${baseNoSlash}/site.js?v=20261102-lmd-theme`;
     </style>
 
     <script type="module" src={siteScriptHref}></script>
+    <script src="../scripts/site-motion.js"></script>
   </body>
 </html>

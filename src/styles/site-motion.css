@@ -1,0 +1,96 @@
+/* Canonical Plus motion layer — the core site remains fully visible without JS. */
+.site-scroll-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 1100;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: linear-gradient(90deg, var(--av-teal), var(--av-emerald), var(--av-magenta));
+  pointer-events: none;
+}
+
+.site-motion-enabled .animate-fade-in-up,
+.site-motion-enabled .animate-fade-in {
+  animation: none;
+}
+
+.page-hero__grid {
+  position: relative;
+  z-index: 1;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  width: min(38rem, 90vw);
+  aspect-ratio: 1;
+  top: 3%;
+  right: -11rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--av-magenta-glow), transparent 67%);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.readiness-signal {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0 0 var(--space-lg);
+}
+
+.readiness-signal span {
+  flex: 1;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--av-emerald), var(--av-teal));
+  transform-origin: left center;
+}
+
+.readiness-signal span:nth-child(even) {
+  background: linear-gradient(90deg, var(--av-teal), var(--av-magenta));
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .page-hero__panel,
+  .outcome-strip__item,
+  .readiness-preview-item,
+  .frameworks__item,
+  .why__item,
+  .audience-route {
+    transition: transform 320ms var(--ease-out), box-shadow 320ms var(--ease-out), border-color 320ms var(--ease-out);
+  }
+
+  .page-hero__panel:hover,
+  .outcome-strip__item:hover,
+  .readiness-preview-item:hover,
+  .frameworks__item:hover,
+  .why__item:hover,
+  .audience-route:hover {
+    transform: translate3d(0, -5px, 0);
+  }
+
+  .page-hero__actions .btn:focus-visible,
+  .page-hero__actions .btn:hover,
+  .cta-panel .btn:focus-visible,
+  .cta-panel .btn:hover {
+    box-shadow: 0 9px 30px var(--av-emerald-glow);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-scroll-progress {
+    display: none;
+  }
+}
+
+@media print {
+  .site-scroll-progress {
+    display: none;
+  }
+
+  [data-motion-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
