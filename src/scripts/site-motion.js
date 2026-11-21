@@ -68,6 +68,7 @@ function initializeSiteMotion() {
     ].join(','));
 
     const reveals = [];
+    const revealDisposers = [];
     groups.forEach((group) => {
       const items = [...group.children].filter((item) => item instanceof HTMLElement);
       if (!items.length) return;
@@ -80,7 +81,7 @@ function initializeSiteMotion() {
       // People cards are geometry-sensitive: their row-count contract must
       // remain stable even while the staggered fade is in progress.
       const geometrySensitive = group.matches('.people-grid');
-      gsap.from(items, {
+      const revealTween = gsap.from(items, {
         opacity: 0,
         ...(geometrySensitive ? {} : { y: 30 }),
         duration: 0.75,
@@ -94,6 +95,13 @@ function initializeSiteMotion() {
           invalidateOnRefresh: true
         }
       });
+      // Focus into a link/card must not leave its content visually hidden.
+      const revealOnFocus = () => {
+        revealTween.progress(1);
+        revealTween.scrollTrigger?.kill();
+      };
+      group.addEventListener('focusin', revealOnFocus);
+      revealDisposers.push(() => group.removeEventListener('focusin', revealOnFocus));
     });
 
     const progress = document.querySelector('.site-scroll-progress');
@@ -118,17 +126,25 @@ function initializeSiteMotion() {
       document.querySelectorAll('.page-hero__actions .btn--primary, .cta-panel .btn--primary').forEach((button) => {
         const moveX = gsap.quickTo(button, 'x', { duration: 0.45, ease: 'power3.out' });
         const moveY = gsap.quickTo(button, 'y', { duration: 0.45, ease: 'power3.out' });
+        // Freeze reference coordinates at pointer entry to avoid feedback:
+        // measuring an already-translated button on every move causes wobble.
+        let pointerFrame;
+        const onEnter = () => { pointerFrame = button.getBoundingClientRect(); };
         const onMove = (event) => {
-          const rect = button.getBoundingClientRect();
+          const rect = pointerFrame || button.getBoundingClientRect();
           if (!rect.width || !rect.height) return;
-          moveX(((event.clientX - rect.left) / rect.width - 0.5) * 10);
-          moveY(((event.clientY - rect.top) / rect.height - 0.5) * 8);
+          const dx = (event.clientX - rect.left) / rect.width - 0.5;
+          const dy = (event.clientY - rect.top) / rect.height - 0.5;
+          moveX(Math.max(-5, Math.min(5, dx * 10)));
+          moveY(Math.max(-4, Math.min(4, dy * 8)));
         };
-        const onLeave = () => { moveX(0); moveY(0); };
+        const onLeave = () => { pointerFrame = undefined; moveX(0); moveY(0); };
+        button.addEventListener('pointerenter', onEnter);
         button.addEventListener('pointermove', onMove);
         button.addEventListener('pointerleave', onLeave);
         button.addEventListener('blur', onLeave);
         unbind.push(() => {
+          button.removeEventListener('pointerenter', onEnter);
           button.removeEventListener('pointermove', onMove);
           button.removeEventListener('pointerleave', onLeave);
           button.removeEventListener('blur', onLeave);
@@ -139,6 +155,7 @@ function initializeSiteMotion() {
     return () => {
       root.classList.remove('site-motion-enabled');
       reveals.forEach((item) => delete item.dataset.motionReveal);
+      revealDisposers.forEach((dispose) => dispose());
       unbind.forEach((dispose) => dispose());
     };
   });

@@ -31,3 +31,15 @@ test('motion is progressive enhancement with a live reduced-motion exit', async 
   assert.match(page, /aria-hidden="true" class="readiness-signal"/);
   assert.doesNotMatch(stylesheet, /(?:^|\n)\s*\[data-motion-reveal\]\s*\{\s*opacity:\s*0/m);
 });
+
+
+test('focus and magnetic interactions include explicit event cleanup', async () => {
+  const source = await read('../src/scripts/site-motion.js');
+  assert.match(source, /group\.addEventListener\('focusin', revealOnFocus\)/);
+  assert.match(source, /revealTween\.progress\(1\)/);
+  assert.match(source, /revealTween\.scrollTrigger\?\.kill\(\)/);
+  assert.match(source, /revealDisposers\.forEach\(\(dispose\) => dispose\(\)\)/);
+  assert.match(source, /button\.addEventListener\('pointerenter', onEnter\)/);
+  assert.match(source, /button\.removeEventListener\('pointerenter', onEnter\)/);
+  assert.match(source, /Math\.max\(-5, Math\.min\(5, dx \* 10\)\)/);
+});
